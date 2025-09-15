@@ -1,0 +1,55 @@
+.dropzone-img.list-group .dropzone-container {
+    background: #f7f7f7;
+    padding: 0px 20px;
+    padding-top: 30px;
+    max-height: 150px;
+    overflow: hidden;
+    -webkit-transition: max-height 0.1s ease-in-out, padding 0.1s ease-in-out;
+    transition: max-height 0.1s ease-in-out, padding 0.1s ease-in-out;
+}
+.dropzone-img.list-group .preview-container {
+    padding: 15px 8px 20px;
+    -webkit-box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.05);
+}
+.dropzone-img .dropzone {
+    border: none;
+    background: none;
+    padding: 0 0 5px;
+    color: #cccccc;
+    text-align: center;
+}
+.dropzone-img .dropzone .icon-picture {
+    display: block;
+    margin: 15px auto 8px;
+    font-size: 40px;
+}
+.dropzone-img .dropzone .icon-download {
+    display: block;
+    margin: 18px auto 4px;
+    font-size: 40px;
+    cursor:pointer;
+}
+.dropzone-img .dropzone .hover {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 3px;
+    background-color: #76b6ec;
+    color: #fff;
+    z-index: 2;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    -webkit-transition: opacity 0.3s 0.1s;
+    transition: opacity 0.3s 0.1s;
+}
+
+/* CLASES PERSONALIZADAS */
+
+/* CLASES PARA BORDES REDONDEADOS */
+.rounded {
+    border-radius: 20px;
+}
+/* CLASES PARA BORDES REDONDEADOS */

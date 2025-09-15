@@ -1,0 +1,307 @@
+div.style-switcher {
+	/*background-color: #fff;
+	color: #262626;
+	width: 225px;
+	position: fixed;
+	top: 140px;
+	z-index: 1002;
+	left: -227px;
+  	border-radius: 0 10px 0 0;*/	
+}
+div.style-switcher .header {
+	padding: 9px 15px;
+	background: #f1f1f1;
+	z-index: 2;
+	position: relative;
+	border: 1px solid #e1e1e1;
+	height: 38px;
+	color: #fff;
+}
+div.style-switcher .body {
+	padding: 0 12px 10px;
+	/*top: 0px;
+	position: absolute;*/
+	opacity: 0;
+	background-color: #ffffff;
+	/*border: 1px solid #f1f1f1;
+	border-top: none;*/
+
+	-webkit-transition: all 0.6s ease-in-out;
+	-moz-transition: all 0.6s ease-in-out;
+	-o-transition: all 0.6s ease-in-out;
+	-ms-transition: all 0.6s ease-in-out;
+	transition: all 0.6s ease-in-out;
+}
+div.style-switcher.opened .body {
+	/*top: 38px;*/
+	opacity: 1;
+}
+div.style-switcher .header h2 {
+	color: #777777;
+	text-transform: none;
+}
+div.style-switcher h2 {
+	margin: 0;
+	font-size: 18px;
+}
+div.style-switcher h3 {
+	margin: 15px 0 5px 0;
+	font-size: 16px;
+}
+div.style-switcher hr {
+	margin: 15px 0;
+}
+div.style-switcher hr + h3 {
+	margin-top: 0;
+}
+div.style-switcher a.trigger {
+	display: block;
+	height: 36px;
+	position: absolute;
+	right: -36px;
+	top: 0px;
+	background: #f1f1f1;
+	width: 36px;
+	font-size: 18px;
+	line-height: 35px;
+	color: #777777;
+	text-align: center;
+	text-decoration: none;
+	border: 1px solid #e1e1e1;
+	border-left: none;
+	border-radius: 0 5px 5px 0;
+}
+div.style-switcher.opened a.trigger {
+	right: 0px;
+	border-color: transparent;
+}
+div.style-switcher ul {
+	list-style: none;
+	margin: 0;
+	padding: 5px 0 0 0;
+	font-size: 0;
+}
+div.style-switcher ul li {
+	width: 25px;
+	height: 25px;
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	margin: 0 3px 3px 0;
+	-webkit-transition: all linear 0.3s;
+	-moz-transition: all linear 0.3s;
+	-o-transition: all linear 0.3s;
+	-ms-transition: all linear 0.3s;
+	transition: all linear 0.3s;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+div.style-switcher ul.layoutChange li {
+	width: 45%;
+	height: 30px;
+	margin-right: 5px;
+	color: #666666;
+	background-color: #f1f1f1;
+	border: 1px solid #f3f3f3;
+	-webkit-border-radius: 0; 
+	-moz-border-radius: 0; 
+	border-radius: 0;
+	font-size: 13px;
+	text-align: center;
+	padding-top: 5px;
+	-webkit-border-radius: 5px; 
+	-moz-border-radius: 5px; 
+	border-radius: 5px;
+}
+div.style-switcher ul.layoutChange li i {
+	color: #cccccc;
+	font-size: 11px;
+}
+div.style-switcher ul.layoutChange li.selected {
+	border: 1px solid #aaaaaa;
+}
+div.style-switcher ul.layoutChange li.selected i {
+	color: #666666;
+}
+div.style-switcher ul.footerChange li {
+	width: 45%;
+	height: 30px;
+	margin-right: 5px;
+	-webkit-border-radius: 0; 
+	-moz-border-radius: 0; 
+	border-radius: 0;
+	font-size: 13px;
+	padding: 6px 14px 0;
+}
+div.style-switcher ul.footerChange li.dark {
+	color: #f1f1f1;
+	background-color: #262626;
+}
+div.style-switcher ul.footerChange li.light {
+	color: #333333;
+	background-color: #f7f7f7;
+}
+div.style-switcher ul.footerChange li i {
+	width: 20px;
+}
+
+div.style-switcher ul.footerChange li.selected i:before {
+	content: "\f046";
+}
+div.style-switcher ul.headerChange li {
+	width: 45%;
+	height: 30px;
+	margin-right: 5px;
+	-webkit-border-radius: 0; 
+	-moz-border-radius: 0; 
+	border-radius: 0;
+	font-size: 13px;
+	padding: 6px 14px 0;
+}
+div.style-switcher ul.headerChange li.dark {
+	color: #f1f1f1;
+	background-color: #262626;
+}
+div.style-switcher ul.headerChange li.light {
+	color: #333333;
+	background-color: #f7f7f7;
+}
+div.style-switcher ul.headerChange li i {
+	width: 20px;
+}
+
+div.style-switcher ul.headerChange li.selected i:before {
+	content: "\f046";
+}
+div.style-switcher ul.patternChange li {
+	border: 1px solid #f3f3f3;
+}
+div.style-switcher ul.styleChange li.selected:after,
+div.style-switcher ul.patternChange li.selected:after {
+	font-family: "FontAwesome";
+	content: "\f00c";
+	color: #fff;
+	top: 0;
+	position: absolute;
+	text-align: center;
+	line-height: 25px;
+	width: 100%;
+	font-size: 16px;
+}
+div.style-switcher ul.patternChange li.pattern-0.selected:after,
+div.style-switcher ul.patternChange li.pattern-1.selected:after,
+div.style-switcher ul.patternChange li.pattern-2.selected:after,
+div.style-switcher ul.patternChange li.pattern-3.selected:after,
+div.style-switcher ul.patternChange li.pattern-4.selected:after {
+	color: #333333;
+}
+div.style-switcher ul.patternChange li.selected:after {
+	color: #ffffff;
+}
+div.style-switcher ul.resetAll li {
+	-webkit-border-radius: 0px; 
+	-moz-border-radius: 0px; 
+	border-radius: 0px;
+	width: 45%;
+	height: 30px;
+  	margin-right: 5px;
+	padding: 6px 0;
+	min-width: 0;
+	-webkit-border-radius: 5px; 
+	-moz-border-radius: 5px; 
+	border-radius: 5px;
+}
+div.style-switcher .btn a {
+	text-decoration: none;
+	color: #ffffff;
+}
+div.style-switcher select {
+	width: 100%;
+	padding: 5px;
+	border: 1px solid #b2bfca;
+}
+div.style-switcher .blue {
+	background: #3697d9;
+}
+div.style-switcher .blue:hover {
+	background: #338dca;
+}
+div.style-switcher .brown {
+	background: #91633c;
+}
+div.style-switcher .brown:hover {
+	background: #795332;
+}
+div.style-switcher .cool-green {
+	background: #21bb9d;
+}
+div.style-switcher .cool-green:hover {
+	background: #1ea88d;
+}
+div.style-switcher .dark-cyan {
+	background: #2aa4a5;
+}
+div.style-switcher .dark-cyan:hover {
+	background: #248d8e;
+}
+div.style-switcher .dark-red {
+	background: #992020;
+}
+div.style-switcher .dark-red:hover {
+	background: #681313;
+}
+div.style-switcher .gold {
+	background: #c7ac56;
+}
+div.style-switcher .gold:hover {
+	background: #b0984d;
+}
+div.style-switcher .gray {
+	background: #809398;
+}
+div.style-switcher .gray:hover {
+	background: #6e7e82;
+}
+div.style-switcher .green {
+	background: #24a828;
+}
+div.style-switcher .green:hover {
+	background: #1f9123;
+}
+div.style-switcher .light-blue {
+	background: #09afdf;
+}
+div.style-switcher .light-blue:hover {
+	background: #0c9ec7;
+}
+div.style-switcher .orange {
+	background: #e07e27;
+}
+div.style-switcher .orange:hover {
+	background: #cc7324;
+}
+div.style-switcher .pink {
+	background: #dd7b9b;
+}
+div.style-switcher .pink:hover {
+	background: #c9718e;
+}
+div.style-switcher .purple {
+	background: #ab6cc6;
+}
+div.style-switcher .purple:hover {
+	background: #9760af;
+}
+div.style-switcher .red {
+	background: #dc5b5b;
+}
+div.style-switcher .red:hover {
+	background: #c15050;
+}
+div.style-switcher .vivid-red {
+	background: #c82727;
+}
+div.style-switcher .vivid-red:hover {
+	background: #b42424;
+}

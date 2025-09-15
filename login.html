@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Login</title>
+
+        <link rel="manifest" href="manifest.json" />
+
+        <!--STYLESHEET-->
+        <!--=================================================-->
+
+        <!--Open Sans Font [ OPTIONAL ] -->
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin"
+            rel="stylesheet"
+            />
+
+        <!--Bootstrap Stylesheet [ REQUIRED ]-->
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+        <!--Nifty Stylesheet [ REQUIRED ]-->
+        <link href="css/nifty.css" rel="stylesheet" />
+
+        <!--Font Awesome [ OPTIONAL ]-->
+        <link
+            href="plugins/font-awesome/css/font-awesome.min.css"
+            rel="stylesheet"
+            />
+
+        <!--Demo [ DEMONSTRATION ]-->
+        <link href="css/demo/nifty-demo.css" rel="stylesheet" />
+
+        <!--Custom Stylesheet -->
+        <link href="css/custom.css" rel="stylesheet" />
+
+        <!--SCRIPT-->
+        <!--=================================================-->
+
+        <!--Page Load Progress Bar [ OPTIONAL ]-->
+        <link href="plugins/pace/pace.min.css" rel="stylesheet" />
+        <script src="plugins/pace/pace.min.js"></script>
+
+        <!--
+    
+            REQUIRED
+            You must include this in your project.
+    
+            RECOMMENDED
+            This category must be included but you may modify which plugins or components which should be included in your project.
+    
+            OPTIONAL
+            Optional plugins. You may choose whether to include it in your project or not.
+    
+            DEMONSTRATION
+            This is to be removed, used for demonstration purposes only. This category must not be included in your project.
+    
+            SAMPLE
+            Some script samples which explain how to initialize plugins or components. This category should not be included in your project.
+    
+    
+            Detailed information and more samples can be found in the document.
+    
+        -->
+    </head>
+
+    <!--TIPS-->
+    <!--You may remove all ID or Class names which contain "demo-", they are only used for demonstration. -->
+
+    <body>
+        <div id="container" class="cls-container">
+            <!-- BACKGROUND IMAGE -->
+            <!--===================================================-->
+           <!-- <div id="bg-overlay" class="bg-img img-balloon"></div>-->
+
+            <!-- HEADER -->
+            <!--===================================================-->
+            <div class="cls-header cls-header-lg">
+                <div class="cls-brand">
+                    <a class="box-inline" href="login.html">
+                        <!-- <img alt="Nifty Admin" src="img/logo.png" class="brand-icon"> -->
+                        <span class="brand-title"
+                              >Recursos Humanos <span class="text-thin">Portal</span></span
+                        >
+                    </a>
+                </div>
+            </div>
+            <!--===================================================-->
+
+            <!-- LOGIN FORM -->
+            <!--===================================================-->
+            <div class="cls-content">
+                <div class="cls-content-sm panel rounded">
+                    <div class="panel-body">
+                        <p class="pad-btm">Acceso al portal</p>
+                        <div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-user"></i>
+                                    </div>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Email"
+                                        />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-asterisk"></i>
+                                    </div>
+                                    <input
+                                        id="pwd"
+                                        name="pwd"
+                                        type="password"
+                                        class="form-control"
+                                        placeholder="Contraseña"
+                                        />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-8 text-left checkbox">
+                                    <!-- <label class="form-checkbox form-icon">
+                                                          <input type="checkbox"> Recuerdame
+                                                      </label> -->
+                                </div>
+                                <div class="col-xs-4">
+                                    <div class="form-group text-right">
+                                        <button
+                                            id="btn-login"
+                                            class="btn btn-success text-uppercase rounded"
+                                            type="button"
+                                            >
+                                            Entrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pad-ver hidden">
+                    <a href="remember.html" class="btn-link mar-rgt"
+                       >Olvidastes la contraseña?</a
+                    >
+                </div>
+            </div>
+
+            <!-- Manejo de errores en el dialogo  -->
+            <dialog
+                id="miDialogo"
+                class="rounded"
+                style="margin: 30px auto; border-width: 1px"
+                >
+                <h3>Advertencia</h3>
+                <p id="contenidoDialogo" style="text-align: left"></p>
+                <button
+                    onclick="document.getElementById('miDialogo').close()"
+                    style="
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    border: none;
+                    background: transparent;
+                    font-size: 18px;
+                    cursor: pointer;
+                    "
+                    >
+                    <i
+                        style="color: red"
+                        class="fa fa-times-circle"
+                        aria-hidden="true"
+                        ></i>
+                </button>
+            </dialog>
+            <!-- Manejo de errores en el dialogo -->
+
+            <!--===================================================-->
+
+            <!-- DEMO PURPOSE ONLY -->
+            <!--===================================================-->
+            <!-- <div class="demo-bg">
+                      <div id="demo-bg-list">
+                          <div class="demo-loading"><i class="fa fa-refresh"></i></div>
+                          <img class="demo-chg-bg bg-trans" src="img/bg-img/thumbs/bg-trns.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-1.jpg" alt="Background Image">
+                          <img class="demo-chg-bg active" src="img/bg-img/thumbs/bg-img-2.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-3.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-4.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-5.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-6.jpg" alt="Background Image">
+                          <img class="demo-chg-bg" src="img/bg-img/thumbs/bg-img-7.jpg" alt="Background Image">
+                      </div>
+                  </div> -->
+            <!--===================================================-->
+        </div>
+        <!--===================================================-->
+        <!-- END OF CONTAINER -->
+
+        <!--JAVASCRIPT-->
+        <!--=================================================-->
+
+        <!--jQuery [ REQUIRED ]-->
+        <script src="js/jquery-2.1.1.min.js"></script>
+
+        <!--BootstrapJS [ RECOMMENDED ]-->
+        <script src="js/bootstrap.min.js"></script>
+
+        <!--Fast Click [ OPTIONAL ]-->
+        <script src="plugins/fast-click/fastclick.min.js"></script>
+
+        <!--Nifty Admin [ RECOMMENDED ]-->
+        <script src="js/nifty.js"></script>
+
+        <!--Background Image [ DEMONSTRATION ]-->
+        <!-- <script src="js/demo/bg-images.js"></script> -->
+
+        <!--
+    
+            REQUIRED
+            You must include this in your project.
+    
+            RECOMMENDED
+            This category must be included but you may modify which plugins or components which should be included in your project.
+    
+            OPTIONAL
+            Optional plugins. You may choose whether to include it in your project or not.
+    
+            DEMONSTRATION
+            This is to be removed, used for demonstration purposes only. This category must not be included in your project.
+    
+            SAMPLE
+            Some script samples which explain how to initialize plugins or components. This category should not be included in your project.
+    
+    
+            Detailed information and more samples can be found in the document.
+    
+        -->
+
+        <script>
+                  $(document).ready(function () {
+                      $("input[type=text],input[type=password]").keypress(function (d) {
+                          if (d.keyCode == 13)
+                              $("#btn-login").click();
+                      });
+                      $("#btn-login").click(function () {
+                          var status = 1;
+                          var msg = "";
+
+                          if ($("#email").val() == "") {
+                              status = 0;
+                              msg += "El campo Email es obligatorio.<br>";
+                          }
+                          if ($("#pwd").val() == "") {
+                              status = 0;
+                              msg += "El campo Contraseña es obligatorio.<br>";
+                          }
+
+                          if (status == 1) {
+                              var cmd =
+                                      "module=login&" + $.param($("#email,#pwd").serializeArray());
+                              $.ajax({
+                                  url: "api-app.php",
+                                  type: "GET",
+                                  data: cmd,
+                                  dataType: "json",
+                                  success: function (d) {
+                                      if (d.status == 1) {
+                                          location.href = "index.php?module=home";
+                                      } else {
+                                          alert(d.msg);
+                                      }
+                                  },
+                              });
+                          } else {
+                              // Adicionar el mensaje de error en el diálogo
+                              document.getElementById("contenidoDialogo").innerHTML = msg;
+                              // Mostrar el diálogo
+                              document.getElementById("miDialogo").showModal();
+                              // alert(msg);
+                          }
+                      });
+                      $("#email").focus();
+                  });
+        </script>
+        <script>
+            /**
+             * Register the service worker
+             * This will allow the app to work offline and load faster
+             */
+        /*     if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("sw.js").then(() => {
+                    console.log("Service Worker registrado");
+                });
+            }   */
+        </script>
+    </body>
+</html>
