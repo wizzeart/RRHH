@@ -8,7 +8,7 @@ ini_set("memory_limit", "512M");
 set_time_limit(120);
 header('Content-type: application/json; charset=utf-8');
 
-include($_SERVER['DOCUMENT_ROOT'] . '/includes/config.php');
+include(__DIR__ . '/includes/config.php');
 include(INCLUDES . DS . 'functions.php');
 init_app();
 $app = new App();
@@ -53,10 +53,13 @@ switch ($_REQUEST['module']) {
             'activo' => 'S'
         );
 
-        $sql = "select * from " . _DB_PREFIX_ . "usuarios"
+        $sql = "select * from usuarios"
             . " where xemail=:email and xactivo=:activo and xeliminado=0";
-
-        $row = $app->db->fetchRow($sql, $param);
+        try {
+            $row = $app->db->fetchRow($sql, $param);
+        } catch (Exception $e) {
+            $data['msg'] = $e->getMessage();
+        }
         $pwd = '';
 
         if ($row) {
@@ -87,7 +90,7 @@ switch ($_REQUEST['module']) {
             $where = array(
                 'xusuario_id' => $row['xusuario_id']
             );
-            $app->db->update(_DB_PREFIX_ . 'usuarios', $update, $where);
+            $app->db->update('usuarios', $update, $where);
         }
 
         print(json_encode($data));
