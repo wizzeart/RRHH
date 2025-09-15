@@ -5,7 +5,8 @@
  *
  * @author alvaro
  */
-class App {
+class App
+{
 
     var $name;
     var $user_id; //codigo de usuario de la aplicación
@@ -14,7 +15,8 @@ class App {
     var $rol; //rol.
     var $rol_name; //rol.
 
-    public function __construct() {
+    public function __construct()
+    {
 
 
         $this->name = '';
@@ -23,14 +25,13 @@ class App {
         session_start();
 
         $this->db = new MsSql(_DB_SERVER_, _DB_NAME_, _DB_USER_, _DB_PASSWD_, '3306'); //sql server
-        $this->dbs = new MsSql(_DB_SERVER_SAGE, _DB_NAME_SAGE, _DB_USER_SAGE, _DB_PASSWD_SAGE, '3306');
 
         if (isset($_SESSION['guser_id'])) {
             $this->user_id = $_SESSION['guser_id'];
             $this->name = $_SESSION['gname'];
             $this->rol = $_SESSION['grol'];
 
-            $sql = "select xrol from " . _DB_PREFIX_ . "roles where xrol_id='{$this->rol}'";
+            $sql = "select xrol from roles where xrol_id='{$this->rol}'";
             $row = $this->db->fetchRow($sql);
             if ($row) {
                 $this->rol_name = $row['xrol'];
@@ -42,7 +43,8 @@ class App {
         }
     }
 
-    public function get_list_roles($val = array()) {
+    public function get_list_roles($val = array())
+    {
         $data = array();
         $cond = '';
 
@@ -50,70 +52,74 @@ class App {
             $cond .= " and a.xactivo='{$val['activo']}'";
 
         $sql = "select a.*"
-                . " from " . _DB_PREFIX_ . "roles a"
-                . " order by a.xrol_id";
+            . " from " . _DB_PREFIX_ . "roles a"
+            . " order by a.xrol_id";
 
         $data = $this->db->fetchAll($sql);
 
         return $data;
     }
 
-    public function close() {
+    public function close()
+    {
         $this->db->close();
     }
 
-    public function eliminar_tildes($cadena) {
+    public function eliminar_tildes($cadena)
+    {
 
         //Codificamos la cadena en formato utf8 en caso de que nos de errores
         //$cadena = utf8_encode($cadena);
         //Ahora reemplazamos las letras
         $cadena = str_replace(
-                array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
-                array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
-                $cadena
+            array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+            array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+            $cadena
         );
 
         $cadena = str_replace(
-                array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
-                array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
-                $cadena
+            array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
+            array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
+            $cadena
         );
 
         $cadena = str_replace(
-                array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
-                array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
-                $cadena
+            array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
+            array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
+            $cadena
         );
 
         $cadena = str_replace(
-                array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
-                array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
-                $cadena
+            array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
+            array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
+            $cadena
         );
 
         $cadena = str_replace(
-                array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
-                array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
-                $cadena
+            array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
+            array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
+            $cadena
         );
 
         $cadena = str_replace(
-                array('ñ', 'Ñ', 'ç', 'Ç'),
-                array('n', 'N', 'c', 'C'),
-                $cadena
+            array('ñ', 'Ñ', 'ç', 'Ç'),
+            array('n', 'N', 'c', 'C'),
+            $cadena
         );
 
         return $cadena;
     }
 
-    public function add_history($val) {
+    public function add_history($val)
+    {
         $val['xuser'] = $this->user_id;
         $val['xdate'] = date(dateSQL);
 
         $this->db->insert(_DB_PREFIX_ . 'historico', $val);
     }
 
-    public function get_list_usuarios($param = array()) {
+    public function get_list_usuarios($param = array())
+    {
         $data = array();
         $cond = '';
         $fields = 'a.*';
@@ -130,9 +136,9 @@ class App {
         }
 
         $sql = "select $fields"
-                . " from " . _DB_PREFIX_ . "usuarios a"
-                . " where a.xeliminado=0$cond"
-                . " order by a.xusuario_id";
+            . " from " . _DB_PREFIX_ . "usuarios a"
+            . " where a.xeliminado=0$cond"
+            . " order by a.xusuario_id";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);
@@ -140,7 +146,8 @@ class App {
         return $data;
     }
 
-    public function get_list_var_informes($param) {
+    public function get_list_var_informes($param)
+    {
         $data = array();
         $cond = '';
 
@@ -156,7 +163,8 @@ class App {
         return $data;
     }
 
-    public function get_data_var_informes($param) {
+    public function get_data_var_informes($param)
+    {
         $data = array();
         $cond = '';
 
@@ -181,7 +189,8 @@ class App {
      * @param array $filtro
      * @return void
      */
-    public function _list_estados($filtro = array()) {
+    public function _list_estados($filtro = array())
+    {
         $data = array();
         $cond = '';
 
@@ -190,9 +199,9 @@ class App {
         }
 
         $sql = "select a.*"
-                . " from " . _DB_PREFIX_ . "estados a"
-                . " where 1 $cond"
-                . " order by a.xestado_id";
+            . " from " . _DB_PREFIX_ . "estados a"
+            . " where 1 $cond"
+            . " order by a.xestado_id";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);
@@ -200,11 +209,13 @@ class App {
         return $data;
     }
 
-    public function format_price($val) {
+    public function format_price($val)
+    {
         return number_format($val, 2, $this->coma_decimal, '') . ' ' . $this->moneda;
     }
 
-    public function get_configuraciones() {
+    public function get_configuraciones()
+    {
         $data = array();
         $sql = "select * from " . _DB_PREFIX_ . "configuraciones where xconfig_id=1";
         //print($sql);
@@ -213,7 +224,8 @@ class App {
         return $data;
     }
 
-    public function clear_query_string($data) {
+    public function clear_query_string($data)
+    {
         $query = '';
         if ($_SERVER['QUERY_STRING'] != '') {
             $var = explode('&', $_SERVER['QUERY_STRING']);
@@ -228,7 +240,8 @@ class App {
         return $query;
     }
 
-    public function IsEmail($e) {
+    public function IsEmail($e)
+    {
         if (preg_match("/^[\.A-z0-9_\-\+]+[@][A-z0-9_\-]+([.][A-z0-9_\-]+)+[A-z]{1,4}$/", $e)) {
             return 1;
         } else {
@@ -236,7 +249,8 @@ class App {
         }
     }
 
-    function rndString($length = 10, $uc = TRUE, $n = TRUE, $sc = FALSE) {
+    function rndString($length = 10, $uc = TRUE, $n = TRUE, $sc = FALSE)
+    {
         $source = 'abcdefghijklmnopqrstuvwxyz';
         if ($uc == 1)
             $source .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -257,7 +271,8 @@ class App {
         return $rstr;
     }
 
-    public function month_long($m) {
+    public function month_long($m)
+    {
         switch ($m) {
             case 1:
                 return 'Enero';
@@ -298,7 +313,8 @@ class App {
         }
     }
 
-    public function chgdmysql($cad) {
+    public function chgdmysql($cad)
+    {
         if ($cad != "") {
             $valor = substr($cad, 6, 4) . "-" . substr($cad, 3, 2) . "-" . substr($cad, 0, 2);
         } else {
@@ -307,7 +323,8 @@ class App {
         return $valor;
     }
 
-    function limpiar_caracteres_especiales($s) {
+    function limpiar_caracteres_especiales($s)
+    {
         /*
           ini_set('display_errors', 1);
           ini_set('display_startup_errors', 1);
@@ -333,48 +350,49 @@ class App {
         return $s;
     }
 
-    function eliminar_acentos($cadena) {
+    function eliminar_acentos($cadena)
+    {
 
         //Reemplazamos la A y a
         $cadena = str_replace(
-                array('Á', 'À', 'Â', 'Ä', 'á', 'à', 'ä', 'â', 'ª'),
-                array('A', 'A', 'A', 'A', 'a', 'a', 'a', 'a', 'a'),
-                $cadena
+            array('Á', 'À', 'Â', 'Ä', 'á', 'à', 'ä', 'â', 'ª'),
+            array('A', 'A', 'A', 'A', 'a', 'a', 'a', 'a', 'a'),
+            $cadena
         );
 
         //Reemplazamos la E y e
         $cadena = str_replace(
-                array('É', 'È', 'Ê', 'Ë', 'é', 'è', 'ë', 'ê'),
-                array('E', 'E', 'E', 'E', 'e', 'e', 'e', 'e'),
-                $cadena
+            array('É', 'È', 'Ê', 'Ë', 'é', 'è', 'ë', 'ê'),
+            array('E', 'E', 'E', 'E', 'e', 'e', 'e', 'e'),
+            $cadena
         );
 
         //Reemplazamos la I y i
         $cadena = str_replace(
-                array('Í', 'Ì', 'Ï', 'Î', 'í', 'ì', 'ï', 'î'),
-                array('I', 'I', 'I', 'I', 'i', 'i', 'i', 'i'),
-                $cadena
+            array('Í', 'Ì', 'Ï', 'Î', 'í', 'ì', 'ï', 'î'),
+            array('I', 'I', 'I', 'I', 'i', 'i', 'i', 'i'),
+            $cadena
         );
 
         //Reemplazamos la O y o
         $cadena = str_replace(
-                array('Ó', 'Ò', 'Ö', 'Ô', 'ó', 'ò', 'ö', 'ô'),
-                array('O', 'O', 'O', 'O', 'o', 'o', 'o', 'o'),
-                $cadena
+            array('Ó', 'Ò', 'Ö', 'Ô', 'ó', 'ò', 'ö', 'ô'),
+            array('O', 'O', 'O', 'O', 'o', 'o', 'o', 'o'),
+            $cadena
         );
 
         //Reemplazamos la U y u
         $cadena = str_replace(
-                array('Ú', 'Ù', 'Û', 'Ü', 'ú', 'ù', 'ü', 'û'),
-                array('U', 'U', 'U', 'U', 'u', 'u', 'u', 'u'),
-                $cadena
+            array('Ú', 'Ù', 'Û', 'Ü', 'ú', 'ù', 'ü', 'û'),
+            array('U', 'U', 'U', 'U', 'u', 'u', 'u', 'u'),
+            $cadena
         );
 
         //Reemplazamos la N, n, C y c
         $cadena = str_replace(
-                array('Ñ', 'ñ', 'Ç', 'ç'),
-                array('N', 'n', 'C', 'c'),
-                $cadena
+            array('Ñ', 'ñ', 'Ç', 'ç'),
+            array('N', 'n', 'C', 'c'),
+            $cadena
         );
 
         return $cadena;

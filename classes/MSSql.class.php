@@ -5,7 +5,8 @@
  *
  * @author alvaro
  */
-class MsSql {
+class MsSql
+{
 
     var $conn;
     var $cr; //por defecto será 1 que equivale a rr si se cambia a 2 y se usa una query almacenará el conjunto en rs
@@ -17,7 +18,7 @@ class MsSql {
     var $SQL_DB;
     var $debug;
 
-  /*
+    /*
 public function __construct($host, $db, $user, $pwd) {
     $this->SQL_HOST = $host;
     $this->SQL_USER = $user;
@@ -42,32 +43,34 @@ public function __construct($host, $db, $user, $pwd) {
     //$this->cr = 1;
 }
 */
-public function __construct($host, $db, $user, $pwd) {
-    $this->SQL_HOST = $host;
-    $this->SQL_USER = $user;
-    $this->SQL_PWD = $pwd;
-    $this->SQL_DB = $db;
-    $this->debug = false;
+    public function __construct($host, $db, $user, $pwd)
+    {
+        $this->SQL_HOST = $host;
+        $this->SQL_USER = $user;
+        $this->SQL_PWD = $pwd;
+        $this->SQL_DB = $db;
+        $this->debug = false;
 
-    try {
-        $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-        $pdo = new PDO($dsn, $user, $pwd, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]);
+        try {
+            $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+            $pdo = new PDO($dsn, $user, $pwd, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
 
-        $this->conn = $pdo;
-    } catch (PDOException $e) {
-        $this->conn = null;
-        print('There was a problem connecting. ' . $e->getMessage());
-        die();
+            $this->conn = $pdo;
+        } catch (PDOException $e) {
+            $this->conn = null;
+            print('There was a problem connecting. ' . $e->getMessage());
+            die();
+        }
+
+        //$this->cr = 1;
     }
 
-    //$this->cr = 1;
-}
 
-
-    public function fetchAll($sql, $param = '') {
+    public function fetchAll($sql, $param = '')
+    {
         $data = null;
         $consulta = null;
         $consulta = $this->conn->prepare($sql);
@@ -82,7 +85,8 @@ public function __construct($host, $db, $user, $pwd) {
         return $data;
     }
 
-    public function directExec($sql, $param = '') {
+    public function directExec($sql, $param = '')
+    {
         $data = null;
         $consulta = null;
 
@@ -105,7 +109,8 @@ public function __construct($host, $db, $user, $pwd) {
         return $r;
     }
 
-    public function fetchRow($sql, $param = '') {
+    public function fetchRow($sql, $param = '')
+    {
         $data = null;
         $consulta = null;
 
@@ -128,12 +133,14 @@ public function __construct($host, $db, $user, $pwd) {
         return $data[0];
     }
 
-    public function close() {
+    public function close()
+    {
         //odbc_close($this->conn);
         $this->conn = null;
     }
 
-    public function del($table, $where) {
+    public function del($table, $where)
+    {
         $consulta = null;
         $r = null;
 
@@ -157,7 +164,8 @@ public function __construct($host, $db, $user, $pwd) {
         return $r;
     }
 
-    public function insert($table, $insert) {
+    public function insert($table, $insert)
+    {
         $p1 = array();
         $p2 = array();
         $r = '';
@@ -177,7 +185,8 @@ public function __construct($host, $db, $user, $pwd) {
         return $r;
     }
 
-    public function update($table, $update, $where) {
+    public function update($table, $update, $where)
+    {
         $consulta = null;
         $r = null;
 
@@ -208,7 +217,8 @@ public function __construct($host, $db, $user, $pwd) {
         return $r;
     }
 
-    public function last_id() {
+    public function last_id()
+    {
         //$this->conn->lastInsertId();
         //return odbc_insert_id($this->conn);
         /* $sql = 'SELECT @@IDENTITY AS ID';
@@ -218,5 +228,3 @@ public function __construct($host, $db, $user, $pwd) {
         return $this->conn->lastInsertId();
     }
 }
-
-?>
