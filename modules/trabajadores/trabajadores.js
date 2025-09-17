@@ -27,44 +27,35 @@ $(document).ready(function () {
         });
     });
     $('#btn-new').click(function () {
-        location.href = '?module=usuarios';
+        location.href = '?module=trabajadores';
     });
     $('#btn-back').click(function () {
-        location.href = 'index.php?module=list-usuarios';
+        location.href = 'index.php?module=list-trabajadores';
     });
     $('#btn-save').click(function () {
         var status = 1;
         var msg = '';
 
-        if ($('#f-usuario').val() == '') {
+        if ($('#f-trabajador').val() == '') {
             status = 0;
-            msg += '<div>El campo Nombre del Usuario es obligatorio.</div>';
-        }
-        if ($('#f-pass').val() == '') {
-            status = 0;
-            msg += '<div>El campo Contraseña es obligatorio.</div>';
+            msg += '<div>El campo Nombre del Trabajador es obligatorio.</div>';
         }
 
-        if ($('#f-rol').val() == '') {
+        if ($('#f-cargo').val() == '') {
             status = 0;
-            msg += '<div>El campo Rol del Usuario es obligatorio.</div>';
-        } else {
-
-            if ($('#f-rol').val() == '10' && $('#f-punto-venta').val() == null) {
-                status = 0;
-                msg += '<div>Rol Punto de Venta Facturación debe tener al menos un punto de venta asociado.</div>';
-            }
+            msg += '<div>El campo Cargo del Trabajador es obligatorio.</div>';
         }
 
         if (status == 1) {
             var param_almacen = '';
             var param_punto_venta = '';
             $('#img-loading').removeClass('hidden');
-
             setTimeout(function() {
                 $('#img-loading').addClass('hidden');
             }, 2000); // 2000 milisegundos = 2 segundos
             
+
+
             $('#btn-save').attr('disabled', true);
 
             var cmd = 'module=usuarios&method=save&' + $.param($('input[name^=x],select[name^=x],textarea[name^=x]').serializeArray());

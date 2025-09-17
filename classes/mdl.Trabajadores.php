@@ -5,7 +5,7 @@
  *
  * @author alvaro
  */
-class Usuario {
+class Trabajador {
 
     var $app;
     var $db;
@@ -26,9 +26,9 @@ class Usuario {
             case 'checked':
                 $this->_checked($param);
                 break;
-            case 'del':
+          /*  case 'del':
                 $this->_del($param);
-                break;
+                break; */
             case 'save':
                 $this->_save($param);
                 break;
@@ -39,15 +39,15 @@ class Usuario {
         global $data, $action, $page, $data_form;
 
         switch ($param['module']) {
-            case 'list-usuarios':
+            case 'list-trabajadores':
                 $data = array();
-                $page['title'] = 'Usuarios';
-                $page['subtitle'] = 'Listado de Usuarios';
+                $page['title'] = 'Trabajadores';
+                $page['subtitle'] = 'Listado de Trabajadores';
 
                 $data_form = array();
                 //$data_form['almacenes'] = $this->app->get_list_almacenes($filtro);
                 break;
-            case 'usuarios':
+            case 'trabajadores':
                 /*
                   ini_set('display_errors', 1);
                   ini_set('display_startup_errors', 1);
@@ -56,23 +56,23 @@ class Usuario {
                  */
 
                 $data = array();
-                $page['title'] = 'Nuevo usuario';
-                $page['subtitle'] = 'Ficha de Usuario';
+                $page['title'] = 'Nuevo trabajador';
+                $page['subtitle'] = 'Ficha de Trabajador';
 
                 $data_form = array();
-                $data_form['roles'] = $this->app->get_list_roles();
+                $data_form['cargos'] = $this->app->get_list_cargos();
 
                 $action = 'insert';
                 if (isset($param['id'])) {
-                    $page['title'] = 'Edición usuario';
+                    $page['title'] = 'Edición trabajador';
                     $action = 'update';
 
                     $val = array(
                         'id' => $param['id']
                     );
                     $sql = "select *"
-                            . " from " . 'usuarios'
-                            . " where xusuario_id=:id";
+                            . " from " . 'trabajadores'
+                            . " where id=:id";
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
 
@@ -82,16 +82,16 @@ class Usuario {
                         //die();
 
                         $data = $row;
-                        $page['subtitle'] = 'Usuario: ' . $row['xusuario_id'] . ' - ' . $row['xusuario'];
+                        $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['trabajador'];
                     }
                 } else {
-                    $data['xactivo'] = 'S';
+                    $data['estatus'] = 'S';
                 }
                 break;
         }
     }
 
-    private function _del($param) {
+  /*  private function _del($param) {
         $data = array(
             'status' => 1,
             'id' => $param['id'],
@@ -118,7 +118,7 @@ class Usuario {
 
         print(json_encode($data));
     }
-
+    */
     private function _save($param) {
         /*
           ini_set('display_errors', 1);
@@ -169,20 +169,20 @@ class Usuario {
             if ($data['action'] == 'insert') {
                 //$insert['xusuario_id'] = $this->app->get_contador('xultimo_usuario');
                 $insert['xuseralta_id'] = $this->app->user_id;
-                $insert['xdatealta'] = date(dateSQL);
-                $insert['xeliminado'] = '0';
+                $insert['fecha_contratacion'] = date(dateSQL);
+                
 
-                $this->app->db->insert('usuarios', $insert);
+                $this->app->db->insert('trabajadores', $insert);
                 $data['msg_title'] = OPERATION_SUCCESS;
                 $data['msg'] = RECORD_INSERT;
                 $data['id'] = $this->db->last_id();
                 $data['date'] = date('d-m-Y H:i:s');
 
                 $history = array(
-                    'xentity' => 'USUARIOS',
-                    'xaction' => 'INSERT-USUARIO',
-                    'xid' => $data['id'],
-                    'xobs' => 'USUARIO: ' . $data['id'] . ' ' . $insert['xusuario']
+                    'xentity' => 'TRABAJADOR',
+                    'xaction' => 'INSERT-TRABAJADOR',
+                    'id' => $data['id'],
+                    'xobs' => 'TRABAJADOR: ' . $data['id'] . ' ' . $insert['xusuario']
                 );
                 $this->app->add_history($history);
             } else {
@@ -218,12 +218,9 @@ class Usuario {
 
     private function _list($param) {
         $data = array();
-        $sql = "select a.*"
-                . ",b.xrol"
-                . " from " .  "usuarios a"
-                . " left join " .  "roles b on a.xrol_id=b.xrol_id"
-                . " where a.xeliminado=0"
-                . " order by a.xusuario_id";
+        $sql = "select *"
+                . " from " .  "trabajadores"
+                . " order by id";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);

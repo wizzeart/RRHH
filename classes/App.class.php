@@ -52,8 +52,24 @@ class App
             $cond .= " and a.xactivo='{$val['activo']}'";
 
         $sql = "select a.*"
-            . " from " . _DB_PREFIX_ . "roles a"
+            . " from " .   "roles a"
             . " order by a.xrol_id";
+
+        $data = $this->db->fetchAll($sql);
+
+        return $data;
+    }
+    public function get_list_cargos($val = array())
+    {
+        $data = array();
+        $cond = '';
+
+        if (isset($val['activo']))
+            $cond .= " and a.xactivo='{$val['activo']}'";
+
+        $sql = "select a.*"
+            . " from " .   "cargos a"
+            . " order by a.id";
 
         $data = $this->db->fetchAll($sql);
 
@@ -115,7 +131,7 @@ class App
         $val['xuser'] = $this->user_id;
         $val['xdate'] = date(dateSQL);
 
-        $this->db->insert(_DB_PREFIX_ . 'historico', $val);
+        $this->db->insert(  'historico', $val);
     }
 
     public function get_list_usuarios($param = array())
@@ -136,7 +152,7 @@ class App
         }
 
         $sql = "select $fields"
-            . " from " . _DB_PREFIX_ . "usuarios a"
+            . " from " . "usuarios a"
             . " where a.xeliminado=0$cond"
             . " order by a.xusuario_id";
         //print($sql);
@@ -155,7 +171,7 @@ class App
             $cond .= " and xmodule='{$param['module']}'";
         }
 
-        $sql = "select * from " . _DB_PREFIX_ . "var_informes where 1=1$cond";
+        $sql = "select * from " .   "var_informes where 1=1$cond";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);
@@ -175,7 +191,7 @@ class App
             $cond .= " and xvar='{$param['var']}'";
         }
 
-        $sql = "select * from " . _DB_PREFIX_ . "var_informes where 1=1$cond";
+        $sql = "select * from " .   "var_informes where 1=1$cond";
         //print($sql);
         //die();
         $data = $this->db->fetchRow($sql);
@@ -199,7 +215,7 @@ class App
         }
 
         $sql = "select a.*"
-            . " from " . _DB_PREFIX_ . "estados a"
+            . " from " .   "estados a"
             . " where 1 $cond"
             . " order by a.xestado_id";
         //print($sql);
@@ -217,7 +233,7 @@ class App
     public function get_configuraciones()
     {
         $data = array();
-        $sql = "select * from " . _DB_PREFIX_ . "configuraciones where xconfig_id=1";
+        $sql = "select * from " .   "configuraciones where xconfig_id=1";
         //print($sql);
         //die();
         $data = $this->db->fetchRow($sql);

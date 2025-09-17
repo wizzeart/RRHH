@@ -140,7 +140,7 @@ class Logs {
         $sql = "select a.xemail_id,a.xtitle,a.xadded,a.xcliente_id,a.xpedido_id,a.xtracking,a.xemail,a.xrevendedor_id
             ,a.xweb_id
             ,date_format(a.xadded,'%d/%m/%Y %H:%i:%s') as xfecha_format
-            from " . _DB_PREFIX_ . "emails a"
+            from " .  . "emails a"
                 . " where 1=1$cond"
                 . " order by xemail_id desc"
                 . " limit $limit";

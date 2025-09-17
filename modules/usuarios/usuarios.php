@@ -2,6 +2,7 @@
     var action = '<?php print($action) ?>';
     var rol = '<?php print($app->rol) ?>';
 </script>
+
 <div class="panel">
     <div class="panel-heading">
         <div class="panel-control">
@@ -33,14 +34,14 @@
                             <div class="col-md-7">
                                 <div class="form-group">
                                     <label class="control-label" for="f-usuario">Nombre del Usuario</label>
-                                    <input type="text" id="f-usuario" name="xusuario" class="form-control" placeholder="Nombre Usuario" value="<?php if (isset($data['xusuario'])) print($data['xusuario']); ?>">
+                                    <input type="text" id="f-usuario" name="xusuario" class="form-control" placeholder="Nombre Usuario" value="<?php if (isset($data['xusuario'])) print($data['xusuario']); ?>" required>
                                     <small class="help-block">Nombre del usuario</small>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-activo">Activo</label>
-                                    <select id="f-activo" name="xactivo" class="form-control">
+                                    <select id="f-activo" name="xactivo" class="form-control" required>
                                         <option value="S" <?php if (isset($data['xactivo']) && $data['xactivo'] == 'S') print('selected'); ?>>Sí</option>
                                         <option value="N" <?php if (isset($data['xactivo']) && $data['xactivo'] == 'N') print('selected'); ?>>No</option>
                                     </select>
@@ -53,24 +54,24 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label" for="f-email">Email</label>
-                                    <input type="text" id="f-email" name="xemail" class="form-control" placeholder="Email" value="<?php if (isset($data['xemail'])) print($data['xemail']); ?>">
+                                    <input type="text" id="f-email" name="xemail" class="form-control" placeholder="Email" value="<?php if (isset($data['xemail'])) print($data['xemail']); ?>" required>
                                     <small class="help-block">Email del Usuario</small>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-pass">Contraseña</label>
-                                    <input type="password" id="f-pass" name="xpwd" class="form-control" placeholder="Contraseña" value="">
+                                    <input type="password" id="f-pass" name="xpwd" class="form-control" placeholder="Contraseña" value="" required>
                                     <small class="help-block">Contraseña del usuario, si se rellena se cambiará</small>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-rol">Rol</label>
-                                    <select id="f-rol" name="xrol_id" class="form-control" data-placeholder="Selecciona un rol">
+                                    <select id="f-rol" name="xrol_id" class="form-control" data-placeholder="Selecciona un rol" required>
                                         <option value="">Selecciona un rol</option>
                                         <?php foreach ($data_form['roles'] as $k => $v) { ?>
-                                            <option value="<?php print($v['xrol_id']) ?>" <?php if ($v['xrol_id'] == $data['xrol_id']) print('selected'); ?>><?php print($v['xrol']) ?></option>
+                                            <option value="<?php print($v['xrol_id']) ?>"><?php print($v['xrol']) ?></option>
                                         <?php } ?>
                                     </select>
                                     <small class="help-block">Indica el rol del usuario</small>

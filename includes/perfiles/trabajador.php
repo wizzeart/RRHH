@@ -52,34 +52,7 @@
 
 -->
 <!--NEW MENU GENERAL-->
-<li class="<?php if ($_GET['module'] == 'home') print('active-link') ?>">
-    <a href="index.php">
 
-        <i class="fa fa-dashboard"></i>
-        <span class="menu-title">
-            <strong>Inicio</strong>
-        </span>
-    </a>
-</li>
-<li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-        <i class="fa fa-th"></i>
-        <span class="menu-title">
-            <strong>General</strong>
-        </span>
-        <i class="arrow"></i>
-    </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
-            <a href="?module=list-usuarios">Usuarios</a>
-        </li>
-        <li e>
-       
-    </ul>
-</li>
 <!--NEW MENU TRABAJADORES-->
 <li class="list-divider"></li>
 <li>

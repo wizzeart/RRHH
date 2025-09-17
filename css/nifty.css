@@ -215,7 +215,7 @@ h6,
 /* Header */
 .cls-header {
     position: relative;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(38, 52, 134, 0.1);
 }
 .cls-header:after {
     content: "";
@@ -378,7 +378,7 @@ h6,
     top: 0;
 }
 #navbar-container {
-    box-shadow: 0 2px 0px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 0px -1px rgba(161, 148, 236, 0.05);
 }
 .navbar-header {
     left: 0;
@@ -409,6 +409,7 @@ h6,
     z-index: 2;
     overflow: hidden;
     width: 220px;
+    align-items: center;
 }
 .navbar-brand:hover,
 .navbar-brand:focus {
@@ -417,12 +418,14 @@ h6,
 .brand-title,
 .brand-icon {
     display: block;
-    line-height: 50px;
+    line-height: 75px;
+    align-self: center;
 }
 .brand-icon {
-    width: 50px;
+    width: 100px;
     height: 50px;
-    float: left;
+    
+    align-self: center;
 }
 .brand-text {
     display: block;
@@ -537,6 +540,7 @@ h6,
     }
     #navbar {
         background-color: transparent;
+        
     }
     .navbar-header {
         float: left;
@@ -547,8 +551,8 @@ h6,
         position: absolute;
         display: block;
         width: 100%;
-        height: 50px;
-        background-color: #32404e;
+        height: 52px;
+        background-color: #fdfeff;
     }
     #container.mainnav-out .navbar-header:before {
         width: 0;
@@ -566,16 +570,21 @@ h6,
     #navbar .brand-title {
         padding: 0 1.5em 0 50px;
     }
+    
     #container.mainnav-in .navbar-brand,
     #container.mainnav-lg .navbar-brand,
     #container.mainnav-in .brand-title,
     #container.mainnav-lg .brand-title {
         width: 220px;
+        text-align: center;
+    display: block;
     }
     #container.mainnav-in .brand-icon,
     #container.mainnav-sm .brand-icon,
     #container.mainnav-lg .brand-icon {
         background-color: transparent;
+        display: inline-block;
+   
     }
     #container.mainnav-in .brand-title,
     #container.mainnav-sm .brand-title,
@@ -632,14 +641,15 @@ h6,
 }
 #mainnav {
     height: 100%;
-    background-color: #32404e;
+    background-color: #375e85;
 }
 #mainnav > *:not(.popover) .nano-pane {
     display: none !important;
 }
 #mainnav .list-header {
-    color: #848c95;
-    font-size: 0.9em;
+    color: #d7dce2;
+    font-size: 2.2em;
+    text-align: center;
 }
 #mainnav .list-divider {
     border-color: rgba(0, 0, 0, 0.1);
@@ -730,7 +740,7 @@ h6,
     background-color: #2c3845;
 }
 #mainnav-menu > .active .active {
-    background-color: #28333e;
+    background-color: #3e5975;
 }
 #mainnav-menu ul a,
 .menu-popover .sub-menu ul a {
@@ -1026,10 +1036,10 @@ h6,
         visibility: visible;
     }
     .menu-popover .sub-menu ul {
-        background-color: #2c3845;
+        background-color: #2f4153;
     }
     .menu-popover .sub-menu ul ul {
-        background-color: #28333e;
+        background-color: #475e75;
     }
     .menu-popover .sub-menu ul ul > li > a {
         padding-left: 27px;

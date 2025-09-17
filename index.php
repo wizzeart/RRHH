@@ -142,9 +142,9 @@ $load_grid = true;
                 <!--================================-->
                 <div class="navbar-header">
                     <a href="index.php" class="navbar-brand">
-                        <img src="img/logo.png" alt="LE Logo" class="brand-icon">
+                        <img src="img/logo.png" alt="Logo" class="brand-icon">
                         <div class="brand-title">
-                            <span class="brand-text">M.Bolea</span>
+                            <span class="brand-text"></span>
                         </div>
                     </a>
                 </div>

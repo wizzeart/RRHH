@@ -12,10 +12,7 @@ if (in_array($app->rol, array('1', '3', '9', '12', '16'))) {
     //$page['envios-pendientes-7'] = $app->get_count_envios_pendientes(7);
     //$page['envios-pendientes-7-pedidos'] = $app->get_count_envios_pendientes_pedidos(7);
 }
-if ($app->rol == '2') {
-    if (!in_array($_REQUEST['module'], array('list-cortes-proveedor', 'view-label', 'logout')))
-        $_REQUEST['module'] = 'list-pedidos-proveedor';
-}
+
 
 //die('kdkdk');
 
@@ -36,6 +33,12 @@ if (isset($_REQUEST['module'])) {
         case 'usuarios':
             include_once(BASE_CLASS . '/mdl.Usuarios.php');
             $mdl = new Usuario($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'list-trabajadores':
+        case 'trabajadores':
+            include_once(BASE_CLASS . '/mdl.Trabajadores.php');
+            $mdl = new Trabajador($app);
             $mdl->controlador($_REQUEST);
             break;
         case 'home':

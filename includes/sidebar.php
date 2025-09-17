@@ -11,8 +11,8 @@
                         <!--Category name-->
                         <li class="list-header">Menú</li>
 
-                        <?php
-                        if ($app->rol == '8') { //CHOFERS
+                       <?php
+             /*           if ($app->rol == '8') { //CHOFERS
                             require_once(INCLUDES . '/perfiles/chofer.php');
                         }
                         if ($app->rol == '7') { //REPARTIDORES
@@ -60,10 +60,18 @@
                         if (in_array($app->rol, array(20, 21))) { //COORDINADOR SAT TÉCNICO SAT
                             require_once(INCLUDES . '/perfiles/sat.php');
                         }
+                            */
                         if ($app->rol == '1') {//ADMINISTRADORES
                             require_once(INCLUDES . '/perfiles/administrador.php');
                         }
-                        ?>
+                        if ($app->rol == '2') {//TRABAJADORES
+                            require_once(INCLUDES . '/perfiles/trabajador.php');
+                        }
+                        if ($app->rol == '3') {//DESARROLLADORES
+                            require_once(INCLUDES . '/perfiles/desarrollador.php');
+                        }
+
+                        ?>         
                     </ul>
                 </div>
             </div>

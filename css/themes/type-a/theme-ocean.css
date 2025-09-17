@@ -39,10 +39,10 @@ a:focus {
   background-color: #e9ecee;
 }
 #navbar-container {
-  box-shadow: 0 2px 0px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 0px -1px rgba(243, 2, 2, 0.05);
 }
 .navbar-header {
-  background-color: #313c48;
+  background-color: #34d414;
 }
 .navbar-content {
   background-color: #5aaedc;

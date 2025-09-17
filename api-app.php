@@ -28,6 +28,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Usuario($app);
         $mdl->api($_REQUEST);
         break;
+    case 'trabajadores':
+        include_once(BASE_CLASS . '/mdl.Trabajadores.php');
+        $mdl = new Trabajador($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'home':
         include_once(BASE_CLASS . '/mdl.Home.php');
         $mdl = new Home($app);
