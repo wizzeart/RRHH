@@ -75,6 +75,22 @@ class App
 
         return $data;
     }
+    public function get_list_bolsa_empleo($val = array())
+    {
+        $data = array();
+        $cond = '';
+
+        if (isset($val['activo']))
+            $cond .= " and a.xactivo='{$val['activo']}'";
+
+        $sql = "select a.*"
+            . " from " .   "bolsa_empleo a"
+            . " order by a.id";
+
+        $data = $this->db->fetchAll($sql);
+
+        return $data;
+    }
 
     public function close()
     {

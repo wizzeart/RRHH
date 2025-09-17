@@ -35,8 +35,50 @@ $(document).ready(function () {
     $('#btn-save').click(function () {
         var status = 1;
         var msg = '';
+        if ($('#f-apellidos').val() == '') {
+            status = 0;
+            msg += '<div>El campo Apellidos del Trabajador es obligatorio.</div>';
+        }
+        if ($('#f-sexo').val() == '') {
+            status = 0;
+            msg += '<div>El campo Sexo del Trabajador es obligatorio.</div>';
+        }
+        if ($('#f-ci').val() == '') {
+            status = 0;
+            msg += '<div>El campo CI del Trabajador es obligatorio.</div>';
+        }
+        if ($('#f-edad').val() == '') {
+            status = 0;
+            msg += '<div>El campo Edad del Trabajador es obligatorio.</div>';
+        }
+        if ($('#f-direccion').val() == '') {
+            status = 0;
+            msg += '<div>El campo Dirección del Trabajador es obligatorio.</div>';
+        }
+         if ($('#f-telefono').val() == '') {
+            status = 0;
+            msg += '<div>El campo Telefono del Trabajador es obligatorio.</div>';
+        }
+         if ($('#f-email').val() == '') {
+            status = 0;
+            msg += '<div>El campo Correo del Trabajador es obligatorio.</div>';
+        }
+         if ($('#f-nivel').val() == '') {
+            status = 0;
+            msg += '<div>El campo Nivel del Trabajador es obligatorio.</div>';
+        }
+        
+         if ($('#f-contratacion').val() == '') {
+            status = 0;
+            msg += '<div>El campo Contratación del Trabajador es obligatorio.</div>';
+        }
+         if ($('#f-estatus').val() == '') {
+            status = 0;
+            msg += '<div>El campo Estatus del Trabajador es obligatorio.</div>';
+        }
 
-        if ($('#f-trabajador').val() == '') {
+
+         if ($('#f-nombre').val() == '') {
             status = 0;
             msg += '<div>El campo Nombre del Trabajador es obligatorio.</div>';
         }
@@ -58,9 +100,9 @@ $(document).ready(function () {
 
             $('#btn-save').attr('disabled', true);
 
-            var cmd = 'module=usuarios&method=save&' + $.param($('input[name^=x],select[name^=x],textarea[name^=x]').serializeArray());
+            var cmd = 'module=trabajadores&method=save&' + $.param($('input[name^=x],select[name^=x],textarea[name^=x]').serializeArray());
             cmd += '&action=' + action;
-            cmd += '&xusuario_id=' + $('#f-usuario-id').val();
+            cmd += '&id=' + $('#f-id').val();
             $.ajax({url: 'api-app.php', type: 'POST', data: cmd, dataType: 'json',
                 success: function (d) {
                     $('#img-loading').addClass('hidden');
@@ -68,7 +110,7 @@ $(document).ready(function () {
                     if (d.status == 1) {
                         if (d.action == 'insert') {
                             action = 'update';
-                            $('#f-usuario-id').val(d.id);
+                            $('#f-id').val(d.id);
                         }
                         $('#f-pass').val('');
                         $.niftyNoty({

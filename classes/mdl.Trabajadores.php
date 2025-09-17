@@ -26,9 +26,9 @@ class Trabajador {
             case 'checked':
                 $this->_checked($param);
                 break;
-          /*  case 'del':
+            case 'del':
                 $this->_del($param);
-                break; */
+                break; 
             case 'save':
                 $this->_save($param);
                 break;
@@ -59,8 +59,12 @@ class Trabajador {
                 $page['title'] = 'Nuevo trabajador';
                 $page['subtitle'] = 'Ficha de Trabajador';
 
-                $data_form = array();
+                
                 $data_form['cargos'] = $this->app->get_list_cargos();
+                
+
+                
+                $data_form['bolsas'] = $this->app->get_list_bolsa_empleo();
 
                 $action = 'insert';
                 if (isset($param['id'])) {
@@ -82,7 +86,7 @@ class Trabajador {
                         //die();
 
                         $data = $row;
-                        $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['trabajador'];
+                        $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['nombre'];
                     }
                 } else {
                     $data['estatus'] = 'S';
@@ -91,7 +95,7 @@ class Trabajador {
         }
     }
 
-  /*  private function _del($param) {
+    private function _del($param) {
         $data = array(
             'status' => 1,
             'id' => $param['id'],
@@ -99,26 +103,24 @@ class Trabajador {
         );
 
         $update = array(
-            'xeliminado' => 1,
-            'xusermodif_id' => $this->app->user_id,
-            'xdatemodif' => date(dateSQL)
+            'trabajador_eliminado' => 1
         );
         $where = array(
-            'xusuario_id' => $param['id']
+            'id' => $param['id']
         );
-        $this->app->db->update('usuarios', $update, $where);
+        $this->app->db->update('trabajadores', $update, $where);
 
         $history = array(
-            'xentity' => 'USUARIOS',
-            'xaction' => 'DEL-USUARIO',
+            'xentity' => 'TRABAJADORES',
+            'xaction' => 'DEL-TRABAJADORES',
             'xid' => $param['id'],
-            'xobs' => 'DEL USUARIO: ' . $param['id']
+            'xobs' => 'DEL TRABAJADOR: ' . $param['id']
         );
         $this->app->add_history($history);
 
         print(json_encode($data));
     }
-    */
+    
     private function _save($param) {
         /*
           ini_set('display_errors', 1);
@@ -182,7 +184,7 @@ class Trabajador {
                     'xentity' => 'TRABAJADOR',
                     'xaction' => 'INSERT-TRABAJADOR',
                     'id' => $data['id'],
-                    'xobs' => 'TRABAJADOR: ' . $data['id'] . ' ' . $insert['xusuario']
+                    'xobs' => 'TRABAJADOR: ' . $data['id'] . ' ' . $insert['nombre']
                 );
                 $this->app->add_history($history);
             } else {
@@ -205,10 +207,10 @@ class Trabajador {
                 //die();
 
                 $history = array(
-                    'xentity' => 'USUARIOS',
-                    'xaction' => 'UPDATE-USUARIO',
-                    'xid' => $insert['xusuario_id'],
-                    'xobs' => 'USUARIO: ' . $insert['xusuario_id'] . ' ' . $insert['xusuario'] // . ' ' . $fields_change
+                    'xentity' => 'TRABAJADOR',
+                    'xaction' => 'UPDATE-TRABAJADOR',
+                    'xid' => $insert['id'],
+                    'xobs' => 'TRABAJADOR: ' . $insert['id'] . ' ' . $insert['nombre'] // . ' ' . $fields_change
                 );
                 $this->app->add_history($history);
             }
@@ -227,39 +229,5 @@ class Trabajador {
         return $data;
     }
 
-    private function _checked($param) {
-        $data = array(
-            'status' => 1,
-            'id' => null,
-            'activo' => null
-        );
-
-        if ($data['status'] == 1) {
-            unset($param['module']);
-            unset($param['method']);
-
-            $update = array(
-                'xactivo' => $param['value'],
-                'xusermodif_id' => $this->app->user_id,
-                'xdatemodif' => date(dateSQL)
-            );
-            $where = array(
-                'xusuario_id' => $param['id']
-            );
-            $noquotes = array('xdatemodif');
-            if ($this->db->update('usuarios', $update, $where, $noquotes) == 1) {
-                $data['id'] = $param['id'];
-                $data['activo'] = $param['value'];
-
-                $history = array(
-                    'xentity' => 'USUARIOS',
-                    'xaction' => 'CHG-ACTIVO',
-                    'xid' => $param['id'],
-                    'xobs' => 'USUARIO: ' . $data['id'] . ' Activo: ' . $data['activo']
-                );
-                $this->app->add_history($history);
-            }
-        }
-        print(json_encode($data));
-    }
+   
 }

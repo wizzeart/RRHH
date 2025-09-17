@@ -53,3 +53,67 @@
     border-radius: 20px;
 }
 /* CLASES PARA BORDES REDONDEADOS */
+
+/* CLASES PARA FONDOS */
+.bg-custom {
+    background-image: url('../img/Untitled.png') !important;
+    background-size:cover  !important;
+    background-position: absolute !important;
+    background-repeat: no-repeat !important;
+}
+/* CLASES PARA FONDOS */
+
+/* CLASES PARA LOGIN */
+.panel-body .pad-btm {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* CLASES PARA HEADER */
+.cls-header.cls-header-lg {
+    padding: 2.5rem 0;
+}
+
+.cls-header .cls-brand .brand-title {
+    font-size: 2.5em !important;
+    font-weight: 600;
+    padding: 0 1.5rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.cls-header .cls-brand .brand-title .text-thin {
+    font-weight: 300;
+    font-size: 0.9em;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.cls-header .cls-brand .box-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 2.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cls-header .cls-brand .box-inline:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+/* CLASES PARA HEADER */
+.cls-content .p{
+   font-size: 0.9em;
+    display: inline-block;
+    margin-left: 10px;
+}

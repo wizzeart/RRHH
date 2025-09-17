@@ -101,7 +101,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label class="control-label" for="f-nivel">Nivel Educacional</label>
-                <input type="text" id="f-nivel" name="nivel_educacional" class="form-control" placeholder="Nivel Educacional" value="<?php if (isset($data['nivel_educacional'])) print($data['xnivel_educacional']); ?>">
+                <input type="text" id="f-nivel" name="nivel_educacional" class="form-control" placeholder="Nivel Educacional" value="<?php if (isset($data['nivel_educacional'])) print($data['nivel_educacional']); ?>">
                 <small class="help-block">Nivel académico alcanzado</small>
             </div>
         </div>
@@ -125,14 +125,14 @@
             <div class="form-group">
                 <label class="control-label" for="f-contratacion">Fecha Contratación</label>
                 <input type="date" id="f-contratacion" name="fecha_contratacion" class="form-control" value="<?php if (isset($data['fecha_contratacion'])) print($data['fecha_contratacion']); ?>">
-                <small class="help-block">Inicio del contrato</small>
+                <small class="help-block">Inicio del Contrato</small>
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-baja">Fecha Baja</label>
                 <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>">
-                <small class="help-block">Fin del contrato</small>
+                <small class="help-block">Fin del Contrato</small>
             </div>
         </div>
         <div class="col-md-3">
@@ -152,7 +152,7 @@
                 <select id="f-bolsa" name="bolsa_empleo_id" class="form-control">
                     <option value="">Seleccione una bolsa</option>
                     <?php foreach ($data_form['bolsas'] as $k => $v) { ?>
-                        <option value="<?php print($v['bolsa_empleo_id']) ?>" <?php if ($v['bolsa_empleo_id'] == $data['bolsa_empleo_id']) print('selected'); ?>><?php print($v['nombre_bolsa']) ?></option>
+                       <option value="<?php print($v['id']) ?>" ><?php print($v['nombre']) ?></option>
                     <?php } ?>
                 </select>
                 <small class="help-block">Bolsa de empleo asociada</small>
@@ -172,11 +172,7 @@
                             <i class="fa fa-plus"></i>
                             Nuevo
                         </button>
-                        <?php if ($app->user_id == 1) { ?>
-                            <button id="btn-test" class="btn btn-danger icon-lg" type="button">
-                                Test
-                            </button>
-                        <?php } ?>
+                      
                     </div>
                 </div>
             </div><!-- TAB PEDIDOS -->
