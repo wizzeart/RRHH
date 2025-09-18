@@ -1,0 +1,574 @@
+2025-09-18 16:59:04 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\phpF68F.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 16:59:04 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1e384ead1_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+    [xuseralta_id] => 1
+)
+
+2025-09-18 16:59:04 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'xuseralta_id' in 'field list'
+2025-09-18 16:59:09 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php91F.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 16:59:09 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1e3d161bb_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+    [xuseralta_id] => 1
+)
+
+2025-09-18 16:59:09 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'xuseralta_id' in 'field list'
+2025-09-18 16:59:13 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php1900.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 16:59:13 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1e412596e_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+    [xuseralta_id] => 1
+)
+
+2025-09-18 16:59:13 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'xuseralta_id' in 'field list'
+2025-09-18 16:59:31 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php606B.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 16:59:31 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 325235
+    [edad] => 54
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-22
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1e5363ef5_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+    [xuseralta_id] => 1
+)
+
+2025-09-18 16:59:31 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'xuseralta_id' in 'field list'
+2025-09-18 17:03:36 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php1C4C.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:03:36 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1f48221c9_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:03:36 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-18 17:03:42 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php337F.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:03:42 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1f4e0d426_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:03:42 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '435345345' for key 'carnet_identidad'
+2025-09-18 17:03:45 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php3F0B.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:03:45 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [sexo] => M
+    [carnet_identidad] => 435345345
+    [edad] => 56
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 53453232
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-17
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc1f510285b_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:03:45 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '435345345' for key 'carnet_identidad'
+2025-09-18 17:15:09 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Carlos
+    [apellidos] => Manuel
+    [sexo] => M
+    [carnet_identidad] => 3212554
+    [edad] => 32
+    [direccion] => calle 455 43 3ser
+    [telefono] => 5466447
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-16
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\phpB1AC.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:15:09 - Intentando insertar:
+Array
+(
+    [nombre] => Carlos
+    [apellidos] => Manuel
+    [sexo] => M
+    [carnet_identidad] => 3212554
+    [edad] => 32
+    [direccion] => calle 455 43 3ser
+    [telefono] => 5466447
+    [email] => pablo@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-16
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc21fdbb7d5_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:15:09 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-18 17:17:25 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Rafael
+    [apellidos] => Garcia
+    [sexo] => M
+    [carnet_identidad] => 5323432
+    [edad] => 34
+    [direccion] => calle 222 entre 5ta y 7ma
+    [telefono] => 533424234
+    [email] => rafael@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-16
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\phpC471.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:17:25 - Intentando insertar:
+Array
+(
+    [nombre] => Rafael
+    [apellidos] => Garcia
+    [sexo] => M
+    [carnet_identidad] => 5323432
+    [edad] => 34
+    [direccion] => calle 222 entre 5ta y 7ma
+    [telefono] => 533424234
+    [email] => rafael@allnovu.net
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-16
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc228590399_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:17:25 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-18 17:44:01 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jhonny
+    [apellidos] => Rodry
+    [sexo] => M
+    [carnet_identidad] => 45345345345
+    [edad] => 24
+    [direccion] => 345345345
+    [telefono] => 3453453454
+    [email] => jhonny@asdas
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+            [type] => image/webp
+            [tmp_name] => C:\xamppNEW\tmp\php1D1D.tmp
+            [error] => 0
+            [size] => 4188
+        )
+
+)
+
+2025-09-18 17:44:01 - Intentando insertar:
+Array
+(
+    [nombre] => Jhonny
+    [apellidos] => Rodry
+    [sexo] => M
+    [carnet_identidad] => 45345345345
+    [edad] => 24
+    [direccion] => 345345345
+    [telefono] => 3453453454
+    [email] => jhonny@asdas
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 1
+    [foto] => uploads/trabajadores/foto_68cc28c1202c7_vector-de-perfil-avatar-predeterminado-foto-usuario-medios-sociales-icono-183042379.webp
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 17:44:01 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist

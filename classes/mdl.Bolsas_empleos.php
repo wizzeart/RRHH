@@ -388,19 +388,9 @@ class Trabajador {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT 
-                t.*,
-                p.id as pase_id, 
-                p.areas_acceso, 
-                p.fecha_generacion, 
-                p.vigente,
-                c.nombre as cargo_nombre,
-                c.id as cargo_id_original
-                FROM trabajadores t 
-                LEFT JOIN pases_acceso p ON t.id = p.trabajador_id 
-                LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
-                WHERE t.trabajador_eliminado = '0'
-                ORDER BY t.id";
+        $sql = "select *"
+                . " from " .  "trabajadores"
+                . " order by id";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);
