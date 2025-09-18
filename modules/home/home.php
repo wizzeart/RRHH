@@ -49,7 +49,7 @@ global $data, $page;
                 <div class="panel panel-warning panel-colorful">
                     <div class="pad-all text-center">
                         <span class="text-3x text-thin" id="total-cargos">0</span>
-                        <p>Cargos Diferentes</p>
+                        <p>Cantidad de Cargos</p>
                     </div>
                 </div>
             </div>
