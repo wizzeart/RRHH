@@ -572,3 +572,51 @@ Array
 
 2025-09-18 17:44:01 - Error al insertar:
 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-18 21:07:35 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.manduley@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-18 21:07:35 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.manduley@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-18 21:07:35 - Error al actualizar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist

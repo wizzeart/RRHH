@@ -49,6 +49,18 @@ $load_grid = true;
     <!--Font Awesome [ OPTIONAL ]-->
     <link href="plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
+    <!-- Dashboard Dependencies -->
+    <!-- Chart.js para gráficos interactivos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    
+    <!-- Heatmap.js para mapas de calor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
+    
+    <!-- Date Range Picker y sus dependencias -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
 
     <!--Animate.css [ OPTIONAL ]-->
     <link href="plugins/animate-css/animate.min.css" rel="stylesheet">
