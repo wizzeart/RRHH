@@ -1,0 +1,306 @@
+2025-09-19 21:18:54 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => +53 5 1234567
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php37B2.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:18:54 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdac9e3441f_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => +53 5 1234567
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:18:54 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-19 21:18:59 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => +53 5 1234567
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php4AEC.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:18:59 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdaca32071b_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => +53 5 1234567
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:18:59 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-19 21:39:55 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php755D.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:39:55 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdb18b2c4a6_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:39:55 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-19 21:40:01 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php8C61.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:40:01 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdb1910ebca_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:40:01 - Error al insertar:
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-19 21:40:39 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php217F.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:40:39 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdb1b74036c_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => +53 5 1237767
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:40:39 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'field list'
+2025-09-19 21:41:05 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => 54645656
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php8654.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:41:05 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdb1d10ee51_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 54645656
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+2025-09-19 21:41:05 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'field list'
+2025-09-19 21:43:17 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [telefono] => 55646546
+    [email] => pablo@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV (1).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xamppNEW\tmp\php8BDF.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-09-19 21:43:17 - Intentando insertar:
+Array
+(
+    [nombre] => Pablo
+    [apellidos] => Sanchez
+    [curriculum] => uploads/curriculos/cv_68cdb255855a7_pruebaCV (1).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 55646546
+    [email] => pablo@allnovu.net
+    [fecha_registro] => 2025-09-19
+    [estatus] => pendiente
+)
+

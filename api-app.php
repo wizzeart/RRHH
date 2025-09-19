@@ -38,6 +38,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Home($app);
         $mdl->api($_REQUEST);
         break;
+     case 'bolsas_empleos':
+        include_once(BASE_CLASS . '/mdl.Bolsas_empleos.php');
+        $mdl = new Bolsas_empleos($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'config':
         include_once(BASE_CLASS . '/mdl.Config.php');
         $mdl = new Config($app);

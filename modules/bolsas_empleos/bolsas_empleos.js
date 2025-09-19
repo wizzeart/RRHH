@@ -32,10 +32,10 @@ $(document).ready(function () {
         });
     });
     $('#btn-new').click(function () {
-        location.href = '?module=trabajadores';
+        location.href = '?module=bolsas_empleos';
     });
     $('#btn-back').click(function () {
-        location.href = 'index.php?module=list-trabajadores';
+        location.href = 'index.php?module=list-bolsas_empleos';
     });
     // Función para manejar la previsualización de imágenes
     function readURL(input, previewId) {
@@ -60,58 +60,56 @@ $(document).ready(function () {
     $('#btn-save').click(function () {
         var status = 1;
         var msg = '';
-        if ($('#f-apellidos').val() == '') {
-            status = 0;
-            msg += '<div>El campo Apellidos del Trabajador es obligatorio.</div>';
-        }
-        if ($('#f-sexo').val() == '') {
-            status = 0;
-            msg += '<div>El campo Sexo del Trabajador es obligatorio.</div>';
-        }
-        if ($('#f-ci').val() == '') {
-            status = 0;
-            msg += '<div>El campo CI del Trabajador es obligatorio.</div>';
-        }
-        if ($('#f-edad').val() == '') {
-            status = 0;
-            msg += '<div>El campo Edad del Trabajador es obligatorio.</div>';
-        }
-        if ($('#f-direccion').val() == '') {
-            status = 0;
-            msg += '<div>El campo Dirección del Trabajador es obligatorio.</div>';
-        }
-         if ($('#f-telefono').val() == '') {
-            status = 0;
-            msg += '<div>El campo Telefono del Trabajador es obligatorio.</div>';
-        }
-         if ($('#f-email').val() == '') {
-            status = 0;
-            msg += '<div>El campo Correo del Trabajador es obligatorio.</div>';
-        }
-         if ($('#f-nivel').val() == '') {
-            status = 0;
-            msg += '<div>El campo Nivel del Trabajador es obligatorio.</div>';
-        }
         
-         if ($('#f-contratacion').val() == '') {
-            status = 0;
-            msg += '<div>El campo Contratación del Trabajador es obligatorio.</div>';
-        }
-         if ($('#f-estatus').val() == '') {
-            status = 0;
-            msg += '<div>El campo Estatus del Trabajador es obligatorio.</div>';
-        }
-
-
+        
          if ($('#f-nombre').val() == '') {
             status = 0;
-            msg += '<div>El campo Nombre del Trabajador es obligatorio.</div>';
+            msg += '<div>El campo Nombre del Postulante es obligatorio.</div>';
+        }
+
+        if ($('#f-apellidos').val() == '') {
+            status = 0;
+            msg += '<div>El campo Apellidos del Postulante es obligatorio.</div>';
+        }
+
+        if ($('#f-telefono').val() == '') {
+            status = 0;
+            msg += '<div>El campo Teléfono del Postulante es obligatorio.</div>';
+        }
+
+        if ($('#f-email').val() == '') {
+            status = 0;
+            msg += '<div>El campo Email del Postulante es obligatorio.</div>';
+        } else {
+            // Validar formato de email
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test($('#f-email').val())) {
+                status = 0;
+                msg += '<div>El formato del email no es válido.</div>';
+            }
         }
 
         if ($('#f-cargo').val() == '') {
             status = 0;
-            msg += '<div>El campo Cargo del Trabajador es obligatorio.</div>';
+            msg += '<div>El campo Cargo del Postulante es obligatorio.</div>';
         }
+       
+        if ($('#f-curriculum').val() == '') {
+            status = 0;
+            msg += '<div>El campo Currículum es obligatorio.</div>';
+        }
+
+        if ($('#f-fecha-registro').val() == '') {
+            status = 0;
+            msg += '<div>El campo Fecha de Registro es obligatorio.</div>';
+        }
+
+        if ($('#f-estatus').val() == '') {
+            status = 0;
+            msg += '<div>El campo Estatus es obligatorio.</div>';
+        }
+  
+        
 
         if (status == 1) {
             var param_almacen = '';
@@ -128,52 +126,28 @@ $(document).ready(function () {
             // Crear FormData para el envío del formulario
             var formDataObj = new FormData();
 
-            // Agregar campos obligatorios
-            var campos = {
-                'module': 'trabajadores',
-                'method': 'save',
-                'action': action,
-                'nombre': $('#f-nombre').val(),
-                'apellidos': $('#f-apellidos').val(),
-                'sexo': $('#f-sexo').val(),
-                'carnet_identidad': $('#f-ci').val(),
-                'edad': $('#f-edad').val(),
-                'direccion': $('#f-direccion').val(),
-                'telefono': $('#f-telefono').val(),
-                'email': $('#f-email').val(),
-                'nivel_educacional': $('#f-nivel').val(),
-                'cargos_id': $('#f-cargo').val(),
-                'fecha_contratacion': $('#f-contratacion').val() || new Date().toISOString().split('T')[0],
-                'estatus': $('#f-estatus').val() || 'activo'
-            };
-
-            // Agregar cada campo al FormData
-            for (var key in campos) {
-                formDataObj.append(key, campos[key]);
-            }
-
-            // Agregar campos opcionales solo si tienen valor
-            if ($('#f-baja').val()) formDataObj.append('fecha_baja', $('#f-baja').val());
-            if ($('#f-bolsa').val()) formDataObj.append('bolsa_empleo_id', $('#f-bolsa').val());
-            
-            // Agregar foto si se seleccionó
-            if ($('#f-foto')[0].files[0]) {
-                formDataObj.append('foto', $('#f-foto')[0].files[0]);
-            }
-            
-            // Agregar foto si se ha seleccionado
-            if ($('#f-foto')[0].files[0]) {
-                formDataObj.append('foto', $('#f-foto')[0].files[0]);
-            }
-            
             // Agregar parámetros de control
-            formDataObj.append('module', 'trabajadores');
+            formDataObj.append('module', 'bolsas_empleos');
             formDataObj.append('method', 'save');
             formDataObj.append('action', action);
 
             // Agregar ID si es una actualización
             if (action === 'update') {
                 formDataObj.append('id', $('#f-id').val());
+            }
+
+            // Agregar todos los campos del formulario
+            formDataObj.append('nombre', $('#f-nombre').val());
+            formDataObj.append('apellidos', $('#f-apellidos').val());
+            formDataObj.append('telefono', $('#f-telefono').val());
+            formDataObj.append('email', $('#f-email').val());
+            formDataObj.append('cargo_postulado_id', $('#f-cargo').val());
+            formDataObj.append('fecha_registro', $('#f-fecha-registro').val());
+            formDataObj.append('estatus', $('#f-estatus').val());
+            
+            // Agregar currículum si se seleccionó
+            if ($('#f-curriculum')[0].files[0]) {
+                formDataObj.append('curriculum', $('#f-curriculum')[0].files[0]);
             }
             // Debug: mostrar datos que se van a enviar
             console.log('Enviando datos:');
@@ -203,8 +177,8 @@ $(document).ready(function () {
                             container: 'floating',
                             title: '¡Éxito!',
                             message: action === 'insert' ? 
-                                'El trabajador ha sido registrado correctamente.' :
-                                'Los datos del trabajador han sido actualizados correctamente.',
+                                'La postulación ha sido registrada correctamente.' :
+                                'Los datos han sido actualizados correctamente.',
                             timer: 5000,
                             closeBtn: true,
                             focus: true
@@ -218,6 +192,24 @@ $(document).ready(function () {
                             timer: 3000
                         });
                     }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.error('Error en la petición:', {
+                        status: XMLHttpRequest.status,
+                        statusText: XMLHttpRequest.statusText,
+                        responseText: XMLHttpRequest.responseText,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
+                    $('#img-loading').addClass('hidden');
+                    $('#btn-save').attr('disabled', false);
+                    $.niftyNoty({
+                        type: 'danger',
+                        title: 'Error de conexión',
+                        message: 'Error al guardar: ' + XMLHttpRequest.responseText,
+                        container: 'floating',
+                        timer: 5000
+                    });
                 }
             });
         } else {
@@ -233,15 +225,6 @@ $(document).ready(function () {
 });
 
 
-function formatoPedido(value, row) {
-    //var s = '<div><input data-ped="' + value + '" type="checkbox" class="chk-ped"/>&nbsp;' + value + '</div>';
-    if (row.xrevendedor == null)
-        row.xrevendedor = 'sin agencia';
-    var s = '<div>' + value + '</div>';
-    s += '<div><small>' + row.xhash + '</small></div>';
-    s += '<div>' + row.xrevendedor + '</div>';
-    return s;
-}
 function formatoToolbar(value, row) {
     var btn_edit = '<button title="Editar" data-id="' + row.xpedido_id + '" data-ref="' + row.xhash + '" class="btn btn-info btn-xs btn-icon icon-sm fa fa-edit"></button>';
     var btn_print = '<button title="Imprimir" data-id="' + row.xpedido_id + '" class="btn btn-warning btn-xs btn-icon icon-sm fa fa-print"></button>';
@@ -259,45 +242,8 @@ function formatoToolbar(value, row) {
     }
     return btn_edit + '\n' + btn_rescue + '\n' + btn_print + '\n' + btn_email + '\n' + btn_del;
 }
-function formatoProducto(value, row) {
-    var art = [], art_join = '';
-    if ('items' in row)
-        $.each(row.items, function (i, v) {
-            var art_ele = {
-                art: v.xarticulo,
-                cant: $.number(v.xcantidad, 0, ',', '')
-            };
 
-            art.push(art_ele);
-        });
 
-    $.each(art, function (i, v) {
-        art_join += '<div style="font-size:10px;">' + v.cant + ' ' + v.art + '</div>';
-    });
-
-    var s = '<div>' + art_join + '</div>';
-    if (row.xobs != '' && row.xobs != null) {
-        s += '<div><strong>Notas: </strong>' + row.xobs + '</div>';
-    }
-
-    return  s;
-}
-function formatoFechas(value, row) {
-    var s = '<div>' + value + '</div>';
-    if (row.xfecha_entregado_format != '' && row.xfecha_entregado_format != null) {
-        s += '<div><small>Fecha Entregado: ' + row.xfecha_entregado_format + '</small></div>';
-    }
-    if (row.xfecha_finalizado_format != '' && row.xfecha_finalizado_format != null) {
-        s += '<div><small>Fecha Finalizado: ' + row.xfecha_finalizado_format + '</small></div>';
-    }
-    return s;
-}
-function formatoCantidad(value, row) {
-    var s = '';
-    if (row.xestado == 'P')
-        value = '';
-    return s;
-}
 function formatoEstado(value, row) {
     var s = '';
     s = '<span class="label label-' + row.xcolor + '">' + value + '</span>';
@@ -306,38 +252,4 @@ function formatoEstado(value, row) {
 }
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
-}
-function formatoTransaccion(value, row) {
-    if (value == null)
-        value = '';
-    var s = '<div>' + value + '</div>';
-    if (value = 'REVENDEDOR') {
-        if (row.xrevendedor == null)
-            row.xrevendedor = '';
-        s += '<small>' + row.xrevendedor + '</small>';
-    }
-    return s;
-}
-function formatoNivel(value, row) {
-    var tag = '', n = '', s;
-    if (row.xnivel == 1)
-        n = 'danger';
-    if (row.xnivel == 2)
-        n = 'warning';
-    if (row.xnivel == 3)
-        n = 'success';
-    if (row.xnivel == 5)
-        n = 'pink';
-    if (row.xnivel == 6)
-        n = 'info';
-    if (row.xnivel == 7)
-        n = 'black';
-    if (n != '')
-        tag = '<span class="pull-right badge badge-' + n + '">' + row.xnivel + '</span>';
-    //tag = ' <span class="label label-table label-' + n + '">' + row.xnivel + '</span>';
-    //s = value + tag;
-    s = '<a target="_blank" class="text-primary" href="?module=clientes&id=' + row.xcliente_id + '">' + value + '</a>' + tag;
-    //<span class="label label-table label-success">Enterprise</span>
-    //return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
-    return s;
 }

@@ -5,7 +5,7 @@
  *
  * @author alvaro
  */
-class Trabajador {
+class Bolsas_empleos {
 
     var $app;
     var $db;
@@ -39,57 +39,38 @@ class Trabajador {
         global $data, $action, $page, $data_form;
 
         switch ($param['module']) {
-            case 'list-trabajadores':
+            case 'list-bolsas_empleos':
                 $data = array();
-                $page['title'] = 'Trabajadores';
-                $page['subtitle'] = 'Listado de Trabajadores';
+                $page['title'] = 'Bolsas de Empleos';
+                $page['subtitle'] = 'Listado Bolsas de Empleos';
 
                 $data_form = array();
                 //$data_form['almacenes'] = $this->app->get_list_almacenes($filtro);
                 break;
-            case 'trabajadores':
-                /*
-                  ini_set('display_errors', 1);
-                  ini_set('display_startup_errors', 1);
-                  error_reporting(E_ALL);
-                 * 
-                 */
-
+            case 'bolsas_empleos':
                 $data = array();
-                $page['title'] = 'Nuevo trabajador';
-                $page['subtitle'] = 'Ficha de Trabajador';
+                $page['title'] = 'Nueva Postulación';
+                $page['subtitle'] = 'Postulación a Empleo';
 
-                
                 $data_form['cargos'] = $this->app->get_list_cargos();
-                
-
-                
-                $data_form['bolsas'] = $this->app->get_list_bolsa_empleo();
 
                 $action = 'insert';
                 if (isset($param['id'])) {
-                    $page['title'] = 'Edición trabajador';
+                    $page['title'] = 'Edición de Postulación';
                     $action = 'update';
 
                     $val = array(
                         'id' => $param['id']
                     );
-                    $sql = "select *"
-                            . " from " . 'trabajadores'
-                            . " where id=:id";
+                    $sql = "SELECT * FROM bolsa_empleo WHERE id=:id";
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
-
-                        //$row['almacenes'] = $this->app->get_list_usuarios_almacenes($row['xusuario_id']);
-                        //$row['puntos-ventas'] = $this->app->get_list_usuarios_revendedores($row['xusuario_id']);
-                        //print_r($row['almacenes']);
-                        //die();
-
                         $data = $row;
-                        $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['nombre'];
+                        $page['subtitle'] = 'Postulación: ' . $row['id'] . ' - ' . $row['nombre'] . ' ' . $row['apellidos'];
                     }
                 } else {
-                    $data['estatus'] = 'S';
+                    $data['estatus'] = 'pendiente';
+                    $data['fecha_registro'] = date('Y-m-d');
                 }
                 break;
         }
@@ -102,19 +83,17 @@ class Trabajador {
             'row' => $param['row']
         );
 
-        $update = array(
-            'trabajador_eliminado' => 1
-        );
+        // Eliminar físicamente el registro de bolsa_empleo
         $where = array(
             'id' => $param['id']
         );
-        $this->app->db->update('trabajadores', $update, $where);
+        $this->app->db->delete('bolsa_empleo', $where);
 
         $history = array(
-            'xentity' => 'TRABAJADORES',
-            'xaction' => 'DEL-TRABAJADORES',
+            'xentity' => 'BOLSA_EMPLEO',
+            'xaction' => 'DEL-POSTULACION',
             'xid' => $param['id'],
-            'xobs' => 'DEL TRABAJADOR: ' . $param['id']
+            'xobs' => 'DEL POSTULACION: ' . $param['id']
         );
         $this->app->add_history($history);
 
@@ -124,9 +103,10 @@ class Trabajador {
     private function _save($param) {
         // Debug: Guardar los parámetros recibidos en un archivo de log
         $log = date('Y-m-d H:i:s') . " - Parámetros recibidos:\n";
-        $log .= print_r($param, true) . "\n";
-        $log .= print_r($_FILES, true) . "\n";
-        file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
+        $log .= "POST: " . print_r($param, true) . "\n";
+        $log .= "FILES: " . print_r($_FILES, true) . "\n";
+        $log .= "Action: " . (isset($param['action']) ? $param['action'] : 'NO ACTION') . "\n";
+        file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
         $data = array(
             'status' => 1,
@@ -135,48 +115,41 @@ class Trabajador {
             'action' => isset($param['action']) ? $param['action'] : 'insert'
         );
 
-        // Procesar foto si se subió
-        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = 'uploads/trabajadores/';
+        // Procesar curriculum si se subió
+        if (isset($_FILES['curriculum']) && $_FILES['curriculum']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = 'uploads/curriculos/';
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
             
-            $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
-            $foto_path = $upload_dir . $foto_name;
-            if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                $param['foto'] = $foto_path;
+            $curriculum_name = uniqid('cv_') . '_' . basename($_FILES['curriculum']['name']);
+            $curriculum_path = $upload_dir . $curriculum_name;
+            if (move_uploaded_file($_FILES['curriculum']['tmp_name'], $curriculum_path)) {
+                $param['curriculum'] = $curriculum_path;
             }
         }
 
-            // Verificar si el carnet de identidad ya existe
-            if ($data['action'] == 'insert' && isset($param['carnet_identidad'])) {
-                $sql = "SELECT id FROM trabajadores WHERE carnet_identidad = :ci AND trabajador_eliminado = '0'";
-                $val = array('ci' => $param['carnet_identidad']);
-                $existing = $this->db->fetchRow($sql, $val);
-                
-                if ($existing) {
-                    $data['status'] = 0;
-                    $data['msg'] = 'Ya existe un trabajador con este Carnet de Identidad';
-                    print(json_encode($data));
-                    return;
-                }
+        // Validar campos requeridos
+        $required_fields = array(
+            'nombre' => 'Nombre',
+            'apellidos' => 'Apellidos',
+            'telefono' => 'Teléfono',
+            'email' => 'Email',
+            'cargo_postulado_id' => 'Cargo al que postula',
+            'estatus' => 'Estatus'
+        );
+        
+        // Validar email si está presente
+        if (isset($param['email']) && !empty($param['email'])) {
+            if (!filter_var($param['email'], FILTER_VALIDATE_EMAIL)) {
+                $data['status'] = 0;
+                $data['msg'] = 'El formato del email no es válido';
+                print(json_encode($data));
+                return;
             }
-
-            // Validar campos requeridos
-            $required_fields = array(
-                'nombre' => 'Nombre',
-                'apellidos' => 'Apellidos',
-                'sexo' => 'Sexo',
-                'carnet_identidad' => 'Carnet de Identidad',
-                'edad' => 'Edad',
-                'direccion' => 'Dirección',
-                'telefono' => 'Teléfono',
-                'email' => 'Email',
-                'nivel_educacional' => 'Nivel Educacional',
-                'cargos_id' => 'Cargo',
-                'estatus' => 'Estatus'
-            );        foreach ($required_fields as $field => $label) {
+        }
+        
+        foreach ($required_fields as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
                 $data['status'] = 0;
                 $data['msg'] = "El campo {$label} es obligatorio";
@@ -188,53 +161,32 @@ class Trabajador {
         $insert = array(
             'nombre' => $param['nombre'],
             'apellidos' => $param['apellidos'],
-            'sexo' => $param['sexo'],
-            'carnet_identidad' => $param['carnet_identidad'],
-            'edad' => intval($param['edad']),
-            'direccion' => $param['direccion'],
+            'curriculum' => isset($param['curriculum']) ? $param['curriculum'] : '',
+            'cargo_postulado_id' => intval($param['cargo_postulado_id']),
             'telefono' => $param['telefono'],
             'email' => $param['email'],
-            'nivel_educacional' => $param['nivel_educacional'],
-            'cargos_id' => intval($param['cargos_id']),
-            'fecha_contratacion' => $param['fecha_contratacion'],
-            'fecha_baja' => !empty($param['fecha_baja']) ? $param['fecha_baja'] : null,
-            'estatus' => $param['estatus'],
-            'bolsa_empleo_id' => !empty($param['bolsa_empleo_id']) ? intval($param['bolsa_empleo_id']) : null,
-            'foto' => isset($param['foto']) ? $param['foto'] : '',
-            'trabajador_eliminado' => '0'
+            'fecha_registro' => isset($param['fecha_registro']) && !empty($param['fecha_registro']) ? $param['fecha_registro'] : date('Y-m-d'),
+            'estatus' => $param['estatus']
         );
 
         $data['action'] = $param['action'];
 
-        // Remover campos que no pertenecen a la tabla trabajadores
+        // Remover campos que no pertenecen a la tabla bolsa_empleo
         unset($insert['module']);
         unset($insert['method']);
         unset($insert['action']);
 
         if ($data['action'] == 'insert') {
-            // Establecer fecha de contratación si no está definida
-            if (!isset($insert['fecha_contratacion']) || empty($insert['fecha_contratacion'])) {
-                $insert['fecha_contratacion'] = date('Y-m-d');
-            }
-            
             // Asegurar que solo se insertan los campos que existen en la tabla
             $campos_validos = [
-                'cargos_id',
-                'foto',
                 'nombre',
                 'apellidos',
-                'carnet_identidad',
-                'sexo',
-                'edad',
-                'direccion',
+                'curriculum',
+                'cargo_postulado_id',
                 'telefono',
                 'email',
-                'nivel_educacional',
-                'fecha_contratacion',
-                'fecha_baja',
-                'estatus',
-                'bolsa_empleo_id',
-                'trabajador_eliminado'
+                'fecha_registro',
+                'estatus'
             ];
             
             // Filtrar solo los campos válidos
@@ -242,12 +194,12 @@ class Trabajador {
             
             // Debug: Guardar la consulta de inserción
             $log = date('Y-m-d H:i:s') . " - Intentando insertar:\n";
-            $log .= print_r($insert, true) . "\n";
-            file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
+            $log .= print_r($insert_filtered, true) . "\n";
+            file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
             try {
-                // Insertar el trabajador usando solo los campos filtrados
-                $result = $this->db->insert('trabajadores', $insert_filtered);
+                // Insertar la postulación usando solo los campos filtrados
+                $result = $this->db->insert('bolsa_empleo', $insert_filtered);
                 
                 if ($result) {
                     // Obtener el último ID insertado
@@ -262,10 +214,10 @@ class Trabajador {
 
                         // Registrar en historial
                         $history = array(
-                            'xentity' => 'TRABAJADOR',
-                            'xaction' => 'INSERT-TRABAJADOR',
+                            'xentity' => 'BOLSA_EMPLEO',
+                            'xaction' => 'INSERT-POSTULACION',
                             'id' => $lastId,
-                            'xobs' => 'TRABAJADOR: ' . $lastId . ' ' . $insert['nombre']
+                            'xobs' => 'POSTULACION: ' . $lastId . ' ' . $insert['nombre'] . ' ' . $insert['apellidos']
                         );
                         $this->app->add_history($history);
                     } else {
@@ -282,7 +234,7 @@ class Trabajador {
                 // Log del error
                 $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
                 $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
+                file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
                 
                 // Respuesta de error
                 $data['status'] = 0;
@@ -293,62 +245,37 @@ class Trabajador {
             // Update existente
             if (!isset($param['id'])) {
                 $data['status'] = 0;
-                $data['msg'] = 'ID de trabajador no proporcionado';
+                $data['msg'] = 'ID de postulación no proporcionado';
                 print(json_encode($data));
                 return;
             }
 
             try {
                 $id = $param['id'];
-
-                // Verificar si el carnet de identidad ya existe en otro registro
-                if (isset($param['carnet_identidad'])) {
-                    $sql = "SELECT id FROM trabajadores WHERE carnet_identidad = :ci AND id != :id AND trabajador_eliminado = '0'";
-                    $val = array(
-                        'ci' => $param['carnet_identidad'],
-                        'id' => $id
-                    );
-                    $existing = $this->db->fetchRow($sql, $val);
-                    
-                    if ($existing) {
-                        $data['status'] = 0;
-                        $data['msg'] = 'Ya existe otro trabajador con este Carnet de Identidad';
-                        print(json_encode($data));
-                        return;
-                    }
-                }
                 
                 // Filtrar campos válidos para actualización
                 $campos_validos = [
-                    'cargos_id',
-                    'foto',
                     'nombre',
                     'apellidos',
-                    'carnet_identidad',
-                    'sexo',
-                    'edad',
-                    'direccion',
+                    'curriculum',
+                    'cargo_postulado_id',
                     'telefono',
                     'email',
-                    'nivel_educacional',
-                    'fecha_contratacion',
-                    'fecha_baja',
-                    'estatus',
-                    'bolsa_empleo_id',
-                    'trabajador_eliminado'
+                    'fecha_registro',
+                    'estatus'
                 ];
                 
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
 
                 // Debug log before update
-                $log = date('Y-m-d H:i:s') . " - Intentando actualizar trabajador ID: " . $id . "\n";
+                $log = date('Y-m-d H:i:s') . " - Intentando actualizar postulación ID: " . $id . "\n";
                 $log .= print_r($update_filtered, true) . "\n";
-                file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
+                file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
-                // Actualizar el trabajador
+                // Actualizar la postulación
                 $where = array('id' => $id);
-                $result = $this->app->db->update('trabajadores', $update_filtered, $where);
+                $result = $this->app->db->update('bolsa_empleo', $update_filtered, $where);
 
                 if ($result) {
                     // Preparar respuesta exitosa
@@ -359,10 +286,10 @@ class Trabajador {
 
                     // Registrar en historial
                     $history = array(
-                        'xentity' => 'TRABAJADOR',
-                        'xaction' => 'UPDATE-TRABAJADOR',
+                        'xentity' => 'BOLSA_EMPLEO',
+                        'xaction' => 'UPDATE-POSTULACION',
                         'id' => $id,
-                        'xobs' => 'TRABAJADOR: ' . $id . ' ' . $insert['nombre']
+                        'xobs' => 'POSTULACION: ' . $id . ' ' . $insert['nombre'] . ' ' . $insert['apellidos']
                     );
                     $this->app->add_history($history);
                 } else {
@@ -374,7 +301,7 @@ class Trabajador {
                 // Log del error
                 $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
                 $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
+                file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
                 
                 // Respuesta de error
                 $data['status'] = 0;
@@ -388,11 +315,10 @@ class Trabajador {
 
     private function _list($param) {
         $data = array();
-        $sql = "select *"
-                . " from " .  "trabajadores"
-                . " order by id";
-        //print($sql);
-        //die();
+        $sql = "SELECT id, nombre, apellidos, curriculum, cargo_postulado_id, telefono, email, fecha_registro, estatus"
+                . " FROM bolsa_empleo"
+                . " ORDER BY id DESC";
+        
         $data = $this->db->fetchAll($sql);
         return $data;
     }

@@ -7,6 +7,7 @@
         <div class="panel-control">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">Trabajador</a></li>
+                <li class="inactive"><a href="#tab-huella" data-toggle="tab" aria-expanded="true">Registrar Huella</a></li>
             </ul>
             <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del usuario</p>" data-html="true" title=""></a>
         </div>
@@ -207,3 +208,14 @@
     <!-- =================================================== -->
     <!-- END BASIC FORM ELEMENTS -->
 </div>
+<div class="panel-body">
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="tab-huella">
+                <div class="panel">
+                    <div class="panel-body orm-padding"><!-- form-horizontal -->
+                    </div>
+                </div>
+           </div>
+        </div>
+</div>
+                    

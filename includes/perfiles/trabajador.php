@@ -75,3 +75,26 @@
         </li>
     </ul>
 </li>
+
+<!--NEW MENU BOLSAS EMPLEO-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-database"></i>
+        <span class="menu-title">
+            <strong>Bolsa de Empleo</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos', 'config'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
+            <a href="?module=list-bolsas_empleos">Lista de Bolsas de Empleos</a>
+        </li>
+        <li e>
+        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
+            <a href="?module=bolsas_empleos">Registrar Bolsa de Empleo</a>
+        </li>
+    </ul>
+</li>
