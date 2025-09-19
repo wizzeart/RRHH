@@ -1,4 +1,13 @@
 $(document).ready(function () {
+    // Helper to escape HTML for safe insertion into hidden inputs
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return str || '';
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#039;');
+    }
     $('#btn-add-new').click(function () {
         location.href = 'index.php?module=trabajadores';
     });
@@ -75,84 +84,61 @@ $(document).ready(function () {
             fotoHtml = '<img src="' + t.foto + '" alt="Foto del trabajador" style="max-width:200px; margin-bottom:10px;" class="img-thumbnail">';
         }
 
-        // Construir el HTML del modal
-        var html = '<div class="row">'
-            + '<div class="col-md-12 text-center mb-4">'
-            + '<h3>Pase de Control de Acceso</h3>'
+        // Construir el HTML del modal como tarjeta de identificación
+        // Usamos un formulario oculto para enviar los datos al generador de PDF.
+        var formId = 'pdfForm_' + (t.id || Math.floor(Math.random() * 100000));
+        var html = '<div class="id-card-container" style="max-width:700px; margin:0 auto;">'
+            + '<form id="' + formId + '" method="POST" action="generate_id_pdf.php" target="_blank">'
+            // Hidden inputs to send to the PDF generator
+            + '<input type="hidden" name="id" value="' + (t.id || '') + '">'
+            + '<input type="hidden" name="nombre" value="' + (escapeHtml(t.nombre || '')) + '">'
+            + '<input type="hidden" name="apellidos" value="' + (escapeHtml(t.apellidos || '')) + '">'
+            + '<input type="hidden" name="carnet_identidad" value="' + (escapeHtml(t.carnet_identidad || '')) + '">'
+            + '<input type="hidden" name="cargo_nombre" value="' + (escapeHtml(t.cargo_nombre || '')) + '">'
+            + '<input type="hidden" name="cargos_id" value="' + (t.cargos_id || '') + '">'
+            + '<input type="hidden" name="areas_acceso" value="' + (escapeHtml(t.areas_acceso || '')) + '">'
+            + '<input type="hidden" name="fecha_generacion" value="' + (escapeHtml(t.fecha_generacion || '')) + '">'
+            + '<input type="hidden" name="vigente" value="' + (t.vigente || '') + '">'
+            + '<input type="hidden" name="foto" value="' + (escapeHtml(t.foto || '')) + '">'
+            + '<div class="row">'
+            + '<div class="col-md-12 text-center mb-3">'
+            + '<h4 style="margin:0;">Tarjeta de Identificación</h4>'
+            + '<small class="text-muted">Pase de Control de Acceso</small>'
             + '</div>'
+            + '</div>'
+            + '<div class="row align-items-center">'
             + '<div class="col-md-4 text-center">'
-            + '<div class="photo-container mb-3">'
-            + (fotoHtml || '<div class="alert alert-info">No hay foto disponible</div>')
+            + '<div class="photo-box" style="width:200px; height:260px; margin:0 auto; border:2px solid #e9ecef; border-radius:6px; display:flex; align-items:center; justify-content:center; background:#fff;">'
+            + (fotoHtml || '<div style="padding:10px;">No hay foto</div>')
             + '</div>'
-            + '<div class="cargo-container" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">'
-            + '<h4 class="cargo-title" style="font-size: 1.5em; font-weight: bold; color: #2196F3; margin-bottom: 5px;">'
-            + '<i class="fa fa-briefcase mr-2"></i>'
-            + (t.cargo_nombre || 'Cargo no especificado')
-            + '</h4>'
+            + '<div style="margin-top:10px;">'
             + '<span class="badge badge-info">ID: ' + (t.cargos_id || 'N/A') + '</span>'
             + '</div>'
             + '</div>'
             + '<div class="col-md-8">'
-            + '<div class="card">'
-            + '<div class="card-body">'
-            + '<h4 class="card-title mb-4">' + (t.nombre || '') + ' ' + (t.apellidos || '') + '</h4>'
-            + '<ul class="list-group">'
-            + '<li class="list-group-item"><i class="fa fa-id-card mr-2"></i> <strong>CI:</strong> ' + (t.carnet_identidad || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-map mr-2"></i> <strong>Áreas de Acceso:</strong> ' + (t.areas_acceso || 'No definidas') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Generación:</strong> ' + (t.fecha_generacion || 'No generado') + '</li>'
-            + '</ul>'
-            + '<div class="alert ' + (t.vigente === '1' ? 'alert-success' : 'alert-warning') + ' mt-3">'
-            + '<i class="fa fa-' + (t.vigente === '1' ? 'check' : 'warning') + '-circle mr-2"></i> '
-            + '<strong>Estado del Pase:</strong> ' + (t.vigente === '1' ? 'Vigente' : 'No Vigente')
+            + '<div class="card" style="border:1px solid #e9ecef; box-shadow: none;">'
+            + '<div class="card-body p-3">'
+            + '<h5 style="font-weight:700; margin-bottom:6px;">' + (t.nombre || '') + ' ' + (t.apellidos || '') + '</h5>'
+            + '<p style="margin:0 0 8px 0; color:#6c757d;">' + (t.cargo_nombre || 'Cargo no especificado') + '</p>'
+            + '<table class="table table-sm" style="margin-bottom:0; font-size:0.95em;">'
+            + '<tr><td><strong>CI</strong></td><td>' + (t.carnet_identidad || 'N/A') + '</td></tr>'
+            + '<tr><td><strong>Áreas</strong></td><td>' + (t.areas_acceso || 'No definidas') + '</td></tr>'
+            + '<tr><td><strong>Fecha Gen.</strong></td><td>' + (t.fecha_generacion || 'N/A') + '</td></tr>'
+            + '<tr><td><strong>Estado Pase</strong></td><td>' + (t.vigente === '1' ? 'Vigente' : 'No Vigente') + '</td></tr>'
+            + '</table>'
+            + '</div>'
+            + '</div>'
+            + '<div class="mt-2">'
+            + '<button type="submit" class="btn btn-primary btn-sm" style="margin-right:8px;" onclick="document.getElementById(\'' + formId + '\').submit();">Generar PDF</button>'
+            + '<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Cerrar</button>'
             + '</div>'
             + '</div>'
             + '</div>'
-            + '</div>'
+            + '</form>'
             + '</div>';
 
-        // Actualizar el título y contenido del modal
-        $('#modalLabel').text('Pase de Control de Acceso');
+        // Actualizar el contenido del modal
         $('#modalBody').html(html);
-        $('#trabajadorModal').modal('show');
-        var fotoHtml = '';
-        if (t.foto) {
-            fotoHtml = '<img src="' + t.foto + '" alt="Foto del trabajador" style="max-width:200px; margin-bottom:10px;" class="img-thumbnail">';
-        }
-
-        var vigenciaClass = t.vigente === '1' ? 'alert-success' : 'alert-warning';
-        var vigenciaText = t.vigente === '1' ? 'Vigente' : 'No Vigente';
-
-        var html = '<div class="row">'
-            + '<div class="col-md-12 text-center mb-4">'
-            + '<h3>Pase de Control de Acceso</h3>'
-            + '</div>'
-            + '<div class="col-md-4 text-center">'
-            + (fotoHtml || '<div class="alert alert-info">No hay foto disponible</div>')
-            + '</div>'
-            + '<div class="col-md-8">'
-            + '<div class="card">'
-            + '<div class="card-body">'
-            + '<h4 class="card-title mb-4">' + (t.nombre || '') + ' ' + (t.apellidos || '') + '</h4>'
-            + '<ul class="list-group mb-3">'
-            + '<li class="list-group-item"><i class="fa fa-id-card mr-2"></i> <strong>CI:</strong> ' + (t.carnet_identidad || 'N/A') + '</li>'
-            + '<div class="list-group-item">'
-            + '<i class="fa fa-briefcase mr-2"></i> <strong>Cargo:</strong> ' 
-            + (t.cargo_nombre ? t.cargo_nombre : 'No especificado') 
-            + ' <span class="badge badge-info">ID: ' + (t.cargos_id || 'N/A') + '</span>'
-            + '</div>'
-            + '<li class="list-group-item"><i class="fa fa-location-arrow mr-2"></i> <strong>Áreas de Acceso:</strong> ' + (t.areas_acceso || 'No definidas') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Generación:</strong> ' + (t.fecha_generacion || 'N/A') + '</li>'
-            + '</ul>'
-            + '<div class="alert ' + vigenciaClass + ' text-center">'
-            + '<i class="fa fa-check-circle mr-2"></i> <strong>Estado del Pase:</strong> ' + vigenciaText
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>';
-
-        $('#modalBody').html(html);
-        $('#trabajadorModal .modal-title').text('Pase de Control de Acceso');
         $('#trabajadorModal').modal('show');
     });
 
@@ -193,6 +179,7 @@ $(document).ready(function () {
             + (fotoHtml || '<div class="alert alert-info">No hay foto disponible</div>')
             + '</div>'
             + '<div class="col-md-8">'
+            + '<h3>Información de trabajador</h3>'
             + '<div class="card">'
             + '<div class="card-body">'
             + '<h4 class="card-title mb-4">' + (t.nombre || '') + ' ' + (t.apellidos || '') + '</h4>'
@@ -227,8 +214,11 @@ $(document).ready(function () {
             + '<div class="row mt-3">'
             + '<div class="col-md-12">'
             + '</div>'
-            + '<div class="col-md-6 mt-3">'
+            + '<div class="col-md-12 mt-3">'
+            + '<div class="badge badge-secondary"><i class="fa fa-user mr-1"></i> ID Trabajador: ' + (t.id || 'N/A') + '</div>'
             + '<div class="badge badge-secondary"><i class="fa fa-database mr-1"></i> Bolsa Empleo ID: ' + (t.bolsa_empleo_id || 'N/A') + '</div>'
+            + ' <span class="badge badge-info">ID Cargo: ' + (t.cargos_id || 'N/A') + '</span>'
+            + ' <span class="badge badge-success">Cargo: ' + (t.cargo_nombre ? t.cargo_nombre : 'No especificado')  + '</span>'
             + '</div>'
             + '</div>'
             + '</div>'
