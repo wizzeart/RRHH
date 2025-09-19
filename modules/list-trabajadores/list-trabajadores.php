@@ -28,7 +28,7 @@
             <thead>
                 <tr>
                   <!-- <th data-field="id" data-sortable="true">ID</th>  -->
-                    <th data-field="cargos_id" data-sortable="true">Cargo</th>
+                    <th data-field="cargo_nombre" data-sortable="true">Cargo</th>
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="apellidos" data-sortable="true">Apellidos</th>
                     <th data-field="carnet_identidad" data-sortable="true">CI</th>
