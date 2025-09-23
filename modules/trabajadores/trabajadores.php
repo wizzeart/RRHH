@@ -104,7 +104,14 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label class="control-label" for="f-nivel">Nivel Educacional <span class="text-danger">*</span></label>
-                <input type="text" id="f-nivel" name="nivel_educacional" class="form-control" placeholder="Nivel Educacional" value="<?php if (isset($data['nivel_educacional'])) print($data['nivel_educacional']); ?>">
+                <select id="f-nivel" name="nivel_educacional" class="form-control">
+                    <option value="">Seleccione nivel educacional</option>
+                    <option value="Universitario" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Universitario') print('selected'); ?>>Universitario</option>
+                    <option value="Preuniversitario" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Preuniversitario') print('selected'); ?>>Preuniversitario</option>
+                    <option value="Técnico Superior" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Técnico Superior') print('selected'); ?>>Técnico Superior</option>
+                    <option value="Técnico Medio" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Técnico Medio') print('selected'); ?>>Técnico Medio</option>
+                    <option value="9no Grado" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == '9no Grado') print('selected'); ?>>9no Grado</option>
+                </select>
                 <!-- <small class="help-block">Nivel académico alcanzado</small> -->
             </div>
         </div>

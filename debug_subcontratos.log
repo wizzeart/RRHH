@@ -1,0 +1,56 @@
+2025-09-23 21:02:11 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [persona_nombre] => Ricardo Sanchez Molina
+    [estatus] => TCP
+    [servicio_objeto] => Es jardinero subcontratado de servicios comunales
+    [fecha_inicio] => 2025-09-17
+    [fecha_fin] => 
+    [areas_acceso] => jardin
+    [module] => subcontratos
+    [method] => save
+)
+
+2025-09-23 21:26:48 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [persona_nombre] => Heylin Garcia Matos
+    [estatus] => TCP
+    [servicio_objeto] => Trabaja de Asistencia Técnica en Servicios WEB
+    [fecha_inicio] => 2025-09-18
+    [fecha_fin] => 
+    [areas_acceso] => jardin
+    [module] => subcontratos
+    [method] => save
+)
+
+2025-09-23 21:26:50 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [persona_nombre] => Heylin Garcia Matos
+    [estatus] => TCP
+    [servicio_objeto] => Trabaja de Asistencia Técnica en Servicios WEB
+    [fecha_inicio] => 2025-09-18
+    [fecha_fin] => 
+    [areas_acceso] => jardin
+    [module] => subcontratos
+    [method] => save
+)
+
+2025-09-23 21:26:51 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [persona_nombre] => Heylin Garcia Matos
+    [estatus] => TCP
+    [servicio_objeto] => Trabaja de Asistencia Técnica en Servicios WEB
+    [fecha_inicio] => 2025-09-18
+    [fecha_fin] => 
+    [areas_acceso] => jardin
+    [module] => subcontratos
+    [method] => save
+)
+

@@ -33,6 +33,8 @@ if (isset($_REQUEST['module'])) {
             break;
         case 'list-trabajadores':
         case 'trabajadores':
+        case 'delete-trabajadores':
+        case 'bajas-trabajadores':
             include_once(BASE_CLASS . '/mdl.Trabajadores.php');
             $mdl = new Trabajador($app);
             $mdl->controlador($_REQUEST);
@@ -46,6 +48,27 @@ if (isset($_REQUEST['module'])) {
         case 'home':
             include_once(BASE_CLASS . '/mdl.Home.php');
             $mdl = new Home($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'historial':
+            include_once(BASE_CLASS . '/mdl.Historial.php');
+            $mdl = new Historial($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'list-subcontratos':
+        case 'subcontratos':
+        case 'delete-subcontratos':
+        case 'bajas-subcontratos':
+            include_once(BASE_CLASS . '/mdl.Subcontratos.php');
+            $mdl = new Subcontrato($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'list-programas-capacitacion':
+        case 'programas-capacitacion':
+        case 'delete-programas-capacitacion':
+        case 'finalizados-programas-capacitacion':
+            include_once(BASE_CLASS . '/mdl.ProgramasCapacitacion.php');
+            $mdl = new ProgramaCapacitacion($app);
             $mdl->controlador($_REQUEST);
             break;
         case 'logout':
