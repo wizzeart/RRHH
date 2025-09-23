@@ -36,20 +36,6 @@ $(document).ready(function () {
     $('#table-panel').on('click', '.fa.fa-edit', function () {
         location.href = 'index.php?module=trabajadores&id=' + $(this).data('id');
     });
-    $('#table-panel').on('click', '.fa.fa-trash', function () {
-        if (confirm('Estás seguro de eliminar?')) {
-            var cmd = 'module=trabajadores&method=del&id=' + $(this).data('id') + '&row=' + $(this).parent().parent().data('index');
-            $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
-                success: function (d) {
-                    if (d.status == 1) {
-                        $('tr[data-index="' + d.row + '"]').fadeOut('slow');
-                    } else {
-
-                    }
-                }
-            });
-        }
-    });
 
     // Handler for 'view' (eye) button - show modal with full worker info
     // Handler for access control pass (tablet icon)
@@ -254,10 +240,9 @@ function formatoActivo(value, row) {
 // Sample Format for Tracking Number Column.
 // =================================================================
 function formatoToolbar(value, row) {
-    var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-trash"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-tablet "></button>';
+    var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar trabajador"></button>\n\
+                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ver detalles"></button>\n\
+                <button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-tablet" title="Pase de acceso"></button>';
 
     return s;
 }

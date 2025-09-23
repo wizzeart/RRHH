@@ -23,6 +23,10 @@ class Trabajador {
                 $data = $this->_list($param);
                 print(json_encode($data));
                 break;
+            case 'list-bajas':
+                $data = $this->_list_bajas($param);
+                print(json_encode($data));
+                break;
             case 'checked':
                 $this->_checked($param);
                 break;
@@ -46,6 +50,20 @@ class Trabajador {
 
                 $data_form = array();
                 //$data_form['almacenes'] = $this->app->get_list_almacenes($filtro);
+                break;
+            case 'delete-trabajadores':
+                $data = array();
+                $page['title'] = 'Dar de Baja Trabajadores';
+                $page['subtitle'] = 'Dar de Baja Trabajadores';
+
+                $data_form = array();
+                break;
+            case 'bajas-trabajadores':
+                $data = array();
+                $page['title'] = 'Trabajadores Dados de Baja';
+                $page['subtitle'] = 'Listado de Trabajadores Dados de Baja';
+
+                $data_form = array();
                 break;
             case 'trabajadores':
                 /*
@@ -103,7 +121,8 @@ class Trabajador {
         );
 
         $update = array(
-            'trabajador_eliminado' => 1
+            'trabajador_eliminado' => 1,
+            'fecha_baja' => date('Y-m-d')
         );
         $where = array(
             'id' => $param['id']
@@ -114,7 +133,7 @@ class Trabajador {
             'xentity' => 'TRABAJADORES',
             'xaction' => 'DEL-TRABAJADORES',
             'xid' => $param['id'],
-            'xobs' => 'DEL TRABAJADOR: ' . $param['id']
+            'xobs' => 'BAJA TRABAJADOR: ' . $param['id'] . ' - Fecha: ' . date('Y-m-d')
         );
         $this->app->add_history($history);
 
@@ -279,15 +298,23 @@ class Trabajador {
                     $data['msg'] = 'Error al insertar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error
+                // Log del error original para diagnóstico
                 $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
                 $errorLog .= $e->getMessage() . "\n";
                 file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
-                
-                // Respuesta de error
+
+                // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
-                $data['msg'] = 'Error al insertar el registro: ' . $e->getMessage();
+                $friendly = '';
+                // Detectar violaciones de integridad (duplicados)
+                if (method_exists($e, 'getCode') && $e->getCode() == '23000') {
+                    $friendly = 'Violación de integridad de datos.';
+                }
+                if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                    $friendly = 'Ya existe un registro con el mismo identificador. Verifique que el ID o el CI no estén duplicados.';
+                }
+                $data['msg'] = $friendly !== '' ? $friendly : ('Error al insertar el registro: ' . $e->getMessage());
             }
         } else {
             // Update existente
@@ -371,15 +398,22 @@ class Trabajador {
                     $data['msg'] = 'Error al actualizar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error
+                // Log del error original para diagnóstico
                 $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
                 $errorLog .= $e->getMessage() . "\n";
                 file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
-                
-                // Respuesta de error
+
+                // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
-                $data['msg'] = 'Error al actualizar el registro: ' . $e->getMessage();
+                $friendly = '';
+                if (method_exists($e, 'getCode') && $e->getCode() == '23000') {
+                    $friendly = 'Violación de integridad de datos.';
+                }
+                if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                    $friendly = 'Conflicto de clave primaria. El registro ya existe con ese identificador.';
+                }
+                $data['msg'] = $friendly !== '' ? $friendly : ('Error al actualizar el registro: ' . $e->getMessage());
             }
         }
 
@@ -403,6 +437,36 @@ class Trabajador {
                 ORDER BY t.id";
         //print($sql);
         //die();
+        $data = $this->db->fetchAll($sql);
+        return $data;
+    }
+
+    private function _list_bajas($param) {
+        $data = array();
+        $sql = "SELECT 
+                t.id,
+                t.cargos_id,
+                t.nombre,
+                t.apellidos,
+                t.carnet_identidad,
+                t.sexo,
+                t.edad,
+                t.direccion,
+                t.telefono,
+                t.email,
+                t.nivel_educacional,
+                t.fecha_contratacion,
+                t.fecha_baja,
+                t.estatus,
+                t.bolsa_empleo_id,
+                t.foto,
+                c.nombre as cargo_nombre
+                FROM trabajadores t 
+                LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
+                WHERE t.fecha_baja IS NOT NULL 
+                AND t.fecha_baja != ''
+                ORDER BY t.fecha_baja DESC";
+        
         $data = $this->db->fetchAll($sql);
         return $data;
     }

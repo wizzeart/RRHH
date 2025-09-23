@@ -4,6 +4,33 @@ $(document).ready(function () {
     $('#f-almacen').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
     $('#f-punto-venta').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
 
+    // Hacer que los campos de fecha sean completamente clickeables para abrir el calendario
+    function makeDateFieldClickable(fieldId) {
+        $(fieldId).on('click', function() {
+            // Forzar el foco y mostrar el selector de fecha
+            this.focus();
+            if (this.showPicker) {
+                this.showPicker();
+            } else {
+                // Fallback para navegadores que no soportan showPicker()
+                this.click();
+            }
+        });
+        
+        // También hacer clickeable el contenedor padre si existe
+        $(fieldId).parent().on('click', function(e) {
+            if (e.target !== $(fieldId)[0]) {
+                $(fieldId).focus();
+                if ($(fieldId)[0].showPicker) {
+                    $(fieldId)[0].showPicker();
+                }
+            }
+        });
+    }
+
+    // Aplicar la funcionalidad a todos los campos de fecha
+    makeDateFieldClickable('#f-fecha-registro');
+
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
         cmd_params=cmd;

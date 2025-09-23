@@ -33,27 +33,27 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-nombre">Nombre</label>
-                <input type="text" id="f-nombre" name="nombre" class="form-control" placeholder="Nombre" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?>">
-                <small class="help-block">Nombre del trabajador</small>
+                <label class="control-label" for="f-nombre">Nombre <span class="text-danger">*</span></label>
+                <input type="text" id="f-nombre" name="nombre" class="form-control" placeholder="Nombre del trabajador" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?>">
+                <!-- <small class="help-block">Nombre del trabajador</small> -->
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-apellidos">Apellidos</label>
-                <input type="text" id="f-apellidos" name="apellidos" class="form-control" placeholder="Apellidos" value="<?php if (isset($data['apellidos'])) print($data['apellidos']); ?>">
-                <small class="help-block">Apellidos del trabajador</small>
+                <label class="control-label" for="f-apellidos">Apellidos <span class="text-danger">*</span></label>
+                <input type="text" id="f-apellidos" name="apellidos" class="form-control" placeholder="Apellidos del trabajador" value="<?php if (isset($data['apellidos'])) print($data['apellidos']); ?>">
+                <!-- <small class="help-block">Apellidos del trabajador</small> -->
             </div>
         </div>
         <div class="col-md-2">
             <div class="form-group">
                 <label class="control-label" for="f-sexo">Sexo</label>
                 <select id="f-sexo" name="sexo" class="form-control">
-                    <option value="">Seleccione</option>
+                    <option value=""></option>
                     <option value="M" <?php if (isset($data['sexo']) && $data['sexo'] == 'M') print('selected'); ?>>Masculino</option>
                     <option value="F" <?php if (isset($data['sexo']) && $data['sexo'] == 'F') print('selected'); ?>>Femenino</option>
                 </select>
-                <small class="help-block">Sexo del trabajador</small>
+                <!-- <small class="help-block">Sexo del trabajador</small> -->
             </div>
         </div>
     </div>
@@ -62,30 +62,30 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label class="control-label" for="f-ci">Carnet de Identidad</label>
-                <input type="text" id="f-ci" name="carnet_identidad" class="form-control" placeholder="Carnet de Identidad" value="<?php if (isset($data['carnet_identidad'])) print($data['carnet_identidad']); ?>">
-                <small class="help-block">Documento de identidad</small>
+                <label class="control-label" for="f-ci">Carnet de Identidad <span class="text-danger">*</span></label>
+                <input type="text" id="f-ci" name="carnet_identidad" class="form-control" placeholder="Carnet de Identidad del trabajador" value="<?php if (isset($data['carnet_identidad'])) print($data['carnet_identidad']); ?>">
+                <!-- <small class="help-block">Documento de identidad</small> -->
             </div>
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <label class="control-label" for="f-edad">Edad</label>
-                <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad" value="<?php if (isset($data['edad'])) print($data['edad']); ?>">
-                <small class="help-block">Edad actual</small>
+                <label class="control-label" for="f-edad">Edad <span class="text-danger">*</span></label>
+                <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad actual" value="<?php if (isset($data['edad'])) print($data['edad']); ?>">
+                <!-- <small class="help-block">Edad actual</small> -->
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-direccion">Dirección</label>
-                <input type="text" id="f-direccion" name="direccion" class="form-control" placeholder="Dirección" value="<?php if (isset($data['direccion'])) print($data['direccion']); ?>">
-                <small class="help-block">Dirección del trabajador</small>
+                <label class="control-label" for="f-direccion">Dirección <span class="text-danger">*</span></label>
+                <input type="text" id="f-direccion" name="direccion" class="form-control" placeholder="Dirección del trabajador" value="<?php if (isset($data['direccion'])) print($data['direccion']); ?>">
+                <!-- <small class="help-block">Dirección del trabajador</small> -->
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label class="control-label" for="f-telefono">Teléfono</label>
-                <input type="text" id="f-telefono" name="telefono" class="form-control" placeholder="Teléfono" value="<?php if (isset($data['telefono'])) print($data['telefono']); ?>">
-                <small class="help-block">Teléfono de contacto</small>
+                <label class="control-label" for="f-telefono">Teléfono <span class="text-danger">*</span></label>
+                <input type="text" id="f-telefono" name="telefono" class="form-control" placeholder="Teléfono de contacto" value="<?php if (isset($data['telefono'])) print($data['telefono']); ?>">
+                <!-- <small class="help-block">Teléfono de contacto</small> -->
             </div>
         </div>
     </div>
@@ -96,28 +96,28 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-email">Email</label>
-                <input type="email" id="f-email" name="email" class="form-control" placeholder="Email" value="<?php if (isset($data['email'])) print($data['email']); ?>">
-                <small class="help-block">Correo electrónico</small>
+                <label class="control-label" for="f-email">Email <span class="text-danger">*</span></label>
+                <input type="email" id="f-email" name="email" class="form-control" placeholder="Correo electrónico" value="<?php if (isset($data['email'])) print($data['email']); ?>">
+                <!-- <small class="help-block">Correo electrónico</small> -->
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-nivel">Nivel Educacional</label>
+                <label class="control-label" for="f-nivel">Nivel Educacional <span class="text-danger">*</span></label>
                 <input type="text" id="f-nivel" name="nivel_educacional" class="form-control" placeholder="Nivel Educacional" value="<?php if (isset($data['nivel_educacional'])) print($data['nivel_educacional']); ?>">
-                <small class="help-block">Nivel académico alcanzado</small>
+                <!-- <small class="help-block">Nivel académico alcanzado</small> -->
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label class="control-label" for="f-cargo">Cargo</label>
+                <label class="control-label" for="f-cargo">Cargo <span class="text-danger">*</span></label>
                 <select id="f-cargo" name="cargos_id" class="form-control">
-                    <option value="">Seleccione un cargo</option>
+                    <option value=""></option>
                     <?php foreach ($data_form['cargos'] as $k => $v) { ?>
                         <option value="<?php print($v['id']) ?>" ><?php print($v['nombre']) ?></option>
                     <?php } ?>
                 </select>
-                <small class="help-block">Cargo asignado</small>
+                <!-- <small class="help-block">Cargo asignado</small> -->
             </div>
         </div>
     </div>
@@ -126,40 +126,41 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label class="control-label" for="f-contratacion">Fecha Contratación</label>
+                <label class="control-label" for="f-contratacion">Fecha Contratación <span class="text-danger">*</span></label>
                 <input type="date" id="f-contratacion" name="fecha_contratacion" class="form-control" value="<?php if (isset($data['fecha_contratacion'])) print($data['fecha_contratacion']); ?>">
-                <small class="help-block">Inicio del Contrato</small>
+                <!-- <small class="help-block">Inicio del Contrato</small> -->
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-baja">Fecha Baja</label>
                 <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>">
-                <small class="help-block">Fin del Contrato</small>
+                <!-- <small class="help-block">Fin del Contrato</small> -->
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label class="control-label" for="f-estatus">Estatus</label>
+                <label class="control-label" for="f-estatus">Estatus <span class="text-danger">*</span></label>
                 <select id="f-estatus" name="estatus" class="form-control">
-                    <option value="">Seleccione</option>
+                    <option value=""></option>
                     <option value="activo" <?php if (isset($data['estatus']) && $data['estatus'] == 'activo') print('selected'); ?>>Activo</option>
                     <option value="inactivo" <?php if (isset($data['estatus']) && $data['estatus'] == 'inactivo') print('selected'); ?>>Inactivo</option>
                 </select>
-                <small class="help-block">Estado actual</small>
+                <!-- <small class="help-block">Estado actual</small> -->
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label class="control-label" for="f-bolsa">Bolsa de Empleo</label>
+                <label class="control-label" for="f-bolsa">Bolsa de Empleo <span class="text-danger">*</span></label>
                 <select id="f-bolsa" name="bolsa_empleo_id" class="form-control">
-                    <option value="">Seleccione una bolsa</option>
+                    <option value=""></option>
                     <?php foreach ($data_form['bolsas'] as $k => $v) { ?>
                        <option value="<?php print($v['id']) ?>" ><?php print($v['nombre']) ?></option>
                     <?php } ?>
                 </select>
-                <small class="help-block">Bolsa de empleo asociada</small>
+                <!-- <small class="help-block">Bolsa de empleo asociada</small> -->
             </div>
+        </div>
         </div
          <div class="row">
                           

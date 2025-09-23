@@ -52,6 +52,7 @@
 
 -->
 <!--NEW MENU GENERAL-->
+<!-- 
 <li class="<?php if ($_GET['module'] == 'home') print('active-link') ?>">
     <a href="index.php">
 
@@ -71,7 +72,7 @@
         <i class="arrow"></i>
     </a>
 
-    <!--Submenu-->
+   
     <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
             <a href="?module=list-usuarios">Usuarios</a>
@@ -79,9 +80,10 @@
         <li e>
        
     </ul>
-</li>
+</li> -->
+
 <!--NEW MENU TRABAJADORES-->
-<li class="list-divider"></li>
+<!-- <li class="list-divider"></li>
 <li>
     <a href="javascript:void(0);">
         <i class="fa fa-users"></i>
@@ -91,7 +93,7 @@
         <i class="arrow"></i>
     </a>
 
-    <!--Submenu-->
+    
     <ul class="collapse <?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'config'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
             <a href="?module=list-trabajadores">Lista de Trabajadores</a>
@@ -101,4 +103,4 @@
             <a href="?module=trabajadores">Registrar Trabajador</a>
         </li>
     </ul>
-</li>
+</li> -->

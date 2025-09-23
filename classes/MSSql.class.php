@@ -129,8 +129,12 @@ public function __construct($host, $db, $user, $pwd) {
             print($sqld);
         }
 
-        $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
-        return $data[0];
+        // Obtener solo una fila; si no hay resultados, devolver null para evitar warnings
+        $row = $consulta->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
+        return $row;
     }
 
     public function close()

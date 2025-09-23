@@ -620,3 +620,513 @@ Array
 
 2025-09-18 21:07:35 - Error al actualizar:
 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mb_recursos_humanos.historico' doesn't exist
+2025-09-23 15:52:07 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Luis 
+    [apellidos] => p
+    [sexo] => F
+    [carnet_identidad] => 01032963698
+    [edad] => 89
+    [direccion] => lo
+    [telefono] => 5588963214
+    [email] => lola@k.com
+    [nivel_educacional] => bajo
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-23
+    [estatus] => activo
+    [bolsa_empleo_id] => 2
+)
+
+Array
+(
+)
+
+2025-09-23 15:52:07 - Intentando insertar:
+Array
+(
+    [nombre] => Luis 
+    [apellidos] => p
+    [sexo] => F
+    [carnet_identidad] => 01032963698
+    [edad] => 89
+    [direccion] => lo
+    [telefono] => 5588963214
+    [email] => lola@k.com
+    [nivel_educacional] => bajo
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-23
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 2
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 15:52:07 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '8' for key 'PRIMARY'
+2025-09-23 16:02:54 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorge
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268102
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php5C98.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:02:54 - Intentando insertar:
+Array
+(
+    [nombre] => Jorge
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268102
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a88e3aa47_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:03:06 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorge
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268102
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php8B3B.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:03:49 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268102
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php3604.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:03:54 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268104
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php49BD.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:03:54 - Intentando insertar:
+Array
+(
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268104
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a8cae7df4_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:04:12 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268122
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php8D21.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:04:12 - Intentando insertar:
+Array
+(
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268122
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a8dc2f12d_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:05:26 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => insert
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268166
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\phpAEA0.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:05:26 - Intentando insertar:
+Array
+(
+    [nombre] => Jorgea
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268166
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a9264d619_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:05:45 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [id] => 12
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\phpFA51.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:05:45 - Intentando actualizar trabajador ID: 12
+Array
+(
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a939a67f8_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:05:45 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '12' for key 'PRIMARY'
+2025-09-23 16:05:58 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [id] => 12
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php2B46.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:05:58 - Intentando actualizar trabajador ID: 12
+Array
+(
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a94631f49_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:05:58 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '12' for key 'PRIMARY'
+2025-09-23 16:06:02 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [id] => 12
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => Screenshot 2025-09-18 100848.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php3D4A.tmp
+            [error] => 0
+            [size] => 27232
+        )
+
+)
+
+2025-09-23 16:06:02 - Intentando actualizar trabajador ID: 12
+Array
+(
+    [nombre] => Jorgeaaa
+    [apellidos] => Ramirez
+    [sexo] => M
+    [carnet_identidad] => 01022268141
+    [edad] => 24
+    [direccion] => calle 654 entre 3ra y 5ta
+    [telefono] => 7564454
+    [email] => jorge@gmail.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2025-09-12
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 3
+    [foto] => uploads/trabajadores/foto_68d2a94aca02f_Screenshot 2025-09-18 100848.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-23 16:06:02 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '12' for key 'PRIMARY'

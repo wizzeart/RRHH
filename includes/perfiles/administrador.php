@@ -92,13 +92,18 @@
     </a>
 
     <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'config'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'delete-trabajadores', 'bajas-trabajadores', 'config'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
             <a href="?module=list-trabajadores">Lista de Trabajadores</a>
         </li>
-        <li e>
         <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
             <a href="?module=trabajadores">Registrar Trabajador</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('delete-trabajadores'))) print('active-link') ?>">
+            <a href="?module=delete-trabajadores">Dar de Baja Trabajadores</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('bajas-trabajadores'))) print('active-link') ?>">
+            <a href="?module=bajas-trabajadores">Listado de Bajas</a>
         </li>
     </ul>
 </li>

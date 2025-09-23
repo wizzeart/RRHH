@@ -1,8 +1,56 @@
 var e, tmp, cmd_params;
 
 $(document).ready(function () {
+    // Helper de notificaciones: usa Nifty Noty si está disponible, si no, fallback a alert
+    function notify(type, title, message, timer) {
+        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+            $.niftyNoty({
+                type: type || 'info',
+                container: 'floating',
+                title: title || '',
+                message: message || '',
+                timer: timer != null ? timer : 3000,
+                closeBtn: true,
+                focus: true
+            });
+        } else {
+            // Fallback simple para garantizar feedback al usuario
+            var text = (title ? (title + ': ') : '') + (message || '');
+            try { alert(text); } catch(e) { console.warn('Notify:', text); }
+        }
+    }
+    // Flag to track if selected photo is a valid image
+    var fotoEsValida = true;
     $('#f-almacen').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
     $('#f-punto-venta').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
+
+    // Hacer que los campos de fecha sean completamente clickeables para abrir el calendario
+    function makeDateFieldClickable(fieldId) {
+        $(fieldId).on('click', function() {
+            // Forzar el foco y mostrar el selector de fecha
+            this.focus();
+            if (this.showPicker) {
+                this.showPicker();
+            } else {
+                // Fallback para navegadores que no soportan showPicker()
+                this.click();
+            }
+        });
+        
+        // También hacer clickeable el contenedor padre si existe
+        $(fieldId).parent().on('click', function(e) {
+            if (e.target !== $(fieldId)[0]) {
+                $(fieldId).focus();
+                if ($(fieldId)[0].showPicker) {
+                    $(fieldId)[0].showPicker();
+                }
+            }
+        });
+    }
+
+    // Aplicar la funcionalidad a todos los campos de fecha
+    makeDateFieldClickable('#f-contratacion');
+    makeDateFieldClickable('#f-baja');
 
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
@@ -49,12 +97,66 @@ $(document).ready(function () {
         }
     }
 
-    // Previsualización de foto
+    // Validación y previsualización de foto (solo imágenes reales)
     $('#f-foto').change(function() {
-        if ($(this).next('.preview-container').length === 0) {
-            $(this).after('<div class="preview-container mt-2" style="display:none"><img src="" style="max-width: 100px; height: auto;"></div>');
+        var $input = $(this);
+        var file = this.files && this.files[0] ? this.files[0] : null;
+
+        // Reset estado previo
+        fotoEsValida = true;
+
+        // Crear contenedor de preview si no existe
+        if ($input.next('.preview-container').length === 0) {
+            $input.after('<div class="preview-container mt-2" style="display:none"><img src="" style="max-width: 100px; height: auto;"></div>');
         }
-        readURL(this, $(this).next('.preview-container').find('img'));
+        var $img = $input.next('.preview-container').find('img');
+
+        if (!file) {
+            // Sin archivo: ocultar preview
+            $img.attr('src', '');
+            $input.next('.preview-container').hide();
+            return;
+        }
+
+        // Validar por MIME type
+        if (!file.type || !file.type.startsWith('image/')) {
+            fotoEsValida = false;
+            $img.attr('src', '');
+            $input.val(''); // limpiar input
+            $input.next('.preview-container').hide();
+            notify('danger', 'Archivo inválido', 'Solo se permiten archivos en formato imagen (JPEG, PNG, GIF, etc.).', 4000);
+            return;
+        }
+
+        // Validar que realmente carga como imagen creando un objeto Image
+        try {
+            var objectUrl = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function() {
+                // Es una imagen válida: mostrar preview
+                $img.attr('src', objectUrl);
+                $input.next('.preview-container').show();
+                // Liberar URL cuando la imagen en el DOM termine de cargar
+                $img.on('load', function() { URL.revokeObjectURL(objectUrl); });
+                fotoEsValida = true;
+            };
+            img.onerror = function() {
+                fotoEsValida = false;
+                URL.revokeObjectURL(objectUrl);
+                $img.attr('src', '');
+                $input.val('');
+                $input.next('.preview-container').hide();
+                notify('danger', 'Archivo inválido', 'El archivo seleccionado no es una imagen válida.', 4000);
+            };
+            img.src = objectUrl;
+        } catch (e) {
+            // Fallback si falla la validación por algún motivo
+            fotoEsValida = false;
+            $img.attr('src', '');
+            $input.val('');
+            $input.next('.preview-container').hide();
+            notify('danger', 'Error al validar imagen', 'No se pudo validar el archivo seleccionado. Intente con otra imagen.', 4000);
+        }
     });
 
     $('#btn-save').click(function () {
@@ -71,6 +173,9 @@ $(document).ready(function () {
         if ($('#f-ci').val() == '') {
             status = 0;
             msg += '<div>El campo CI del Trabajador es obligatorio.</div>';
+        } else if ($('#f-ci').val().length !== 11) {
+            status = 0;
+            msg += '<div>El Carnet de Identidad debe tener exactamente 11 caracteres.</div>';
         }
         if ($('#f-edad').val() == '') {
             status = 0;
@@ -82,11 +187,23 @@ $(document).ready(function () {
         }
          if ($('#f-telefono').val() == '') {
             status = 0;
-            msg += '<div>El campo Telefono del Trabajador es obligatorio.</div>';
+            msg += '<div>El campo Teléfono del Trabajador es obligatorio.</div>';
+        } else {
+            var phonePattern = /^[0-9+\-\s()]+$/;
+            if (!phonePattern.test($('#f-telefono').val())) {
+                status = 0;
+                msg += '<div>El teléfono debe contener solo números, espacios, guiones, paréntesis o el signo +.</div>';
+            }
         }
          if ($('#f-email').val() == '') {
             status = 0;
             msg += '<div>El campo Correo del Trabajador es obligatorio.</div>';
+        } else {
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test($('#f-email').val())) {
+                status = 0;
+                msg += '<div>Por favor ingrese un correo electrónico válido.</div>';
+            }
         }
          if ($('#f-nivel').val() == '') {
             status = 0;
@@ -111,6 +228,24 @@ $(document).ready(function () {
         if ($('#f-cargo').val() == '') {
             status = 0;
             msg += '<div>El campo Cargo del Trabajador es obligatorio.</div>';
+        }
+
+        if ($('#f-bolsa').val() == '') {
+            status = 0;
+            msg += '<div>El campo Bolsa de Empleo es obligatorio.</div>';
+        }
+
+        // Validar foto antes de enviar (si se seleccionó)
+        var archivoFoto = $('#f-foto')[0].files ? $('#f-foto')[0].files[0] : null;
+        if (archivoFoto) {
+            if (!archivoFoto.type || !archivoFoto.type.startsWith('image/')) {
+                status = 0;
+                msg += '<div>El archivo adjunto debe ser una imagen.</div>';
+            }
+            if (!fotoEsValida) {
+                status = 0;
+                msg += '<div>La imagen seleccionada no es válida. Por favor seleccione otra.</div>';
+            }
         }
 
         if (status == 1) {
@@ -198,40 +333,28 @@ $(document).ready(function () {
                             $('#f-id').val(d.id);
                         }
                         $('#f-pass').val('');
-                        $.niftyNoty({
-                            type: 'success',
-                            container: 'floating',
-                            title: '¡Éxito!',
-                            message: action === 'insert' ? 
-                                'El trabajador ha sido registrado correctamente.' :
-                                'Los datos del trabajador han sido actualizados correctamente.',
-                            timer: 5000,
-                            closeBtn: true,
-                            focus: true
-                        });
+                        notify(
+                            'success',
+                            '¡Éxito!',
+                            action === 'insert' ? 'El trabajador ha sido registrado correctamente.' : 'Los datos del trabajador han sido actualizados correctamente.',
+                            5000
+                        );
                     } else {
-                        $.niftyNoty({
-                            type: 'danger',
-                            title: 'Guardar datos',
-                            message: d.msg,
-                            container: 'floating',
-                            timer: 3000
-                        });
+                        notify('danger', 'Guardar datos', d.msg, 3000);
                     }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $('#img-loading').addClass('hidden');
+                    $('#btn-save').attr('disabled', false);
+                    var response = XMLHttpRequest && XMLHttpRequest.responseText ? XMLHttpRequest.responseText : (errorThrown || textStatus || 'Error desconocido');
+                    notify('danger', 'Error al guardar', response, 5000);
                 }
             });
         } else {
-            $.niftyNoty({
-                type: 'danger',
-                title: 'Guardar datos',
-                message: msg,
-                container: 'floating',
-                timer: 3000
-            });
+            notify('danger', 'Guardar datos', msg, 3000);
         }
     });
 });
-
 
 function formatoPedido(value, row) {
     //var s = '<div><input data-ped="' + value + '" type="checkbox" class="chk-ped"/>&nbsp;' + value + '</div>';
