@@ -80,7 +80,7 @@
                     <table 
                         id="table-retornados"
                         data-toggle="table"
-                        data-url="api-app.php?module=recursos&method=list&estado=0"
+                        data-url="api-app.php?module=list-recursos&method=list&estado=0"
                         data-search="true"
                         data-show-refresh="true"
                         data-show-toggle="false"

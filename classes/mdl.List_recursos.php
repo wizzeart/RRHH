@@ -21,14 +21,34 @@ class List_recursos {
 
     private function _list() {
         $data = array();
-        // Consulta para obtener los recursos con información del trabajador
-        $sql = "SELECT r.*, 
-                        CONCAT(t.nombre, ' ', t.apellidos) as nombre_trabajador
-                FROM recursos r
-                LEFT JOIN trabajadores t ON r.trabajador_id = t.id
-                ORDER BY r.fecha_entrega_a_t DESC, r.id DESC";
         
-        $data = $this->db->fetchAll($sql);
+        // Construir la consulta base
+        $sql = "SELECT r.*, CONCAT(t.nombre, ' ', t.apellidos) as nombre_trabajador
+                FROM recursos r
+                LEFT JOIN trabajadores t ON r.trabajador_id = t.id";
+        
+        $params = array();
+        
+        // Filtrar por estado si se proporciona
+        if (isset($_GET['estado']) && ($_GET['estado'] === '0' || $_GET['estado'] === '1')) {
+            $sql .= " WHERE r.estado = ?";
+            $params[] = (int)$_GET['estado'];
+        }
+        
+        // Ordenar según corresponda
+        if (isset($_GET['estado']) && $_GET['estado'] === '0') {
+            $sql .= " ORDER BY r.fecha_entrega_a_rh DESC, r.id DESC";
+        } else {
+            $sql .= " ORDER BY r.fecha_entrega_a_t DESC, r.id DESC";
+        }
+        
+        // Ejecutar la consulta
+        if (!empty($params)) {
+            $data = $this->db->fetchAll($sql, $params);
+        } else {
+            $data = $this->db->fetchAll($sql);
+        }
+        
         return $data;
     }
 
