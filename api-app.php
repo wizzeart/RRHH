@@ -23,6 +23,11 @@ if ($app->user_id == '' && !in_array($_REQUEST['module'], array('login', 'reset'
 }
 
 switch ($_REQUEST['module']) {
+    case 'list-recursos':
+        include_once(BASE_CLASS . '/mdl.List_recursos.php');
+        $mdl = new List_recursos($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'usuarios':
         include_once(BASE_CLASS . '/mdl.Usuarios.php');
         $mdl = new Usuario($app);

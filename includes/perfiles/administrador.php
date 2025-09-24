@@ -123,11 +123,33 @@
     <!--Submenu-->
     <ul class="collapse <?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos', 'config'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
-            <a href="?module=list-bolsas_empleos">Bolsa de Empleos</a>
+            <a href="?module=list-bolsas_empleos">Bolsa de Empleos</a>    
         </li>
         <li e>
         <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
             <a href="?module=bolsas_empleos">Postulación a Empleo</a>
+        </li>
+    </ul>
+</li>
+
+<!--NEW MENU ENTREGA DE RECURSOS-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-cube"></i>
+        <span class="menu-title">
+            <strong>Entrega de Recursos</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-recursos'))) print('active-link') ?>">
+            <a href="?module=list-recursos">Lista de Recursos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('gestion-recursos'))) print('active-link') ?>">
+            <a href="?module=gestion-recursos">Gestionar Recursos</a>
         </li>
     </ul>
 </li>
