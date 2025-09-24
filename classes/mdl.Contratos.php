@@ -82,10 +82,10 @@ class Contrato {
         if (empty($fecha_inicio)) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La fecha de inicio es obligatoria'; print(json_encode($data)); return; }
         if (!empty($fecha_fin) && $fecha_fin < $fecha_inicio) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La fecha fin no puede ser anterior a la fecha inicio'; print(json_encode($data)); return; }
 
-        // Manejo de uploads
+        // Manejo de uploads (solo firma, el contrato se genera como PDF automáticamente)
         $upload_dir = 'uploads/contratos/';
         if (!file_exists($upload_dir)) { @mkdir($upload_dir, 0777, true); }
-        $archivo_contrato_path = null;
+        $archivo_contrato_path = null; // será el PDF generado
         $firma_digital_path = null;
 
         if (isset($_FILES['archivo_contrato']) && $_FILES['archivo_contrato']['error'] === UPLOAD_ERR_OK) {
@@ -110,10 +110,20 @@ class Contrato {
 
         try {
             if (!isset($param['id']) || $param['id'] == '') {
+                // 1) Insertar sin archivo_contrato para obtener el ID
                 $result = $this->db->insert('contratos', $insert);
                 if ($result) {
                     $lastId = method_exists($this->db, 'last_id') ? $this->db->last_id() : (method_exists($this->db, 'lastInsertId') ? $this->db->lastInsertId() : null);
-                    if ($lastId) { $data['id'] = $lastId; }
+                    if ($lastId) {
+                        $data['id'] = $lastId;
+                        // 2) Generar PDF con mPDF
+                        $pdfPath = $this->generar_pdf_contrato($upload_dir, $lastId, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, $firma_digital_path);
+                        if ($pdfPath) {
+                            // 3) Actualizar ruta del archivo en BD
+                            $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $lastId));
+                            $data['file_url'] = $pdfPath;
+                        }
+                    }
                 } else { $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al insertar'; }
             } else {
                 $id = intval($param['id']);
@@ -123,11 +133,66 @@ class Contrato {
                 $where = array('id' => $id);
                 $result = $this->db->update('contratos', $insert, $where);
                 if ($result === false) { $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al actualizar'; }
-                else { $data['id'] = $id; }
+                else {
+                    $data['id'] = $id;
+                    // Regenerar PDF con datos actualizados
+                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, isset($insert['firma_digital']) ? $insert['firma_digital'] : $firma_digital_path);
+                    if ($pdfPath) {
+                        $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $id));
+                        $data['file_url'] = $pdfPath;
+                    }
+                }
             }
         } catch (Exception $e) {
             $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al guardar: ' . $e->getMessage();
         }
         print(json_encode($data));
+    }
+
+    // Helper: Genera el PDF del contrato con mPDF
+    private function generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, $firma_digital_path) {
+        // Cargar datos del trabajador (usar nombres de columnas reales)
+        $trab = $this->db->fetchRow("SELECT nombre, apellidos, carnet_identidad FROM trabajadores WHERE id = :id", array('id' => $trabajador_id));
+        $nombreCompleto = '';
+        if ($trab) {
+            $nombreCompleto = trim(($trab['nombre'] ?? '') . ' ' . ($trab['apellidos'] ?? ''));
+        }
+
+        // Cargar mPDF
+        $autoloads = array(
+            BASE . '/plugins/mpdf/vendor/autoload.php',
+            BASE . '/plugins/mpdf/autoload.php',
+            __DIR__ . '/../plugins/mpdf/vendor/autoload.php',
+            __DIR__ . '/../plugins/mpdf/autoload.php'
+        );
+        foreach ($autoloads as $auto) {
+            if (file_exists($auto)) { require_once($auto); break; }
+        }
+        if (!class_exists('Mpdf\\Mpdf')) {
+            return null; // mPDF no disponible
+        }
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir()]);
+
+        // Estilos simples (puedes reemplazar por plantilla propia)
+        $css = 'body { font-family: DejaVu Sans, sans-serif; font-size: 12px; } .title { text-align:center; font-weight:bold; font-size:18px; margin-bottom:10px; } .sec h3 { margin: 10px 0 5px; } .row { margin: 6px 0; } .label { color:#666; width: 180px; display:inline-block; }';
+        $html = '<html><head><style>' . $css . '</style></head><body>'
+              . '<div class="title">Contrato #' . htmlspecialchars((string)$id) . '</div>'
+              . '<div class="sec">'
+              . '<div class="row"><span class="label">Trabajador:</span> ' . htmlspecialchars($nombreCompleto ?: ('ID ' . $trabajador_id)) . '</div>'
+              . '<div class="row"><span class="label">Tipo de Contrato:</span> ' . htmlspecialchars($tipo) . '</div>'
+              . '<div class="row"><span class="label">Fecha Inicio:</span> ' . htmlspecialchars($fecha_inicio ?: '') . '</div>'
+              . '<div class="row"><span class="label">Fecha Fin:</span> ' . htmlspecialchars($fecha_fin ?: 'Indefinido') . '</div>'
+              . '</div>';
+        if (!empty($firma_digital_path)) {
+            $html .= '<div class="sec"><h3>Firma Digital</h3><div class="row"><img src="' . htmlspecialchars($firma_digital_path) . '" style="max-width:250px; max-height:120px;"></div></div>';
+        }
+        $html .= '<div class="sec"><h3>Cláusulas</h3><div class="row">Este documento ha sido generado automáticamente por el sistema.</div></div>';
+        $html .= '</body></html>';
+
+        $mpdf->WriteHTML($html);
+        $fileName = 'contrato_' . $id . '.pdf';
+        $fullPath = rtrim($upload_dir, '/\\') . '/' . $fileName;
+        $mpdf->Output($fullPath, 'F');
+        return $fullPath;
     }
 }

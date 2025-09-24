@@ -1,6 +1,6 @@
 <div class="panel">
     <div class="form-control">
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Programa" title="Añadir Nuevo Programa de Capacitación"></button>
+        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Programa" title="Añadir Nuevo Programa de Capacitación">Añadir Nuevo Programa</button>
     </div>
 </div>
 

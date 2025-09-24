@@ -1,9 +1,11 @@
 <div class="panel">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php print($page['subtitle'] ?? 'Lista de Contratos'); ?></h3>
+<div class="panel-heading">
+        <h3 class="panel-title">Listado de contratos</h3>
     </div>
+
     <div class="panel-body">
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Contrato" title="Añadir Nuevo Contrato"></button>
+       
+        
         <table 
             id="table-panel"
             data-toggle="table"
@@ -19,9 +21,13 @@
             data-pagination="true" data-show-pagination-switch="true">
             <thead>
                 <tr>
-                    <th data-field="id" data-sortable="true">ID</th>
-                    <th data-field="nombre" data-sortable="true">Nombre</th>
-                    <th data-field="fecha" data-sortable="true">Fecha</th>
+                    <th data-field="id" data-sortable="true" data-width="80">ID</th>
+                    <th data-field="trabajador_nombre" data-sortable="true">Trabajador</th>
+                    <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
+                    <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
+
+                    <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
+                    <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
                 </tr>
             </thead>
         </table>

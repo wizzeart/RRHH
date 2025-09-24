@@ -9,13 +9,13 @@
             
             <!-- Primera fila -->
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label class="control-label" for="f-nombre">Nombre de la Persona <span class="text-danger">*</span></label>
                         <input type="text" id="f-nombre" name="persona_nombre" class="form-control" placeholder="Nombre completo de la persona" value="<?php if (isset($data['persona_nombre'])) print($data['persona_nombre']); ?>">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label class="control-label" for="f-estatus">Estatus <span class="text-danger">*</span></label>
                         <select id="f-estatus" name="estatus" class="form-control">
@@ -26,7 +26,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label class="control-label" for="f-entidad">Entidad Representada</label>
                         <input type="text" id="f-entidad" name="entidad_representada" class="form-control" placeholder="Entidad que representa" value="<?php if (isset($data['entidad_representada'])) print($data['entidad_representada']); ?>">
@@ -34,28 +34,35 @@
                 </div>
             </div>
 
-            <!-- Fila adicional: Carnet de Identidad (CI) -->
+            <!-- Segunda fila: CI y Áreas de Acceso para simetría -->
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="f-ci">CI - Carnet de Identidad <span class="text-danger">*</span></label>
                         <input type="text" id="f-ci" name="carnet_identidad" class="form-control" placeholder="Ej: 12345678901" maxlength="11" value="<?php if (isset($data['carnet_identidad'])) print($data['carnet_identidad']); ?>">
                         <small class="help-block">Debe tener 11 dígitos</small>
                     </div>
                 </div>
-            </div>
-
-            <!-- Segunda fila -->
-            <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="f-servicio">Servicio u Objeto de Contrato <span class="text-danger">*</span></label>
-                        <textarea id="f-servicio" name="servicio_objeto" class="form-control" rows="3" placeholder="Descripción del servicio o objeto del contrato"><?php if (isset($data['servicio_objeto'])) print($data['servicio_objeto']); ?></textarea>
+                        <label class="control-label" for="f-areas">Áreas de Acceso</label>
+                        <input type="text" id="f-areas" name="areas_acceso" class="form-control" placeholder="Áreas permitidas para acceso" value="<?php if (isset($data['areas_acceso'])) print($data['areas_acceso']); ?>">
+                        <small class="help-block">Separar múltiples áreas con comas</small>
                     </div>
                 </div>
             </div>
 
-            <!-- Tercera fila -->
+            <!-- Tercera fila: Servicio/Objeto del contrato a ancho completo -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" for="f-servicio">Servicio u Objeto de Contrato <span class="text-danger">*</span></label>
+                        <textarea id="f-servicio" name="servicio_objeto" class="form-control" rows="4" style="resize: none; height: 120px;" placeholder="Descripción del servicio o objeto del contrato"><?php if (isset($data['servicio_objeto'])) print($data['servicio_objeto']); ?></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuarta fila: Fechas -->
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
@@ -65,22 +72,19 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <div class="checkbox" style="margin-bottom: 10px;">
-                            <label>
-                                <input type="checkbox" id="check-fecha-fin" <?php if (isset($data['fecha_fin']) && !empty($data['fecha_fin'])) print('checked'); ?>>
-                                <strong>El contrato tiene fecha de finalización</strong>
-                            </label>
-                        </div>
                         <label class="control-label" for="f-fecha-fin">Fecha de Fin</label>
-                        <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>" disabled>
-                        <small class="help-block">Marque la casilla superior para activar este campo</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="control-label" for="f-areas">Áreas de Acceso</label>
-                        <input type="text" id="f-areas" name="areas_acceso" class="form-control" placeholder="Áreas permitidas para acceso" value="<?php if (isset($data['areas_acceso'])) print($data['areas_acceso']); ?>">
-                        <small class="help-block">Separar múltiples áreas con comas</small>
+                        <div class="input-group">
+                            <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>" disabled>
+                            <div class="input-group-append" style="display:flex; align-items:center; padding-left:8px;">
+                                <div class="checkbox" style="margin:0;">
+                                    <label style="margin:0;">
+                                        <input type="checkbox" id="check-fecha-fin" <?php if (isset($data['fecha_fin']) && !empty($data['fecha_fin'])) print('checked'); ?>>
+                                        Tiene fin
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="help-block">Active la casilla para habilitar la fecha de fin</small>
                     </div>
                 </div>
             </div>

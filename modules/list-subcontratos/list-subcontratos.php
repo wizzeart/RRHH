@@ -6,7 +6,7 @@
 
 <div class="panel">
     <div class="form-control">
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato"></button>
+        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato">Añadir Nuevo Subcontrato</button>
     </div>
 </div>
 

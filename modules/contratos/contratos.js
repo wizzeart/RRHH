@@ -57,12 +57,25 @@ $(document).ready(function () {
   }
   cargarTrabajadoresSiFaltan();
 
+  // Checkbox: Sin fecha fin -> deshabilita y limpia fecha_fin
+  function aplicarSinFechaFin() {
+    var $chk = $('#chk-sin-fecha-fin');
+    var $ff = $('#f-fecha-fin');
+    if ($chk.is(':checked')) {
+      $ff.val('').prop('disabled', true).removeClass('is-invalid');
+    } else {
+      $ff.prop('disabled', false);
+    }
+  }
+  $('#chk-sin-fecha-fin').on('change', aplicarSinFechaFin);
+  aplicarSinFechaFin();
+
   $('#btn-save').click(function(){
     var errores = [];
     var trabajadorId = ($('#f-trabajador').val()||'').trim();
     var tipo = ($('#f-tipo').val()||'').trim();
     var fi = ($('#f-fecha-inicio').val()||'').trim();
-    var ff = ($('#f-fecha-fin').val()||'').trim();
+    var ff = ($('#chk-sin-fecha-fin').is(':checked') ? '' : ($('#f-fecha-fin').val()||'').trim());
 
     if (trabajadorId === '') { errores.push('El trabajador es obligatorio'); $('#f-trabajador').addClass('is-invalid'); } else { $('#f-trabajador').removeClass('is-invalid'); }
     if (tipo === '') { errores.push('El tipo de contrato es obligatorio'); $('#f-tipo').addClass('is-invalid'); } else { $('#f-tipo').removeClass('is-invalid'); }

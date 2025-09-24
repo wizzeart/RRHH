@@ -1,6 +1,6 @@
 <div class="panel">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php print($page['subtitle'] ?? 'Registrar Contrato'); ?></h3>
+<div class="panel-heading">
+        <h3 class="panel-title">Registrar Contrato</h3>
     </div>
     <div class="panel-body">
         <form id="form-contrato" enctype="multipart/form-data">
@@ -54,14 +54,26 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="control-label" for="f-fecha-fin">Fecha Fin</label>
-                        <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>">
+                        <div class="input-group">
+                            <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>">
+                            <div class="input-group-append" style="display:flex; align-items:center; padding-left:8px;">
+                                <div class="checkbox" style="margin:0;">
+                                    <label style="margin:0;">
+                                        <input type="checkbox" id="chk-sin-fecha-fin" <?php if (!isset($data['fecha_fin']) || empty($data['fecha_fin'])) print('checked'); ?>>
+                                        Sin fecha fin
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label class="control-label" for="f-archivo">Archivo del Contrato</label>
-                        <input type="file" id="f-archivo" name="archivo_contrato" class="form-control" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
-                        <?php if (!empty($data['archivo_contrato'])) { echo '<small><a href="' . htmlspecialchars($data['archivo_contrato'], ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver archivo actual</a></small>'; } ?>
+                        <label class="control-label">Archivo del Contrato</label>
+                        <div class="form-control" style="height:auto;">
+                            <small class="text-muted">Se generará automáticamente en PDF al guardar.</small><br>
+                            <?php if (!empty($data['archivo_contrato'])) { echo '<a class="btn btn-link p-0" href="' . htmlspecialchars($data['archivo_contrato'], ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver contrato generado</a>'; } ?>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">
