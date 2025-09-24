@@ -66,6 +66,13 @@ class ProgramaCapacitacion {
                 $page['title'] = 'Nuevo Programa';
                 $page['subtitle'] = 'Registro de Programa de Capacitación';
 
+                // Cargar lista de trabajadores activos para el select Dirigido a
+                try {
+                    $data_form['trabajadores'] = $this->db->fetchAll("SELECT id, nombre, apellidos FROM trabajadores WHERE trabajador_eliminado = '0' ORDER BY nombre ASC, apellidos ASC");
+                } catch (Exception $e) {
+                    $data_form['trabajadores'] = array();
+                }
+
                 if (isset($param['id'])) {
                     $val = array(
                         'id' => $param['id']
@@ -91,30 +98,32 @@ class ProgramaCapacitacion {
             'row' => $param['row']
         );
 
-        $update = array(
-            'fecha_finalizacion' => date('Y-m-d')
-        );
-        $where = array(
-            'id' => $param['id']
-        );
-        $this->app->db->update('programas_capacitacion', $update, $where);
+        try {
+            $update = array('fecha_finalizacion' => date('Y-m-d'));
+            $where = array('id' => $param['id']);
+            $this->app->db->update('programas_capacitacion', $update, $where);
 
-        $history = array(
-            'xentity' => 'PROGRAMAS-CAPACITACION',
-            'xaction' => 'FINALIZAR-PROGRAMA',
-            'xid' => $param['id'],
-            'xobs' => 'FINALIZAR PROGRAMA: ' . $param['id'] . ' - Fecha: ' . date('Y-m-d')
-        );
-        $this->app->add_history($history);
+            $history = array(
+                'xentity' => 'PROGRAMAS-CAPACITACION',
+                'xaction' => 'FINALIZAR-PROGRAMA',
+                'xid' => $param['id'],
+                'xobs' => 'FINALIZAR PROGRAMA: ' . $param['id'] . ' - Fecha: ' . date('Y-m-d')
+            );
+            $this->app->add_history($history);
+        } catch (Exception $e) {
+            $data['status'] = 0;
+            $msg = $e->getMessage();
+            if (strpos($msg, 'Unknown column') !== false && strpos($msg, 'fecha_finalizacion') !== false) {
+                $data['msg'] = 'La columna fecha_finalizacion no existe en la tabla. Agregue la columna o desactive la función de finalizar programas.';
+            } else {
+                $data['msg'] = 'Error al finalizar el programa: ' . $msg;
+            }
+        }
 
         print(json_encode($data));
     }
     
     private function _save($param) {
-        // Debug: Guardar los parámetros recibidos en un archivo de log
-        $log = date('Y-m-d H:i:s') . " - Parámetros recibidos:\n";
-        $log .= print_r($param, true) . "\n";
-        file_put_contents('debug_programas_capacitacion.log', $log, FILE_APPEND);
 
         $data = array(
             'status' => 1,
@@ -122,33 +131,45 @@ class ProgramaCapacitacion {
             'msg' => 'Programa de capacitación guardado correctamente'
         );
 
-        // Campos del formulario - ajustado a la estructura de la tabla
-        $insert = array(
-            'tema' => $param['tema'],
-            'dirigido_a' => $param['dirigido_a'],
-            'responsable' => $param['responsable'],
-            'fecha_estimada' => $param['fecha_estimada']
-        );
-
-        // Agregar campos adicionales si están presentes
-        if (!empty($param['modalidad'])) {
-            $insert['modalidad'] = $param['modalidad'];
+        // Construir campos a insertar solo con columnas existentes en la tabla
+        $possible = array('tema','dirigido_a','responsable','fecha_estimada','modalidad','horas','fecha_finalizacion');
+        $cols = $this->_getTableColumns('programas_capacitacion');
+        $allowed = array_intersect($possible, $cols);
+        $insert = array();
+        foreach ($allowed as $col) {
+            if (isset($param[$col]) && $param[$col] !== '') {
+                $insert[$col] = $param[$col];
+            }
         }
-        if (!empty($param['horas'])) {
-            $insert['horas'] = $param['horas'];
-        }
-
-        // Solo agregar fecha_finalizacion si no está vacía
-        if (!empty($param['fecha_finalizacion'])) {
-            $insert['fecha_finalizacion'] = $param['fecha_finalizacion'];
+        // Asegurar campos obligatorios mínimos
+        foreach (array('tema','dirigido_a','responsable','fecha_estimada') as $req) {
+            if (!isset($insert[$req]) && isset($param[$req])) {
+                $insert[$req] = $param[$req];
+            }
         }
 
         if (!isset($param['id']) || $param['id'] == '') {
             // Insert nuevo
             try {
+                // Validación de duplicado por (tema, dirigido_a)
+                $temaVal = isset($insert['tema']) ? $insert['tema'] : (isset($param['tema']) ? $param['tema'] : '');
+                $dirigidoVal = isset($insert['dirigido_a']) ? $insert['dirigido_a'] : (isset($param['dirigido_a']) ? $param['dirigido_a'] : '');
+                if ($temaVal !== '' && $dirigidoVal !== '') {
+                    $sql = "SELECT id FROM programas_capacitacion WHERE LOWER(tema) = LOWER(:tema) AND LOWER(dirigido_a) = LOWER(:dirigido) LIMIT 1";
+                    $val = array('tema' => $temaVal, 'dirigido' => $dirigidoVal);
+                    $exists = $this->db->fetchRow($sql, $val);
+                    if ($exists) {
+                        $data['status'] = 0;
+                        $data['msg_title'] = 'Duplicado';
+                        $data['msg'] = 'Ya existe un programa de capacitación con el mismo Tema y Dirigido a.';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
+
                 $result = $this->app->db->insert('programas_capacitacion', $insert);
                 if ($result) {
-                    $lastId = $this->app->db->lastInsertId();
+                    $lastId = method_exists($this->app->db, 'last_id') ? $this->app->db->last_id() : (method_exists($this->app->db, 'lastInsertId') ? $this->app->db->lastInsertId() : null);
                     if ($lastId) {
                         $data['status'] = 1;
                         $data['msg_title'] = '¡Registro Exitoso!';
@@ -174,11 +195,6 @@ class ProgramaCapacitacion {
                     $data['msg'] = 'Error al insertar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_programas_capacitacion.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
@@ -202,6 +218,21 @@ class ProgramaCapacitacion {
             }
 
             try {
+                // Validación de duplicado por (tema, dirigido_a) excluyendo el propio ID
+                $temaVal = isset($insert['tema']) ? $insert['tema'] : (isset($param['tema']) ? $param['tema'] : '');
+                $dirigidoVal = isset($insert['dirigido_a']) ? $insert['dirigido_a'] : (isset($param['dirigido_a']) ? $param['dirigido_a'] : '');
+                if ($temaVal !== '' && $dirigidoVal !== '') {
+                    $sql = "SELECT id FROM programas_capacitacion WHERE LOWER(tema) = LOWER(:tema) AND LOWER(dirigido_a) = LOWER(:dirigido) AND id != :id LIMIT 1";
+                    $val = array('tema' => $temaVal, 'dirigido' => $dirigidoVal, 'id' => $param['id']);
+                    $exists = $this->db->fetchRow($sql, $val);
+                    if ($exists) {
+                        $data['status'] = 0;
+                        $data['msg_title'] = 'Duplicado';
+                        $data['msg'] = 'Ya existe otro programa con el mismo Tema y Dirigido a.';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
                 $where = array('id' => $param['id']);
                 $result = $this->app->db->update('programas_capacitacion', $insert, $where);
                 
@@ -225,11 +256,6 @@ class ProgramaCapacitacion {
                     $data['msg'] = 'Error al actualizar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_programas_capacitacion.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
@@ -252,7 +278,6 @@ class ProgramaCapacitacion {
         $sql = "SELECT 
                 p.*
                 FROM programas_capacitacion p 
-                WHERE (p.fecha_finalizacion IS NULL OR p.fecha_finalizacion = '')
                 ORDER BY p.id DESC";
         
         $data = $this->db->fetchAll($sql);
@@ -270,5 +295,32 @@ class ProgramaCapacitacion {
         
         $data = $this->db->fetchAll($sql);
         return $data;
+    }
+
+    // Obtiene y cachea los nombres de las columnas de una tabla
+    private function _getTableColumns($tableName) {
+        static $cache = array();
+        if (isset($cache[$tableName])) {
+            return $cache[$tableName];
+        }
+        $cols = array();
+        try {
+            $rows = $this->db->fetchAll('DESCRIBE ' . $tableName);
+            if ($rows && is_array($rows)) {
+                foreach ($rows as $r) {
+                    if (isset($r['Field'])) {
+                        $cols[] = $r['Field'];
+                    } elseif (isset($r[0])) {
+                        // Por compatibilidad si fetchAll devuelve índices numéricos
+                        $cols[] = $r[0];
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // Si falla, devolver arreglo vacío para no romper flujo
+            $cols = array();
+        }
+        $cache[$tableName] = $cols;
+        return $cols;
     }
 }

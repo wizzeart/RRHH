@@ -39,7 +39,7 @@ $(document).ready(function () {
             + '<li class="list-group-item"><i class="fa fa-users mr-2"></i> <strong>Dirigido a:</strong> ' + (p.dirigido_a || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-user mr-2"></i> <strong>Responsable:</strong> ' + (p.responsable || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Estimada:</strong> ' + (p.fecha_estimada || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar-times mr-2"></i> <strong>Fecha Finalización:</strong> ' + (p.fecha_finalizacion || 'N/A') + '</li>'
+            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Finalización:</strong> ' + (p.fecha_finalizacion || 'N/A') + '</li>'
             + '</ul>'
             + '</div>'
             + '<div class="col-md-6">'

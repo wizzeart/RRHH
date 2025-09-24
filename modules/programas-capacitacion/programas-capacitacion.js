@@ -1,4 +1,59 @@
 $(document).ready(function () {
+  // Helper de notificaciones: usa Nifty Noty si está disponible, si no, fallback a alert
+  function notify(type, title, message, timer) {
+    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+        $.niftyNoty({
+            type: type || 'info',
+            container: 'floating',
+            title: title || '',
+            message: message || '',
+            timer: timer != null ? timer : 3000,
+            closeBtn: true,
+            focus: true
+        });
+    } else {
+        // Fallback simple para garantizar feedback al usuario
+        var text = (title ? (title + ': ') : '') + (message || '');
+        try { alert(text); } catch(e) { console.warn('Notify:', text); }
+    }
+}
+    // UI alert helper (Bootstrap-like)
+
+    function showAlert(type, title, message) {
+        // type: 'success' | 'danger' | 'warning' | 'info'
+        var $container = $('.panel-body').first();
+        if ($container.length === 0) {
+            $container = $('.panel').last();
+        }
+        if ($container.length === 0) {
+            $container = $('body');
+        }
+        
+        var html = '<div class="alert alert-' + type + ' alert-dismissible" role="alert" style="margin-bottom:12px; margin-top:12px;">'
+                 + '  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                 + '  <strong>' + (title || '') + '</strong> ' + (message || '')
+                 + '</div>';
+        
+        // remove previous alerts of same type to reduce clutter
+        $container.find('.alert.alert-' + type).remove();
+        
+        // Insert after the first panel or at the beginning of container
+        if ($container.hasClass('panel-body')) {
+            $container.prepend(html);
+        } else {
+            $container.find('.panel').first().after(html);
+            if ($container.find('.alert').length === 0) {
+                $container.prepend(html);
+            }
+        }
+        
+        // auto dismiss after 6s
+        setTimeout(function(){ 
+            $container.find('.alert.alert-' + type).fadeOut(400, function(){ 
+                $(this).remove(); 
+            }); 
+        }, 6000);
+    }
     // Helper to escape HTML for safe insertion into hidden inputs
     function escapeHtml(str) {
         if (typeof str !== 'string') return str || '';
@@ -19,12 +74,16 @@ $(document).ready(function () {
     }
 
     // Mejorar funcionalidad de campos de fecha
-    $('#f-fecha-estimada, #f-fecha-finalizacion').on('click focus', function() {
+    $('#f-fecha-estimada').on('click focus', function() {
         $(this)[0].showPicker();
     });
 
     $('#btn-back').click(function () {
         location.href = 'index.php?module=list-programas-capacitacion';
+    });
+
+    $('#btn-new').click(function () {
+        location.href = 'index.php?module=programas-capacitacion';
     });
 
     $('#btn-save').click(function () {
@@ -73,18 +132,6 @@ $(document).ready(function () {
             $('#f-horas').removeClass('is-invalid');
         }
 
-        // Validación adicional: fecha de finalización no puede ser anterior a fecha estimada
-        if ($('#f-fecha-estimada').val() && $('#f-fecha-finalizacion').val()) {
-            var fechaEstimada = new Date($('#f-fecha-estimada').val());
-            var fechaFinalizacion = new Date($('#f-fecha-finalizacion').val());
-            if (fechaFinalizacion < fechaEstimada) {
-                errores.push('La fecha de finalización no puede ser anterior a la fecha estimada');
-                $('#f-fecha-finalizacion').addClass('is-invalid');
-            } else {
-                $('#f-fecha-finalizacion').removeClass('is-invalid');
-            }
-        }
-
         if (errores.length > 0) {
             notify('warning', 'Validación', errores.join('<br>'), 5000);
             // Enfocar el primer campo con error
@@ -94,39 +141,65 @@ $(document).ready(function () {
 
         var cmd = $('#form-programa').serialize() + '&module=programas-capacitacion&method=save';
         
+        // Mostrar spinner y deshabilitar botón
+        $('#img-loading').removeClass('hidden');
+        $('#btn-save').attr('disabled', true);
+        
         $.ajax({
             url: 'api-app.php',
             type: 'POST',
             data: cmd,
             dataType: 'json',
             success: function (d) {
+                $('#img-loading').addClass('hidden');
+                $('#btn-save').attr('disabled', false);
+                
+                console.log('Respuesta del servidor:', d); // Debug temporal
                 if (d.status == 1) {
                     // Mensaje de éxito mejorado
                     if ($('#f-id').val() == '') {
                         // Nuevo registro
-                        notify('success', '¡Éxito!', 'Programa de capacitación registrado correctamente. ID: ' + d.id, 4000);
+                        $('#f-id').val(d.id);
+                        notify('success', '¡Registro Exitoso!', 'El programa de capacitación ha sido registrado correctamente en el sistema. ID: ' + d.id, 5000);
+                        showAlert('success', '¡Registro Exitoso!', 'El programa de capacitación ha sido registrado correctamente. ID: ' + d.id);
                         
-                        // Preguntar si desea agregar otro programa
-                        setTimeout(function() {
-                            if (confirm('¿Desea registrar otro programa de capacitación?')) {
-                                limpiarFormulario();
-                                $('#f-tema').focus();
-                            } else {
-                                // Actualizar el ID en el formulario para edición
-                                $('#f-id').val(d.id);
-                                window.history.replaceState({}, '', 'index.php?module=programas-capacitacion&id=' + d.id);
-                            }
-                        }, 1000);
+                        // Actualizar URL para edición
+                        window.history.replaceState({}, '', 'index.php?module=programas-capacitacion&id=' + d.id);
                     } else {
                         // Actualización
-                        notify('success', '¡Actualizado!', 'Programa de capacitación actualizado correctamente', 3000);
+                        notify('success', '¡Actualización Exitosa!', 'Los datos del programa de capacitación han sido actualizados correctamente', 5000);
+                        showAlert('success', '¡Actualización Exitosa!', 'Los datos del programa han sido actualizados correctamente.');
                     }
                 } else {
-                    notify('danger', 'Error', d.msg || 'Error al guardar el programa de capacitación', 4000);
+                    console.log('Error del servidor:', d.msg); // Debug temporal
+                    notify('danger', 'Error al Guardar', d.msg || 'Error al guardar el programa de capacitación', 5000);
+                    showAlert('danger', 'Error al Guardar:', d.msg || 'Error al guardar el programa de capacitación');
                 }
             },
             error: function(xhr, status, error) {
-                notify('danger', 'Error de Conexión', 'No se pudo conectar con el servidor: ' + error, 4000);
+                $('#img-loading').addClass('hidden');
+                $('#btn-save').attr('disabled', false);
+
+                var responseText = xhr && xhr.responseText ? xhr.responseText.trim() : '';
+                var title = 'Error al Guardar';
+                var message = 'No se pudo conectar con el servidor';
+                // Intentar parsear JSON válido si existe
+                try {
+                    if (responseText && responseText.charAt(0) === '{') {
+                        var jd = JSON.parse(responseText);
+                        if (typeof jd === 'object') {
+                            if (jd.msg_title) title = jd.msg_title;
+                            if (jd.msg) message = jd.msg;
+                        }
+                    } else if (error) {
+                        message = error;
+                    }
+                } catch (e) {
+                    if (error) message = error;
+                }
+
+                notify('danger', title, message, 5000);
+                showAlert('danger', title, message);
             }
         });
     });
@@ -161,20 +234,6 @@ $(document).ready(function () {
             $(this).addClass('is-invalid');
         } else {
             $(this).removeClass('is-invalid');
-        }
-    });
-
-    // Validación de fechas en tiempo real
-    $('#f-fecha-finalizacion').on('change', function() {
-        if ($('#f-fecha-estimada').val() && $(this).val()) {
-            var fechaEstimada = new Date($('#f-fecha-estimada').val());
-            var fechaFinalizacion = new Date($(this).val());
-            if (fechaFinalizacion < fechaEstimada) {
-                $(this).addClass('is-invalid');
-                notify('warning', 'Fecha Inválida', 'La fecha de finalización no puede ser anterior a la fecha estimada', 3000);
-            } else {
-                $(this).removeClass('is-invalid');
-            }
         }
     });
 

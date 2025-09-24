@@ -137,6 +137,26 @@
         </li>
     </ul>
 </li>
+<!--NEW MENU CONTRATOS-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-file-text-o"></i>
+        <span class="menu-title">
+            <strong>Contratos</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-contratos', 'contratos'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-contratos', 'contratos'))) print('active-link') ?>">
+            <a href="?module=list-contratos">Lista de Contratos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('contratos'))) print('active-link') ?>">
+            <a href="?module=contratos">Registrar Contrato</a>
+        </li>
+    </ul>
+</li>
 
 <!--NEW MENU PROGRAMAS CAPACITACION-->
 <li class="list-divider"></li>

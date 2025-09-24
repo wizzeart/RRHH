@@ -111,10 +111,6 @@ class Subcontrato {
     }
     
     private function _save($param) {
-        // Debug: Guardar los parámetros recibidos en un archivo de log
-        $log = date('Y-m-d H:i:s') . " - Parámetros recibidos:\n";
-        $log .= print_r($param, true) . "\n";
-        file_put_contents('debug_subcontratos.log', $log, FILE_APPEND);
 
         $data = array(
             'status' => 1,
@@ -122,22 +118,51 @@ class Subcontrato {
             'msg' => 'Subcontrato guardado correctamente'
         );
 
-        // Campos del formulario
+        // Campos del formulario (usar acceso seguro para evitar warnings y romper el JSON)
         $insert = array(
-            'persona_nombre' => $param['persona_nombre'],
-            'estatus' => $param['estatus'],
-            'entidad_representada' => $param['entidad_representada'],
-            'servicio_objeto' => $param['servicio_objeto'],
-            'fecha_inicio' => $param['fecha_inicio'],
-            'areas_acceso' => $param['areas_acceso']
+            'persona_nombre'      => isset($param['persona_nombre']) ? trim($param['persona_nombre']) : '',
+            'carnet_identidad'    => isset($param['carnet_identidad']) ? trim($param['carnet_identidad']) : null,
+            'estatus'             => isset($param['estatus']) ? trim($param['estatus']) : '',
+            'entidad_representada'=> isset($param['entidad_representada']) ? trim($param['entidad_representada']) : null,
+            'servicio_objeto'     => isset($param['servicio_objeto']) ? trim($param['servicio_objeto']) : '',
+            'fecha_inicio'        => isset($param['fecha_inicio']) ? $param['fecha_inicio'] : null,
+            'areas_acceso'        => isset($param['areas_acceso']) ? trim($param['areas_acceso']) : null
         );
 
-        // Solo agregar fecha_fin si no está vacía
-        if (!empty($param['fecha_fin'])) {
+        // Solo agregar fecha_fin si no está vacía y es una fecha válida
+        if (!empty($param['fecha_fin']) && $param['fecha_fin'] !== '' && $param['fecha_fin'] !== '0000-00-00') {
             $insert['fecha_fin'] = $param['fecha_fin'];
         }
 
         if (!isset($param['id']) || $param['id'] == '') {
+            // Validaciones de duplicados (INSERT)
+            // CI único si fue proporcionado
+            if (!empty($insert['carnet_identidad'])) {
+                $sql = "SELECT id FROM subcontratos WHERE carnet_identidad = :ci LIMIT 1";
+                $val = array('ci' => $insert['carnet_identidad']);
+                $existing = $this->db->fetchRow($sql, $val);
+                if ($existing) {
+                    $data['status'] = 0;
+                    $data['msg_title'] = 'Duplicado';
+                    $data['msg'] = 'Ya existe un subcontrato con el mismo Carnet de Identidad (CI).';
+                    print(json_encode($data));
+                    return;
+                }
+            }
+
+            // Nombre único (regla de negocio solicitada)
+            if (!empty($insert['persona_nombre'])) {
+                $sql = "SELECT id FROM subcontratos WHERE LOWER(persona_nombre) = LOWER(:nombre) AND (fecha_fin IS NULL OR fecha_fin = '') LIMIT 1";
+                $val = array('nombre' => $insert['persona_nombre']);
+                $existing = $this->db->fetchRow($sql, $val);
+                if ($existing) {
+                    $data['status'] = 0;
+                    $data['msg_title'] = 'Duplicado';
+                    $data['msg'] = 'Ya existe un subcontrato activo con el mismo Nombre.';
+                    print(json_encode($data));
+                    return;
+                }
+            }
             // Insert nuevo
             try {
                 $result = $this->app->db->insert('subcontratos', $insert);
@@ -168,11 +193,6 @@ class Subcontrato {
                     $data['msg'] = 'Error al insertar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_subcontratos.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
@@ -197,6 +217,32 @@ class Subcontrato {
 
             try {
                 $where = array('id' => $param['id']);
+                // Validaciones de duplicados (UPDATE)
+                if (!empty($insert['carnet_identidad'])) {
+                    $sql = "SELECT id FROM subcontratos WHERE carnet_identidad = :ci AND id != :id LIMIT 1";
+                    $val = array('ci' => $insert['carnet_identidad'], 'id' => $param['id']);
+                    $existing = $this->db->fetchRow($sql, $val);
+                    if ($existing) {
+                        $data['status'] = 0;
+                        $data['msg_title'] = 'Duplicado';
+                        $data['msg'] = 'Ya existe otro subcontrato con el mismo Carnet de Identidad (CI).';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
+
+                if (!empty($insert['persona_nombre'])) {
+                    $sql = "SELECT id FROM subcontratos WHERE LOWER(persona_nombre) = LOWER(:nombre) AND id != :id AND (fecha_fin IS NULL OR fecha_fin = '') LIMIT 1";
+                    $val = array('nombre' => $insert['persona_nombre'], 'id' => $param['id']);
+                    $existing = $this->db->fetchRow($sql, $val);
+                    if ($existing) {
+                        $data['status'] = 0;
+                        $data['msg_title'] = 'Duplicado';
+                        $data['msg'] = 'Ya existe otro subcontrato activo con el mismo Nombre.';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
                 $result = $this->app->db->update('subcontratos', $insert, $where);
                 
                 if ($result !== false) {
@@ -219,11 +265,6 @@ class Subcontrato {
                     $data['msg'] = 'Error al actualizar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_subcontratos.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';

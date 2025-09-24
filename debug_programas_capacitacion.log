@@ -1,0 +1,89 @@
+2025-09-24 14:02:16 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [horas] => 240
+    [dirigido_a] => Personal operativo
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-09-30
+    [modalidad] => Virtual
+    [fecha_finalizacion] => 2025-10-28
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:02:16 - Error al insertar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'modalidad' in 'field list'
+2025-09-24 14:10:01 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Personal operativo
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-31
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:10:03 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Personal operativo
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-31
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:10:03 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Personal operativo
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-31
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:10:40 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Todos los trabajadores
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-01
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:10:40 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Todos los trabajadores
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-01
+    [module] => programas-capacitacion
+    [method] => save
+)
+
+2025-09-24 14:10:40 - Parámetros recibidos:
+Array
+(
+    [id] => 
+    [tema] => Capacitacion de Lenguas Extranjeras
+    [dirigido_a] => Todos los trabajadores
+    [responsable] => Rowder 
+    [fecha_estimada] => 2025-10-01
+    [module] => programas-capacitacion
+    [method] => save
+)
+

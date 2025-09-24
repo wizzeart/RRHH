@@ -1,9 +1,3 @@
-<div class="panel">
-    <div class="form-control">
-        <button id="btn-back" class="btn btn-mint btn-icon icon-lg fa fa-arrow-left" alt="Volver" title="Volver"></button>
-        <button id="btn-save" class="btn btn-success btn-icon icon-lg fa fa-save" alt="Guardar" title="Guardar"></button>
-    </div>
-</div>
 
 <div class="panel">
     <div class="panel-heading">
@@ -15,16 +9,10 @@
             
             <!-- Primera fila -->
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label class="control-label" for="f-tema">Tema de Capacitación <span class="text-danger">*</span></label>
                         <input type="text" id="f-tema" name="tema" class="form-control" placeholder="Tema o nombre del programa de capacitación" value="<?php if (isset($data['tema'])) print($data['tema']); ?>">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="control-label" for="f-horas">Horas de Duración <span class="text-danger">*</span></label>
-                        <input type="number" id="f-horas" name="horas" class="form-control" placeholder="Número de horas" min="1" max="999" value="<?php if (isset($data['horas'])) print($data['horas']); ?>">
                     </div>
                 </div>
             </div>
@@ -36,14 +24,18 @@
                         <label class="control-label" for="f-dirigido">Dirigido a <span class="text-danger">*</span></label>
                         <select id="f-dirigido" name="dirigido_a" class="form-control">
                             <option value="">Seleccione a quién va dirigido</option>
-                            <option value="Todos los trabajadores" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Todos los trabajadores') print('selected'); ?>>Todos los trabajadores</option>
-                            <option value="Directivos" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Directivos') print('selected'); ?>>Directivos</option>
-                            <option value="Supervisores" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Supervisores') print('selected'); ?>>Supervisores</option>
-                            <option value="Personal administrativo" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Personal administrativo') print('selected'); ?>>Personal administrativo</option>
-                            <option value="Personal operativo" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Personal operativo') print('selected'); ?>>Personal operativo</option>
-                            <option value="Nuevo personal" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Nuevo personal') print('selected'); ?>>Nuevo personal</option>
-                            <option value="Área específica" <?php if (isset($data['dirigido_a']) && $data['dirigido_a'] == 'Área específica') print('selected'); ?>>Área específica</option>
+                            <?php 
+                            if (isset($data_form['trabajadores']) && is_array($data_form['trabajadores'])) {
+                                foreach ($data_form['trabajadores'] as $t) {
+                                    $full = trim(($t['nombre'] ?? '') . ' ' . ($t['apellidos'] ?? ''));
+                                    if ($full === '') continue;
+                                    $sel = (isset($data['dirigido_a']) && $data['dirigido_a'] == $full) ? 'selected' : '';
+                                    print('<option value="' . htmlspecialchars($full, ENT_QUOTES, 'UTF-8') . '" ' . $sel . '>' . htmlspecialchars($full, ENT_QUOTES, 'UTF-8') . '</option>');
+                                }
+                            }
+                            ?>
                         </select>
+                        <small class="help-block">Lista generada desde Trabajadores activos</small>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -76,12 +68,28 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="control-label" for="f-fecha-finalizacion">Fecha de Finalización</label>
-                        <input type="date" id="f-fecha-finalizacion" name="fecha_finalizacion" class="form-control" value="<?php if (isset($data['fecha_finalizacion'])) print($data['fecha_finalizacion']); ?>">
-                        <small class="help-block">Dejar vacío si el programa está activo</small>
+                        <label class="control-label" for="f-horas">Horas de Duración <span class="text-danger">*</span></label>
+                        <input type="number" id="f-horas" name="horas" class="form-control" placeholder="Número de horas" min="1" max="999" value="<?php if (isset($data['horas'])) print($data['horas']); ?>">
                     </div>
                 </div>
             </div>
         </form>
+        
+        <!-- Panel Footer con botones estándar -->
+        <div class="panel-footer text-center">
+            <img id="img-loading" class="hidden" src="img/spinners/282.gif"/>
+            <button id="btn-save" class="btn btn-info icon-lg" type="button">
+                <i class="fa fa-check"></i>
+                Guardar
+            </button>
+            <button id="btn-back" class="btn btn-default icon-lg" type="button">
+                <i class="fa fa-undo"></i>
+                Volver
+            </button>
+            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
+                <i class="fa fa-plus"></i>
+                Nuevo
+            </button>
+        </div>
     </div>
 </div>

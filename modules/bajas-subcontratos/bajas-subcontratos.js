@@ -36,6 +36,7 @@ $(document).ready(function () {
             + '<div class="col-md-6">'
             + '<ul class="list-group">'
             + '<li class="list-group-item"><i class="fa fa-user mr-2"></i> <strong>Nombre:</strong> ' + (s.persona_nombre || 'N/A') + '</li>'
+            + '<li class="list-group-item"><i class="fa fa-id-card mr-2"></i> <strong>CI:</strong> ' + (s.carnet_identidad || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-tag mr-2"></i> <strong>Estatus:</strong> ' + (s.estatus || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-building mr-2"></i> <strong>Entidad:</strong> ' + (s.entidad_representada || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Inicio:</strong> ' + (s.fecha_inicio || 'N/A') + '</li>'

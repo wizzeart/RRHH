@@ -1,7 +1,34 @@
 $(document).ready(function () {
-    $('#table-panel').on('click', '.fa.fa-trash', function () {
+  // Helper de notificaciones: usa Nifty Noty si está disponible, si no, fallback a alert
+  function notify(type, title, message, timer) {
+    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+        $.niftyNoty({
+            type: type || 'info',
+            container: 'floating',
+            title: title || '',
+            message: message || '',
+            timer: timer != null ? timer : 3000,
+            closeBtn: true,
+            focus: true
+        });
+    } else {
+        // Fallback simple para garantizar feedback al usuario
+        var text = (title ? (title + ': ') : '') + (message || '');
+        try { alert(text); } catch(e) { console.warn('Notify:', text); }
+    }
+}
+
+
+
+    // Delegar el clic sobre el botón con data-id (independiente del ícono)
+    $('#table-panel').on('click', 'button[data-id], .fa.fa-trash, .fa.fa-ban', function (e) {
+        // Obtener el botón si el clic fue sobre el ícono
+        var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
+        if ($btn.length === 0) return;
+
         if (confirm('¿Estás seguro de finalizar este subcontrato? Se establecerá la fecha de fin automáticamente.')) {
-            var cmd = 'module=subcontratos&method=del&id=' + $(this).data('id') + '&row=' + $(this).parent().parent().data('index');
+            var rowIndex = $btn.parent().parent().data('index');
+            var cmd = 'module=subcontratos&method=del&id=' + $btn.data('id') + '&row=' + rowIndex;
             $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
                 success: function (d) {
                     if (d.status == 1) {
@@ -64,6 +91,6 @@ $(document).ready(function () {
 // Sample Format for Tracking Number Column - Only Delete Button
 // =================================================================
 function formatoToolbar(value, row) {
-    var s = '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-trash" title="Finalizar subcontrato"></button>';
+    var s = '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-ban" title="Finalizar subcontrato"></button>';
     return s;
 }

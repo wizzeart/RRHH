@@ -182,6 +182,32 @@ class Trabajador {
                 }
             }
 
+            // Verificar si el email ya existe (insert)
+            if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
+                $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
+                $val = array('email' => $param['email']);
+                $existing = $this->db->fetchRow($sql, $val);
+                if ($existing) {
+                    $data['status'] = 0;
+                    $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
+                    print(json_encode($data));
+                    return;
+                }
+            }
+
+            // Verificar si el nombre completo ya existe (insert)
+            if ($data['action'] == 'insert' && isset($param['nombre']) && isset($param['apellidos'])) {
+                $sql = "SELECT id FROM trabajadores WHERE LOWER(nombre) = LOWER(:nombre) AND LOWER(apellidos) = LOWER(:apellidos) AND trabajador_eliminado = '0'";
+                $val = array('nombre' => $param['nombre'], 'apellidos' => $param['apellidos']);
+                $existing = $this->db->fetchRow($sql, $val);
+                if ($existing) {
+                    $data['status'] = 0;
+                    $data['msg'] = 'Ya existe un trabajador con el mismo nombre y apellidos';
+                    print(json_encode($data));
+                    return;
+                }
+            }
+
             // Validar campos requeridos
             $required_fields = array(
                 'nombre' => 'Nombre',
@@ -340,6 +366,39 @@ class Trabajador {
                     if ($existing) {
                         $data['status'] = 0;
                         $data['msg'] = 'Ya existe otro trabajador con este Carnet de Identidad';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
+
+                // Verificar si el email ya existe en otro registro (update)
+                if (isset($param['email']) && trim($param['email']) !== '') {
+                    $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
+                    $val = array(
+                        'email' => $param['email'],
+                        'id' => $id
+                    );
+                    $existing = $this->db->fetchRow($sql, $val);
+                    if ($existing) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
+                        print(json_encode($data));
+                        return;
+                    }
+                }
+
+                // Verificar si el nombre completo ya existe en otro registro (update)
+                if (isset($param['nombre']) && isset($param['apellidos'])) {
+                    $sql = "SELECT id FROM trabajadores WHERE LOWER(nombre) = LOWER(:nombre) AND LOWER(apellidos) = LOWER(:apellidos) AND id != :id AND trabajador_eliminado = '0'";
+                    $val = array(
+                        'nombre' => $param['nombre'],
+                        'apellidos' => $param['apellidos'],
+                        'id' => $id
+                    );
+                    $existing = $this->db->fetchRow($sql, $val);
+                    if ($existing) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Ya existe otro trabajador con el mismo nombre y apellidos';
                         print(json_encode($data));
                         return;
                     }

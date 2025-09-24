@@ -33,6 +33,7 @@
             <thead>
                 <tr>
                     <th data-field="persona_nombre" data-sortable="true">Nombre</th>
+                    <th data-field="carnet_identidad" data-sortable="true">CI</th>
                     <th data-field="estatus" data-sortable="true">Estatus</th>
                     <th data-field="entidad_representada" data-sortable="true">Entidad</th>
                     <th data-field="servicio_objeto" data-sortable="true">Servicio/Objeto</th>

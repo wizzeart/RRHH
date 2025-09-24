@@ -1,4 +1,9 @@
 $(document).ready(function () {
+
+
+
+
+    
     // Helper to escape HTML for safe insertion into hidden inputs
     function escapeHtml(str) {
         if (typeof str !== 'string') return str || '';
@@ -63,7 +68,7 @@ $(document).ready(function () {
             + '<ul class="list-group">'
             + '<li class="list-group-item"><i class="fa fa-desktop mr-2"></i> <strong>Modalidad:</strong> ' + (p.modalidad || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-clock-o mr-2"></i> <strong>Horas:</strong> ' + (p.horas || 'N/A') + ' horas</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar-times mr-2"></i> <strong>Fecha Finalización:</strong> ' + (p.fecha_finalizacion || 'Programa Activo') + '</li>'
+            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Finalización:</strong> ' + (p.fecha_finalizacion || 'Programa Activo') + '</li>'
             + '</ul>'
             + '</div>'
             + '</div>'
@@ -168,8 +173,7 @@ $(document).ready(function () {
 // =================================================================
 function formatoToolbar(value, row) {
     var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar programa"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ver detalles"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-certificate" title="Generar certificado"></button>';
+                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ver detalles"></button>';
 
     return s;
 }

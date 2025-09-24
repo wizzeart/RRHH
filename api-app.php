@@ -63,6 +63,11 @@ switch ($_REQUEST['module']) {
         $mdl = new ProgramaCapacitacion($app);
         $mdl->api($_REQUEST);
         break;
+    case 'contratos':
+        include_once(BASE_CLASS . '/mdl.Contratos.php');
+        $mdl = new Contrato($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'login':
         $data = array(
             'status' => 0,

@@ -1,9 +1,3 @@
-<div class="panel">
-    <div class="form-control">
-        <button id="btn-back" class="btn btn-mint btn-icon icon-lg fa fa-arrow-left" alt="Volver" title="Volver"></button>
-        <button id="btn-save" class="btn btn-success btn-icon icon-lg fa fa-save" alt="Guardar" title="Guardar"></button>
-    </div>
-</div>
 
 <div class="panel">
     <div class="panel-heading">
@@ -40,6 +34,17 @@
                 </div>
             </div>
 
+            <!-- Fila adicional: Carnet de Identidad (CI) -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="control-label" for="f-ci">CI - Carnet de Identidad <span class="text-danger">*</span></label>
+                        <input type="text" id="f-ci" name="carnet_identidad" class="form-control" placeholder="Ej: 12345678901" maxlength="11" value="<?php if (isset($data['carnet_identidad'])) print($data['carnet_identidad']); ?>">
+                        <small class="help-block">Debe tener 11 dígitos</small>
+                    </div>
+                </div>
+            </div>
+
             <!-- Segunda fila -->
             <div class="row">
                 <div class="col-md-12">
@@ -60,9 +65,15 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
+                        <div class="checkbox" style="margin-bottom: 10px;">
+                            <label>
+                                <input type="checkbox" id="check-fecha-fin" <?php if (isset($data['fecha_fin']) && !empty($data['fecha_fin'])) print('checked'); ?>>
+                                <strong>El contrato tiene fecha de finalización</strong>
+                            </label>
+                        </div>
                         <label class="control-label" for="f-fecha-fin">Fecha de Fin</label>
-                        <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>">
-                        <small class="help-block">Dejar vacío si el contrato está activo</small>
+                        <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>" disabled>
+                        <small class="help-block">Marque la casilla superior para activar este campo</small>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -75,6 +86,23 @@
             </div>
 
         </form>
+        
+        <!-- Panel Footer con botones estándar -->
+        <div class="panel-footer text-center">
+            <img id="img-loading" class="hidden" src="img/spinners/282.gif"/>
+            <button id="btn-save" class="btn btn-info icon-lg" type="button">
+                <i class="fa fa-check"></i>
+                Guardar
+            </button>
+            <button id="btn-back" class="btn btn-default icon-lg" type="button">
+                <i class="fa fa-undo"></i>
+                Volver
+            </button>
+            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
+                <i class="fa fa-plus"></i>
+                Nuevo
+            </button>
+        </div>
     </div>
 </div>
 

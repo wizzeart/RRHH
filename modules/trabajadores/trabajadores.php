@@ -140,9 +140,15 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
+                <div class="checkbox" style="margin-bottom: 10px;">
+                    <label>
+                        <input type="checkbox" id="check-fecha-baja" <?php if (isset($data['fecha_baja']) && !empty($data['fecha_baja'])) print('checked'); ?>>
+                        <strong>El trabajador tiene fecha de baja</strong>
+                    </label>
+                </div>
                 <label class="control-label" for="f-baja">Fecha Baja</label>
-                <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>">
-                <!-- <small class="help-block">Fin del Contrato</small> -->
+                <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>" disabled>
+                <small class="help-block">Marque la casilla superior para activar este campo</small>
             </div>
         </div>
         <div class="col-md-3">
