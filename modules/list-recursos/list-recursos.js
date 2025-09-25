@@ -1,12 +1,8 @@
 // Formateador para las fechas
 function formatoFecha(value, row) {
-    if (!value) return 'N/A';
-    var date = new Date(value);
-    return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    });
+    if (!value) 
+        return 'N/A';
+    return value;
 }
 
 // Formateador para el estado
@@ -23,18 +19,18 @@ function formatoEstado(value, row) {
 function formatoToolbar(value, row) {
     var html = '<div class="btn-group">';
     
-    // Botón de ver detalles
-    html += '<button class="btn btn-info btn-icon icon-lg fa fa-eye view-recurso" ';
-    html += 'data-id="' + row.id + '" title="Ver detalles"></button>';
     
     // Botón de editar
-    html += '<button class="btn btn-primary btn-icon icon-lg fa fa-edit edit-recurso" ';
+    html += '<button class="btn btn-info btn-icon icon-sm fa fa-edit edit-recurso" ';
     html += 'data-id="' + row.id + '" title="Editar"></button>';
     
-    // Botón de eliminar
-    html += '<button class="btn btn-danger btn-icon icon-lg fa fa-trash delete-recurso" ';
-    html += 'data-id="' + row.id + '" title="Eliminar"></button>';
     
+    // Botón de ver detalles
+    html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
+    html += 'data-id="' + row.id + '" title="Ver detalles"></button>';
+    // Botón de eliminar
+    html += '<button class="btn btn-danger btn-icon icon-sm fa fa-trash delete-recurso" ';
+    html += 'data-id="' + row.id + '" title="Eliminar"></button>';
     html += '</div>';
     return html;
 }
@@ -83,13 +79,12 @@ $(document).ready(function () {
     });
 
     // Manejador para el botón de editar
-    $('#table-panel').on('click', '.edit-recurso', function () {
-        var id = $(this).data('id');
-        location.href = 'index.php?module=gestion-recursos&method=edit&id=' + id;
+    $('.panel-body').on('click', '.edit-recurso', function () {
+        location.href = 'index.php?module=gestion-recursos&id=' + $(this).data('id');
     });
 
     // Manejador para el botón de eliminar
-    $('#table-panel').on('click', '.delete-recurso', function () {
+    $('.panel-body').on('click', '.delete-recurso', function () {
         var id = $(this).data('id');
         
         bootbox.confirm({

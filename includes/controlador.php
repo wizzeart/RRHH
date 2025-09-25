@@ -41,14 +41,10 @@ if (isset($_REQUEST['module'])) {
             break;
         case 'list-bolsas_empleos':
         case 'list-recursos':
+        case 'gestion-recursos':
             include_once(BASE_CLASS . '/mdl.List_recursos.php');
             $mdl = new List_recursos($app);
             $mdl->controlador($_REQUEST);
-            break;
-        case 'gestion-recursos':
-            //include_once(BASE_CLASS . '/mdl.Gestion_recursos.php');
-            //$mdl = new Gestion_recursos($app);
-            //$mdl->controlador($_REQUEST);
             break;
         case 'bolsas_empleos':
             include_once(BASE_CLASS . '/mdl.Bolsas_empleos.php');
