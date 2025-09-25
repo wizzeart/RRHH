@@ -53,6 +53,26 @@ switch ($_REQUEST['module']) {
         $mdl = new Config($app);
         $mdl->api($_REQUEST);
         break;
+    case 'historial':
+        include_once(BASE_CLASS . '/mdl.Historial.php');
+        $mdl = new Historial($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'subcontratos':
+        include_once(BASE_CLASS . '/mdl.Subcontratos.php');
+        $mdl = new Subcontrato($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'programas-capacitacion':
+        include_once(BASE_CLASS . '/mdl.ProgramasCapacitacion.php');
+        $mdl = new ProgramaCapacitacion($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'contratos':
+        include_once(BASE_CLASS . '/mdl.Contratos.php');
+        $mdl = new Contrato($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'login':
         $data = array(
             'status' => 0,

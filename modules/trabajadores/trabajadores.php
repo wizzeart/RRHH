@@ -24,28 +24,28 @@
 
     <!-- Primera fila -->
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-id">Código del trabajador</label>
                 <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id'])) print($data['id']); ?>" disabled>
                 <small class="help-block">Identificador único</small>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-nombre">Nombre <span class="text-danger">*</span></label>
                 <input type="text" id="f-nombre" name="nombre" class="form-control" placeholder="Nombre del trabajador" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?>">
                 <!-- <small class="help-block">Nombre del trabajador</small> -->
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-apellidos">Apellidos <span class="text-danger">*</span></label>
                 <input type="text" id="f-apellidos" name="apellidos" class="form-control" placeholder="Apellidos del trabajador" value="<?php if (isset($data['apellidos'])) print($data['apellidos']); ?>">
                 <!-- <small class="help-block">Apellidos del trabajador</small> -->
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-sexo">Sexo</label>
                 <select id="f-sexo" name="sexo" class="form-control">
@@ -67,14 +67,14 @@
                 <!-- <small class="help-block">Documento de identidad</small> -->
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-edad">Edad <span class="text-danger">*</span></label>
                 <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad actual" value="<?php if (isset($data['edad'])) print($data['edad']); ?>">
                 <!-- <small class="help-block">Edad actual</small> -->
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-direccion">Dirección <span class="text-danger">*</span></label>
                 <input type="text" id="f-direccion" name="direccion" class="form-control" placeholder="Dirección del trabajador" value="<?php if (isset($data['direccion'])) print($data['direccion']); ?>">
@@ -104,7 +104,14 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label class="control-label" for="f-nivel">Nivel Educacional <span class="text-danger">*</span></label>
-                <input type="text" id="f-nivel" name="nivel_educacional" class="form-control" placeholder="Nivel Educacional" value="<?php if (isset($data['nivel_educacional'])) print($data['nivel_educacional']); ?>">
+                <select id="f-nivel" name="nivel_educacional" class="form-control">
+                    <option value="">Seleccione nivel educacional</option>
+                    <option value="Universitario" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Universitario') print('selected'); ?>>Universitario</option>
+                    <option value="Preuniversitario" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Preuniversitario') print('selected'); ?>>Preuniversitario</option>
+                    <option value="Técnico Superior" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Técnico Superior') print('selected'); ?>>Técnico Superior</option>
+                    <option value="Técnico Medio" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == 'Técnico Medio') print('selected'); ?>>Técnico Medio</option>
+                    <option value="9no Grado" <?php if (isset($data['nivel_educacional']) && $data['nivel_educacional'] == '9no Grado') print('selected'); ?>>9no Grado</option>
+                </select>
                 <!-- <small class="help-block">Nivel académico alcanzado</small> -->
             </div>
         </div>
@@ -134,8 +141,17 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label class="control-label" for="f-baja">Fecha Baja</label>
-                <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>">
-                <!-- <small class="help-block">Fin del Contrato</small> -->
+                <div class="input-group">
+                    <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja'])) print($data['fecha_baja']); ?>" disabled>
+                    <div class="input-group-append" style="display:flex; align-items:center; padding-left:8px;">
+                        <div class="checkbox" style="margin:0;">
+                            <label style="margin:0;">
+                                <input type="checkbox" id="check-fecha-baja" <?php if (isset($data['fecha_baja']) && !empty($data['fecha_baja'])) print('checked'); ?>>
+                                Tiene baja
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-3">
@@ -162,6 +178,7 @@
             </div>
         </div>
                     </div>
+        </div>
          <div class="row">
                           
                             <div class="col-md-12">

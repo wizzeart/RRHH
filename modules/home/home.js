@@ -4,7 +4,13 @@ $(document).ready(function() {
             total: '#total-trabajadores',
             activos: '#trabajadores-activos',
             edad: '#promedio-edad',
-            cargos: '#total-cargos'
+            cargos: '#total-cargos',
+            subcontratos: '#total-subcontratos',
+            contratos: '#total-contratos',
+            capacitaciones: '#total-capacitaciones',
+            bolsas: '#total-bolsas',
+            usuarios: '#total-usuarios',
+            bajasTrabajadores: '#total-bajas-trabajadores'
         },
         init: function() {
             this.loadData();
@@ -50,6 +56,12 @@ $(document).ready(function() {
             $(this.selectors.activos).text(stats.activos || 0);
             $(this.selectors.edad).text(stats.promedioEdad || 0);
             $(this.selectors.cargos).text(stats.totalCargos || 0);
+            $(this.selectors.subcontratos).text(stats.totalSubcontratos || 0);
+            $(this.selectors.contratos).text(stats.totalContratos || 0);
+            $(this.selectors.capacitaciones).text(stats.totalCapacitaciones || 0);
+            $(this.selectors.bolsas).text(stats.totalBolsas || 0);
+            $(this.selectors.usuarios).text(stats.totalUsuarios || 0);
+            $(this.selectors.bajasTrabajadores).text(stats.totalBajasTrabajadores || 0);
         },
 
         renderWorkers: function(workers) {

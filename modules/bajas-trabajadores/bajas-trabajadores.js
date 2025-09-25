@@ -55,7 +55,7 @@ $(document).ready(function () {
             + '<li class="list-group-item"><i class="fa fa-graduation-cap mr-2"></i> <strong>Nivel Educacional:</strong> ' + (t.nivel_educacional || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-briefcase mr-2"></i> <strong>Cargo:</strong> ' + (t.cargo_nombre || 'N/A') + '</li>'
             + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Contratación:</strong> ' + (t.fecha_contratacion || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar-times mr-2"></i> <strong>Fecha Baja:</strong> ' + (t.fecha_baja || 'N/A') + '</li>'
+            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Baja:</strong> ' + (t.fecha_baja || 'N/A') + '</li>'
             + '</ul>'
             + '</div>'
             + '</div>'

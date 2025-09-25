@@ -145,9 +145,15 @@ class App
     public function add_history($val)
     {
         $val['xuser'] = $this->user_id;
-        $val['xdate'] = date(dateSQL);
+        // Ensure xdate is properly formatted for database insertion
+        if (defined('dateSQL')) {
+            $val['xdate'] = date(dateSQL);
+        } else {
+            // Fallback to standard MySQL datetime format
+            $val['xdate'] = date('Y-m-d H:i:s');
+        }
 
-        $this->db->insert(  'historico', $val);
+        $this->db->insert('historico', $val);
     }
 
     public function get_list_usuarios($param = array())

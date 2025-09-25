@@ -24,7 +24,7 @@ class Home {
                     // Obtener estadísticas rápidas
                     $sql = "SELECT 
                         COUNT(*) as total,
-                        SUM(CASE WHEN estatus = 'ACTIVO' AND trabajador_eliminado = 0 THEN 1 ELSE 0 END) as activos,
+                        SUM(CASE WHEN trabajador_eliminado = 0 THEN 1 ELSE 0 END) as activos,
                         ROUND(AVG(edad)) as promedioEdad,
                         COUNT(DISTINCT cargos_id) as totalCargos
                     FROM trabajadores 
@@ -42,6 +42,40 @@ class Home {
                         'promedioEdad' => (int)$result['promedioEdad'],
                         'totalCargos' => (int)$result['totalCargos']
                     ];
+
+                    // Contadores adicionales: Subcontratos, Contratos, Capacitaciones
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM subcontratos");
+                        $quickStats['totalSubcontratos'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalSubcontratos'] = 0; }
+
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM contratos");
+                        $quickStats['totalContratos'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalContratos'] = 0; }
+
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM programas_capacitacion");
+                        $quickStats['totalCapacitaciones'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalCapacitaciones'] = 0; }
+
+                    // Bolsas de empleo
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM bolsa_empleo");
+                        $quickStats['totalBolsas'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalBolsas'] = 0; }
+
+                    // Usuarios (conteo total)
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM usuarios");
+                        $quickStats['totalUsuarios'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalUsuarios'] = 0; }
+
+                    // Trabajadores dados de baja (trabajador_eliminado IS NULL o vacío)
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM trabajadores WHERE trabajador_eliminado IS NULL OR trabajador_eliminado = ''");
+                        $quickStats['totalBajasTrabajadores'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['totalBajasTrabajadores'] = 0; }
 
                     // Obtener lista de trabajadores (id, nombre, apellidos, cargos_id, cargo)
                     $workersSql = "SELECT t.id, t.nombre, t.apellidos, t.cargos_id, c.nombre AS cargo

@@ -1,7 +1,12 @@
 $(document).ready(function () {
-    $('#table-panel').on('click', '.fa.fa-trash', function () {
+    // Delegar el clic sobre el botón con data-id (independiente del ícono)
+    $('#table-panel').on('click', 'button[data-id], .fa.fa-trash, .fa.fa-ban', function () {
+        var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
+        if ($btn.length === 0) return;
+
         if (confirm('¿Estás seguro de dar de baja a este trabajador? Se establecerá la fecha de baja automáticamente.')) {
-            var cmd = 'module=trabajadores&method=del&id=' + $(this).data('id') + '&row=' + $(this).parent().parent().data('index');
+            var rowIndex = $btn.parent().parent().data('index');
+            var cmd = 'module=trabajadores&method=del&id=' + $btn.data('id') + '&row=' + rowIndex;
             $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
                 success: function (d) {
                     if (d.status == 1) {
@@ -64,6 +69,6 @@ $(document).ready(function () {
 // Sample Format for Tracking Number Column - Only Delete Button
 // =================================================================
 function formatoToolbar(value, row) {
-    var s = '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-trash" title="Dar de baja trabajador"></button>';
+    var s = '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-ban" title="Dar de baja trabajador"></button>';
     return s;
 }

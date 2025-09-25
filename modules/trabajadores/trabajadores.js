@@ -48,9 +48,30 @@ $(document).ready(function () {
         });
     }
 
+    // Control del checkbox para fecha de baja
+    $('#check-fecha-baja').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#f-baja').prop('disabled', false);
+            $('#f-baja').closest('.form-group').find('.help-block').text('Seleccione la fecha de baja del trabajador');
+        } else {
+            $('#f-baja').prop('disabled', true).val('');
+            $('#f-baja').removeClass('is-invalid');
+            $('#f-baja').closest('.form-group').find('.help-block').text('Marque la casilla superior para activar este campo');
+        }
+    });
+
     // Aplicar la funcionalidad a todos los campos de fecha
     makeDateFieldClickable('#f-contratacion');
-    makeDateFieldClickable('#f-baja');
+    
+    // Para fecha de baja, solo hacer clickeable si no está deshabilitado
+    $('#f-baja').on('click', function() {
+        if (!$(this).prop('disabled')) {
+            this.focus();
+            if (this.showPicker) {
+                this.showPicker();
+            }
+        }
+    });
 
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
@@ -235,6 +256,21 @@ $(document).ready(function () {
             msg += '<div>El campo Bolsa de Empleo es obligatorio.</div>';
         }
 
+        // Validación de fecha de baja
+        if ($('#check-fecha-baja').is(':checked')) {
+            if ($('#f-baja').val() == '') {
+                status = 0;
+                msg += '<div>Debe seleccionar una fecha de baja o desmarcar la casilla.</div>';
+            } else if ($('#f-contratacion').val() && $('#f-baja').val()) {
+                var fechaContratacion = new Date($('#f-contratacion').val());
+                var fechaBaja = new Date($('#f-baja').val());
+                if (fechaBaja < fechaContratacion) {
+                    status = 0;
+                    msg += '<div>La fecha de baja no puede ser anterior a la fecha de contratación.</div>';
+                }
+            }
+        }
+
         // Validar foto antes de enviar (si se seleccionó)
         var archivoFoto = $('#f-foto')[0].files ? $('#f-foto')[0].files[0] : null;
         if (archivoFoto) {
@@ -287,8 +323,10 @@ $(document).ready(function () {
                 formDataObj.append(key, campos[key]);
             }
 
-            // Agregar campos opcionales solo si tienen valor
-            if ($('#f-baja').val()) formDataObj.append('fecha_baja', $('#f-baja').val());
+            // Agregar fecha de baja solo si el checkbox está marcado y tiene valor
+            if ($('#check-fecha-baja').is(':checked') && $('#f-baja').val()) {
+                formDataObj.append('fecha_baja', $('#f-baja').val());
+            }
             if ($('#f-bolsa').val()) formDataObj.append('bolsa_empleo_id', $('#f-bolsa').val());
             
             // Agregar foto si se seleccionó
@@ -354,6 +392,9 @@ $(document).ready(function () {
             notify('danger', 'Guardar datos', msg, 3000);
         }
     });
+
+    // Inicializar estado del checkbox de fecha baja al cargar la página
+    $('#check-fecha-baja').trigger('change');
 });
 
 function formatoPedido(value, row) {
