@@ -144,12 +144,9 @@
     </a>
 
     <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-recursos'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-recursos'))) print('active-link') ?>">
             <a href="?module=list-recursos">Lista de Recursos</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('gestion-recursos'))) print('active-link') ?>">
-            <a href="?module=gestion-recursos">Gestionar Recursos</a>
         </li>
     </ul>
 </li>

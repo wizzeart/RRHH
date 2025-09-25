@@ -42,7 +42,7 @@ function formatoToolbar(value, row) {
 $(document).ready(function () {
     // Botón para agregar nuevo recurso
     $('#btn-add-new').click(function () {
-        location.href = 'index.php?module=gestion-recursos';
+        location.href = 'index.php?module=gestion-recursos&method=new';
     });
 
     // Manejador para el botón de ver detalles
@@ -85,7 +85,7 @@ $(document).ready(function () {
     // Manejador para el botón de editar
     $('#table-panel').on('click', '.edit-recurso', function () {
         var id = $(this).data('id');
-        location.href = 'index.php?module=gestion-recursos&id=' + id;
+        location.href = 'index.php?module=gestion-recursos&method=edit&id=' + id;
     });
 
     // Manejador para el botón de eliminar
