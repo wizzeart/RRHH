@@ -186,6 +186,28 @@
     </ul>
 </li>
 
+<!--NEW MENU OTROS-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-ellipsis-h"></i>
+        <span class="menu-title">
+            <strong>Otros</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
+            <a href="?module=list-departamentos">Departamentos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
+            <a href="?module=list-cargos">Cargos</a>
+        </li>
+    </ul>
+</li>
+
 <!--NEW MENU BOLSAS EMPLEO-->
 <li class="list-divider"></li>
 <li>

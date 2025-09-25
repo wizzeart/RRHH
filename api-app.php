@@ -43,7 +43,7 @@ switch ($_REQUEST['module']) {
         $mdl = new Home($app);
         $mdl->api($_REQUEST);
         break;
-     case 'bolsas_empleos':
+    case 'bolsas_empleos':
         include_once(BASE_CLASS . '/mdl.Bolsas_empleos.php');
         $mdl = new Bolsas_empleos($app);
         $mdl->api($_REQUEST);
@@ -66,6 +66,16 @@ switch ($_REQUEST['module']) {
     case 'programas-capacitacion':
         include_once(BASE_CLASS . '/mdl.ProgramasCapacitacion.php');
         $mdl = new ProgramaCapacitacion($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'departamentos':
+        include_once(BASE_CLASS . '/mdl.Departamentos.php');
+        $mdl = new Departamentos($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'cargos':
+        include_once(BASE_CLASS . '/mdl.Cargos.php');
+        $mdl = new Cargos($app);
         $mdl->api($_REQUEST);
         break;
     case 'contratos':
@@ -143,3 +153,4 @@ switch ($_REQUEST['module']) {
         break;
 }
 $app->close();
+
