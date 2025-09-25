@@ -177,7 +177,7 @@
                 <!-- <small class="help-block">Bolsa de empleo asociada</small> -->
             </div>
         </div>
-                    </div>
+                    
         </div>
          <div class="row">
                           
