@@ -20,7 +20,7 @@
                     <table 
                         id="table-todos"
                         data-toggle="table"
-                        data-url="api-app.php?module=list-recursos&method=list"
+                        data-url="api-app.php?module=gestion-recursos&method=list"
                         data-search="true"
                         data-show-refresh="true"
                         data-show-toggle="false"
@@ -51,7 +51,7 @@
                     <table 
                         id="table-asignados"
                         data-toggle="table"
-                        data-url="api-app.php?module=list-recursos&method=list&estado=1"
+                        data-url="api-app.php?module=gestion-recursos&method=list&estado=1"
                         data-search="true"
                         data-show-refresh="true"
                         data-show-toggle="false"
@@ -80,7 +80,7 @@
                     <table 
                         id="table-retornados"
                         data-toggle="table"
-                        data-url="api-app.php?module=list-recursos&method=list&estado=0"
+                        data-url="api-app.php?module=gestion-recursos&method=list&estado=0"
                         data-search="true"
                         data-show-refresh="true"
                         data-show-toggle="false"

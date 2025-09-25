@@ -82,9 +82,15 @@ $(document).ready(function () {
             var formDataObj = new FormData();
 
             // Agregar parámetros de control
-            formDataObj.append('module', 'list-recursos');
+            formDataObj.append('module', 'gestion-recursos');
             formDataObj.append('method', 'save');
-            formDataObj.append('action', 'insert');
+            formDataObj.append('action', action);
+
+            // Agregar ID si es una actualización
+            if (action === 'update') {
+                formDataObj.append('id', $('#f-id').val());
+                formDataObj.append('fecha_entrega_a_rh', $('#f-fecha-devolucion').val());
+            }
 
             // Agregar todos los campos del formulario
             formDataObj.append('trabajador_id', $('#f-trabajador').val());

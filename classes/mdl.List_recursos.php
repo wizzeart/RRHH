@@ -9,7 +9,7 @@ class List_recursos
     {
         $this->app = $app;
         $this->db = $app->db;
-        $this->action = 'insert';
+        $action = 'insert';
     }
 
     public function api($param)
@@ -92,7 +92,8 @@ class List_recursos
         $insert = array(
             'trabajador_id' => $param['trabajador_id'],
             'fecha_entrega_a_t' => isset($param['fecha_entrega_a_t']) && !empty($param['fecha_entrega_a_t']) ? $param['fecha_entrega_a_t'] : date('Y-m-d'),
-            'nombre' => $param['nombre']
+            'nombre' => $param['nombre'],
+            //'fecha_entrega_a_rh' => $param['fecha_entrega_a_rh']
         );
 
         $data['action'] = $param['action'];
@@ -178,11 +179,17 @@ class List_recursos
                 $campos_validos = [
                     'trabajador_id',
                     'fecha_entrega_a_t',
-                    'nombre'
+                    'nombre',
+                    'fecha_entrega_a_rh'
                 ];
 
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
+                
+                $update_filtered['fecha_entrega_a_rh'] = $param['fecha_entrega_a_rh'];
+                if (isset($param['fecha_entrega_a_rh'])) {
+                    $update_filtered['estado'] = 0;
+                }
 
                 // Debug log before update
                 $log = date('Y-m-d H:i:s') . " - Intentando actualizar postulación ID: " . $id . "\n";
@@ -204,7 +211,6 @@ class List_recursos
                     $history = array(
                         'xentity' => 'RECURSOS',
                         'xaction' => 'UPDATE-RECURSO',
-                        'id' => $id,
                         'xobs' => 'RECURSO: ' . $id . ' ' . $insert['trabajador_id'] . ' ' . $insert['nombre']
                     );
                     $this->app->add_history($history);
@@ -332,7 +338,7 @@ class List_recursos
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
                         $data = $row;
-                        $page['subtitle'] = 'Recurso: ' . $row['id'] . ' - ' . $row['nombre'] . ' ' . $row['apellidos'];
+                        $page['subtitle'] = 'Recurso: ' . $row['id'] . ' - ' . $row['nombre'] ;
                     }
                 } else {
                     $data['estado'] = 1;

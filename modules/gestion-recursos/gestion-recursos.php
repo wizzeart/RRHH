@@ -23,21 +23,27 @@
 
                         <!-- Primera fila -->
                         <div class="row">
-
+                            <div class="col-md-3 hidden">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-id">Código del Recurso</label>
+                                    <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id'])) print($data['id']); ?>" disabled>
+                                    <small class="help-block">Identificador único</small>
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label" for="f-trabajador">Trabajador</label>
-                                    <select id="f-trabajador" name="trabajador_id" class="form-control" required>
+                                    <select id="f-trabajador" name="trabajador_id" class="form-control" required <?php if (isset($data['trabajador_id'])) echo 'disabled'; ?>>
                                         <option value="">Seleccione un trabajador</option>
-                                        <?php 
+                                        <?php
                                         // Obtener la lista de trabajadores activos
                                         $sql = "SELECT id, CONCAT(nombre, ' ', apellidos) as nombre_completo 
                                                 FROM trabajadores 
                                                 WHERE trabajador_eliminado = 0 
                                                 ORDER BY nombre, apellidos";
                                         $trabajadores = $app->db->fetchAll($sql);
-                                        
-                                        foreach ($trabajadores as $trabajador): 
+
+                                        foreach ($trabajadores as $trabajador):
                                             $selected = (isset($data['trabajador_id']) && $data['trabajador_id'] == $trabajador['id']) ? 'selected' : '';
                                         ?>
                                             <option value="<?php echo $trabajador['id']; ?>" <?php echo $selected; ?>>
@@ -50,15 +56,26 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label" for="f-recurso">Recurso</label>
-                                    <input type="text" id="f-recurso" name="recurso" class="form-control" placeholder="Recurso" value="<?php if (isset($data['recurso'])) print($data['recurso']); ?>">
+                                    <input type="text" id="f-recurso" name="recurso" class="form-control" placeholder="Recurso" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?> " <?php if (isset($data['nombre'])) echo 'disabled'; ?>>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="control-label" for="f-fecha-registro">Fecha Entrega</label>
-                                    <input type="date" id="f-fecha-registro" name="fecha_registro" class="form-control" value="<?php if (isset($data['fecha_registro'])) print($data['fecha_registro']);
-                                                                                                                                else print(date('Y-m-d')); ?>">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="f-fecha-registro">Fecha Entrega</label>
+                                        <input type="date" id="f-fecha-registro" name="fecha_entrega_a_t" class="form-control" value="<?php if (isset($data['fecha_entrega_a_t'])) print($data['fecha_entrega_a_t']);else print(date('Y-m-d')); ?>">
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6" <?php if (!isset($data['id'])) print("hidden"); ?>>
+                                    <div class="form-group" >
+                                        <label class="control-label" for="f-fecha-devolucion">Fecha Entrega a RH</label>
+                                        <input type="date" id="f-fecha-devolucion" name="fecha_entrega_a_rh" class="form-control" value="<?php if (isset($data['fecha_entrega_a_rh'])) print($data['fecha_entrega_a_rh']);else print(date('Y-m-d')); ?>">
+                                    </div>  
+                                    </div>
                                 </div>
+                            </div>
+                            <div class="col-md-4" >
                             </div>
 
                         </div>
