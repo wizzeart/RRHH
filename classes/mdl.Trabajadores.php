@@ -147,11 +147,6 @@ class Trabajador {
     }
     
     private function _save($param) {
-        // Debug: Guardar los parámetros recibidos en un archivo de log
-        $log = date('Y-m-d H:i:s') . " - Parámetros recibidos:\n";
-        $log .= print_r($param, true) . "\n";
-        $log .= print_r($_FILES, true) . "\n";
-        file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
 
         $data = array(
             'status' => 1,
@@ -294,10 +289,6 @@ class Trabajador {
             // Filtrar solo los campos válidos
             $insert_filtered = array_intersect_key($insert, array_flip($campos_validos));
             
-            // Debug: Guardar la consulta de inserción
-            $log = date('Y-m-d H:i:s') . " - Intentando insertar:\n";
-            $log .= print_r($insert, true) . "\n";
-            file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
 
             try {
                 // Insertar el trabajador usando solo los campos filtrados
@@ -333,11 +324,6 @@ class Trabajador {
                     $data['msg'] = 'Error al insertar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';
@@ -353,15 +339,15 @@ class Trabajador {
             }
         } else {
             // Update existente
-            if (!isset($param['id'])) {
+            if (!isset($param['id']) || empty($param['id'])) {
                 $data['status'] = 0;
-                $data['msg'] = 'ID de trabajador no proporcionado';
+                $data['msg'] = 'ID de trabajador no proporcionado para actualización';
                 print(json_encode($data));
                 return;
             }
 
             try {
-                $id = $param['id'];
+                $id = intval($param['id']);
 
                 // Verificar si el carnet de identidad ya existe en otro registro
                 if (isset($param['carnet_identidad'])) {
@@ -437,10 +423,6 @@ class Trabajador {
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
 
-                // Debug log before update
-                $log = date('Y-m-d H:i:s') . " - Intentando actualizar trabajador ID: " . $id . "\n";
-                $log .= print_r($update_filtered, true) . "\n";
-                file_put_contents('debug_trabajadores.log', $log, FILE_APPEND);
 
                 // Actualizar el trabajador
                 $where = array('id' => $id);
@@ -467,11 +449,6 @@ class Trabajador {
                     $data['msg'] = 'Error al actualizar el registro';
                 }
             } catch (Exception $e) {
-                // Log del error original para diagnóstico
-                $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
-                $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_trabajadores.log', $errorLog, FILE_APPEND);
-
                 // Respuesta de error amigable
                 $data['status'] = 0;
                 $data['msg_title'] = 'Error';

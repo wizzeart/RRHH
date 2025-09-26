@@ -9,9 +9,18 @@
 <!-- atributos quitados del tag table:   --> 
 <div class="panel">
     <div class="panel-heading">
+        <div class="panel-control">
+            <ul class="nav nav-tabs">
+                <li><a href="#" onclick="location.href='?module=list-trabajadores'">Listado de Trabajadores</a></li>
+                <li class="active"><a href="#tab-dar-baja" data-toggle="tab" aria-expanded="true">Dar de baja</a></li>
+                <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="tab-dar-baja">
         <table 
             id="table-panel"
             data-toggle="table"
@@ -39,6 +48,8 @@
                 </tr>
             </thead>
         </table>
+            </div>
+        </div>
     </div>
 </div>
 <!--===================================================-->
