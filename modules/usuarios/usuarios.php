@@ -82,13 +82,13 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Observaciones</label>
-                                    <textarea id="f-obs" name="xobs" class="form-control" rows="5" ><?php if (isset($data['xobs'])) print($data['xobs']) ?></textarea>
+                                    <textarea id="f-obs" name="xobs" class="form-control" rows="5"><?php if (isset($data['xobs'])) print($data['xobs']) ?></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="panel-footer text-center">
-                        <img id="img-loading" class="hidden" src="img/spinners/282.gif"/>
+                        <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
                         <button id="btn-save" class="btn btn-info icon-lg" type="button">
                             <i class="fa fa-check"></i>
                             Guardar

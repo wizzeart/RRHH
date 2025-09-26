@@ -65,6 +65,30 @@ class Trabajador {
 
                 $data_form = array();
                 break;
+            case 'ficha-trabajador':
+                $data = array();
+                $page['title'] = 'Ficha de Trabajador';
+                $page['subtitle'] = 'Ficha de Trabajador';
+
+                $val = array(
+                    'id' => $param['id']
+                );
+                $sql = "select *"
+                        . " from " . 'trabajadores'
+                        . " where id=:id";
+                $row = $this->db->fetchRow($sql, $val);
+                if ($row) {
+
+                    //$row['almacenes'] = $this->app->get_list_usuarios_almacenes($row['xusuario_id']);
+                    //$row['puntos-ventas'] = $this->app->get_list_usuarios_revendedores($row['xusuario_id']);
+                    //print_r($row['almacenes']);
+                    //die();
+
+                    $data = $row;
+                    $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['nombre'];
+                }
+                $data_form = array();
+                break;
             case 'trabajadores':
                 /*
                   ini_set('display_errors', 1);
