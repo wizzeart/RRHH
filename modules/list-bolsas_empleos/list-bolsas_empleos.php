@@ -24,7 +24,7 @@
             data-pagination="true" data-show-pagination-switch="true">
             <thead>
                 <tr>
-                    <th data-field="id" data-sortable="true">ID</th>
+                    <!-- <th data-field="id" data-sortable="true">ID</th> -->
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="apellidos" data-sortable="true">Apellidos</th>
                     <th data-field="telefono" data-sortable="true">Teléfono</th>

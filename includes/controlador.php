@@ -70,6 +70,18 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Subcontrato($app);
             $mdl->controlador($_REQUEST);
             break;
+        case 'list-departamentos':
+        case 'departamentos':
+            include_once(BASE_CLASS . '/mdl.Departamentos.php');
+            $mdl = new Departamentos($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'list-cargos':
+        case 'cargos':
+            include_once(BASE_CLASS . '/mdl.Cargos.php');
+            $mdl = new Cargos($app);
+            $mdl->controlador($_REQUEST);
+            break;
         case 'list-programas-capacitacion':
         case 'programas-capacitacion':
         case 'delete-programas-capacitacion':

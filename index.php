@@ -395,8 +395,6 @@ $load_grid = true;
 
     <!--Demo script [ DEMONSTRATION ]-->
     <script src="js/demo/nifty-demo.js"></script>
-
-
     <!--Specify page [ SAMPLE ]-->
     <!-- <script src="js/demo/dashboard.js"></script> -->
 
@@ -410,12 +408,13 @@ $load_grid = true;
         }
     }
     ?>
+    <!-- Common helpers for list modules -->
+    <script src="/js/list-common.js?<?php print time(); ?>"></script>
+    
     <script>
         var alv_module = '<?php if (isset($_REQUEST['module'])) print($_REQUEST['module']); ?>';
     </script>
     <!--
-    
-            REQUIRED
             You must include this in your project.
     
             RECOMMENDED

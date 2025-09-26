@@ -61,7 +61,7 @@ global $data, $page;
                 </div>
                 <!-- Cargos Diferentes -->
                 <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver cargos en trabajadores">
+                    <a href="?module=list-cargos" style="text-decoration:none;" data-toggle="tooltip" title="Ver cargos en trabajadores">
                     <div class="panel panel-warning panel-colorful">
                         <div class="pad-all text-center">
                             <div class="mar-btm"><i class="fa fa-briefcase fa-2x"></i></div>

@@ -83,30 +83,13 @@
 </li>
 <!--NEW MENU TRABAJADORES-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
+<li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'delete-trabajadores', 'bajas-trabajadores'))) print('active-link') ?>">
+    <a href="?module=list-trabajadores">
         <i class="fa fa-users"></i>
         <span class="menu-title">
             <strong>Trabajadores</strong>
         </span>
-        <i class="arrow"></i>
     </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'delete-trabajadores', 'bajas-trabajadores', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
-            <a href="?module=list-trabajadores">Lista de Trabajadores</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
-            <a href="?module=trabajadores">Registrar Trabajador</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('delete-trabajadores'))) print('active-link') ?>">
-            <a href="?module=delete-trabajadores">Dar de Baja Trabajadores</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('bajas-trabajadores'))) print('active-link') ?>">
-            <a href="?module=bajas-trabajadores">Listado de Bajas</a>
-        </li>
-    </ul>
 </li>
 
 
@@ -182,6 +165,28 @@
         </li>
         <li class="<?php if (in_array($_GET['module'], array('finalizados-programas-capacitacion'))) print('active-link') ?>">
             <a href="?module=finalizados-programas-capacitacion">Programas Finalizados</a>
+        </li>
+    </ul>
+</li>
+
+<!--NEW MENU OTROS-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-ellipsis-h"></i>
+        <span class="menu-title">
+            <strong>Otros</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
+            <a href="?module=list-departamentos">Departamentos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
+            <a href="?module=list-cargos">Cargos</a>
         </li>
     </ul>
 </li>

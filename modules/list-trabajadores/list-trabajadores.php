@@ -1,18 +1,22 @@
-<div class="panel">
-    <div class="form-control">
-        <!-- <button id="btn-back" class="btn btn-mint btn-icon icon-lg fa fa-arrow-left" alt="Volver" title="Volver"></button> -->
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador">Añadir Nuevo Trabajador</button>
-    </div>
-</div>
+
 
 <!--Basic Toolbar-->
 <!--===================================================-->
 <!-- atributos quitados del tag table:   --> 
 <div class="panel">
     <div class="panel-heading">
+        <div class="panel-control">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Trabajadores</a></li>
+                <li><a href="#" onclick="location.href='?module=delete-trabajadores'">Dar de baja</a></li>
+                <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="tab-listado">
         <table 
             id="table-panel"
             data-toggle="table"
@@ -40,6 +44,14 @@
                 </tr>
             </thead>
         </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel">
+    <div class="form-control">
+        <!-- <button id="btn-back" class="btn btn-mint btn-icon icon-lg fa fa-arrow-left" alt="Volver" title="Volver"></button> -->
+        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador">Añadir Nuevo Trabajador</button>
     </div>
 </div>
 <!--===================================================-->

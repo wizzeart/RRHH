@@ -246,6 +246,11 @@ $(document).ready(function () {
             msg += '<div>El campo Nombre del Trabajador es obligatorio.</div>';
         }
 
+        if ($('#f-departamento').val() == '') {
+            status = 0;
+            msg += '<div>El campo Departamento del Trabajador es obligatorio.</div>';
+        }
+
         if ($('#f-cargo').val() == '') {
             status = 0;
             msg += '<div>El campo Cargo del Trabajador es obligatorio.</div>';
@@ -313,6 +318,7 @@ $(document).ready(function () {
                 'telefono': $('#f-telefono').val(),
                 'email': $('#f-email').val(),
                 'nivel_educacional': $('#f-nivel').val(),
+                'departamento_id': $('#f-departamento').val(),
                 'cargos_id': $('#f-cargo').val(),
                 'fecha_contratacion': $('#f-contratacion').val() || new Date().toISOString().split('T')[0],
                 'estatus': $('#f-estatus').val() || 'activo'

@@ -21,7 +21,7 @@
             data-pagination="true" data-show-pagination-switch="true">
             <thead>
                 <tr>
-                    <th data-field="id" data-sortable="true" data-width="80">ID</th>
+                    <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
                     <th data-field="trabajador_nombre" data-sortable="true">Trabajador</th>
                     <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>

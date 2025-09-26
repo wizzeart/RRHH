@@ -75,6 +75,25 @@ class App
 
         return $data;
     }
+    public function get_list_departamentos($val = array())
+    {
+        $data = array();
+        $cond = '';
+
+        if (isset($val['activo']))
+            $cond .= " and a.activo='{$val['activo']}'";
+
+        $sql = "select a.*"
+            . " from " .   "departamentos a"
+            . " where 1=1"
+            . $cond
+            . " order by a.nombre";
+
+        $data = $this->db->fetchAll($sql);
+
+        return $data;
+    }
+    
     public function get_list_bolsa_empleo($val = array())
     {
         $data = array();
@@ -85,6 +104,8 @@ class App
 
         $sql = "select a.*"
             . " from " .   "bolsa_empleo a"
+            . " where a.estatus = 'aprobado'"
+            . $cond
             . " order by a.id";
 
         $data = $this->db->fetchAll($sql);
