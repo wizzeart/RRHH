@@ -22,12 +22,12 @@ function formatoToolbar(value, row) {
     
     // Botón de editar
     html += '<button class="btn btn-info btn-icon icon-sm fa fa-edit edit-recurso" ';
-    html += 'data-id="' + row.id + '" title="Editar"></button>';
+    html += 'data-id="' + row.id + '" title="Editar"> </button> ';
     
     
     // Botón de ver detalles
     html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
-    html += 'data-id="' + row.id + '" title="Ver detalles"></button>';
+    html += 'data-id="' + row.id + '" title="Ver detalles"></button> ';
     // Botón de eliminar
     html += '<button class="btn btn-danger btn-icon icon-sm fa fa-trash delete-recurso" ';
     html += 'data-id="' + row.id + '" title="Eliminar"></button>';
@@ -42,10 +42,10 @@ $(document).ready(function () {
     });
 
     // Manejador para el botón de ver detalles
-    $('#table-panel').on('click', '.view-recurso', function () {
+    $('#table-todos, #table-asignados, #table-retornados').on('click', '.view-recurso', function () {
         var id = $(this).data('id');
-        var $table = $('#table-panel');
-        var rowData = $table.bootstrapTable('getRowByUniqueId', id);
+        var $tables = $('#table-todos');
+        var rowData = $tables.bootstrapTable('getRowByUniqueId', id);
         
         if (!rowData) {
             alert('No se encontró la información del recurso.');
@@ -79,55 +79,75 @@ $(document).ready(function () {
     });
 
     // Manejador para el botón de editar
-    $('.panel-body').on('click', '.edit-recurso', function () {
+    $('#table-todos, #table-asignados, #table-retornados').on('click', '.edit-recurso', function () {
         location.href = 'index.php?module=gestion-recursos&id=' + $(this).data('id');
     });
 
     // Manejador para el botón de eliminar
-    $('.panel-body').on('click', '.delete-recurso', function () {
+    $('#table-todos, #table-asignados, #table-retornados').on('click', '.delete-recurso', function () {
+        var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
+        if ($btn.length === 0) return;
+        
         var id = $(this).data('id');
         
-        bootbox.confirm({
-            message: '¿Está seguro de que desea eliminar este recurso?',
-            buttons: {
-                confirm: {
-                    label: 'Sí, eliminar',
-                    className: 'btn-danger'
-                },
-                cancel: {
-                    label: 'Cancelar',
-                    className: 'btn-default'
-                }
-            },
-            callback: function (result) {
-                if (result) {
-                    // Realizar la petición de eliminación
-                    $.ajax({
-                        url: 'api-app.php',
-                        type: 'POST',
-                        data: {
-                            module: 'recursos',
-                            method: 'delete',
-                            id: id
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                // Recargar la tabla
-                                $('#table-panel').bootstrapTable('refresh');
-                                // Mostrar mensaje de éxito
-                                bootbox.alert('El recurso ha sido eliminado correctamente.');
-                            } else {
-                                bootbox.alert('Error al eliminar el recurso: ' + (response.message || 'Error desconocido'));
-                            }
-                        },
-                        error: function() {
-                            bootbox.alert('Error al conectar con el servidor. Por favor, intente nuevamente.');
+        if (confirm('¿Estás seguro de dar de baja a este registro?')) {
+            var rowIndex = $btn.parent().parent().parent().data('index');
+            var cmd = 'module=gestion-recursos&method=del&id=' + id + '&row=' + rowIndex;
+            $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
+                success: function (d) {
+                    if (d.status == 1) {
+                        $('tr[data-index="' + d.row + '"]').fadeOut('slow');
+                        // Mostrar notificación de éxito
+                        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                            $.niftyNoty({
+                                type: 'success',
+                                container: 'floating',
+                                title: 'Dado de Baja',
+                                message: 'El registro ha sido dado de baja correctamente con fecha de hoy.',
+                                timer: 3000,
+                                closeBtn: true,
+                                focus: true
+                            });
+                        } else {
+                            alert('Registro eliminado correctamente.');
                         }
-                    });
+                        $('#table-todos').bootstrapTable('refresh');
+                        $('#table-asignados').bootstrapTable('refresh');
+                        $('#table-retornados').bootstrapTable('refresh');
+                    } else {
+                        // Mostrar notificación de error
+                        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                            $.niftyNoty({
+                                type: 'danger',
+                                container: 'floating',
+                                title: 'Error',
+                                message: 'No se pudo dar de baja al registro.',
+                                timer: 3000,
+                                closeBtn: true,
+                                focus: true
+                            });
+                        } else {
+                            alert('Error al eliminar el registro.');
+                        }
+                    }
+                },
+                error: function() {
+                    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                        $.niftyNoty({
+                            type: 'danger',
+                            container: 'floating',
+                            title: 'Error',
+                            message: 'Error de conexión al dar de baja al registro.',
+                            timer: 3000,
+                            closeBtn: true,
+                            focus: true
+                        });
+                    } else {
+                        alert('Error de conexión.');
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 
     // Función para formatear la fecha en la búsqueda
