@@ -125,7 +125,7 @@
 
                         <!-- Tercera fila -->
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-email">Email <span
                                             class="text-danger">*</span></label>
@@ -136,7 +136,7 @@
                                     <!-- <small class="help-block">Correo electrónico</small> -->
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-nivel">Nivel Educacional <span
                                             class="text-danger">*</span></label>
@@ -162,12 +162,27 @@
                                     <!-- <small class="help-block">Nivel académico alcanzado</small> -->
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-departamento">Departamento <span
+                                            class="text-danger">*</span></label>
+                                    <select id="f-departamento" name="departamento_id" class="form-control">
+                                        <option value="">Seleccione departamento</option>
+                                        <?php if (isset($data_form['departamentos']) && is_array($data_form['departamentos'])) { ?>
+                                            <?php foreach ($data_form['departamentos'] as $k => $v) { ?>
+                                                <option value="<?php print ($v['id']) ?>" <?php if (isset($data['departamento_id']) && $data['departamento_id'] == $v['id']) print ('selected'); ?>><?php print ($v['nombre']) ?></option>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    </select>
+                                    <!-- <small class="help-block">Departamento donde trabajará</small> -->
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-cargo">Cargo <span
                                             class="text-danger">*</span></label>
                                     <select id="f-cargo" name="cargos_id" class="form-control">
-                                        <option value=""></option>
+                                        <option value="">Seleccione cargo</option>
                                         <?php foreach ($data_form['cargos'] as $k => $v) { ?>
                                             <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
                                         <?php } ?>
@@ -230,7 +245,7 @@
                                     <label class="control-label" for="f-bolsa">Bolsa de Empleo <span
                                             class="text-danger">*</span></label>
                                     <select id="f-bolsa" name="bolsa_empleo_id" class="form-control">
-                                        <option value=""></option>
+                                        <option value="">Seleccione bolsa de empleo</option>
                                         <?php foreach ($data_form['bolsas'] as $k => $v) { ?>
                                             <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
                                         <?php } ?>

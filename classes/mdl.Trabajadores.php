@@ -79,6 +79,12 @@ class Trabajador {
 
                 
                 $data_form['cargos'] = $this->app->get_list_cargos();
+                // Lista de Departamentos para el select en el formulario
+                if (method_exists($this->app, 'get_list_departamentos')) {
+                    $data_form['departamentos'] = $this->app->get_list_departamentos();
+                } else {
+                    $data_form['departamentos'] = array();
+                }
                 
 
                 
@@ -219,6 +225,7 @@ class Trabajador {
                 'telefono' => 'Teléfono',
                 'email' => 'Email',
                 'nivel_educacional' => 'Nivel Educacional',
+                'departamento_id' => 'Departamento',
                 'cargos_id' => 'Cargo',
                 'estatus' => 'Estatus'
             );        foreach ($required_fields as $field => $label) {
@@ -240,6 +247,7 @@ class Trabajador {
             'telefono' => $param['telefono'],
             'email' => $param['email'],
             'nivel_educacional' => $param['nivel_educacional'],
+            'departamento_id' => intval($param['departamento_id']),
             'cargos_id' => intval($param['cargos_id']),
             'fecha_contratacion' => $param['fecha_contratacion'],
             'fecha_baja' => !empty($param['fecha_baja']) ? $param['fecha_baja'] : null,
@@ -265,6 +273,7 @@ class Trabajador {
             // Asegurar que solo se insertan los campos que existen en la tabla
             $campos_validos = [
                 'cargos_id',
+                'departamento_id',
                 'foto',
                 'nombre',
                 'apellidos',
@@ -407,6 +416,7 @@ class Trabajador {
                 // Filtrar campos válidos para actualización
                 $campos_validos = [
                     'cargos_id',
+                    'departamento_id',
                     'foto',
                     'nombre',
                     'apellidos',

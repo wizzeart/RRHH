@@ -23,7 +23,6 @@
             data-pagination="true" data-show-pagination-switch="true">
             <thead>
                 <tr>
-                    
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="descripcion" data-sortable="false">Descripción</th>
                     <th data-field="salario" data-align="right" data-sortable="true" data-formatter="salarioFormatter">Salario</th>

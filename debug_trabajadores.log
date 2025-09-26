@@ -1130,3 +1130,623 @@ Array
 
 2025-09-23 16:06:02 - Error al actualizar:
 SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '12' for key 'PRIMARY'
+2025-09-26 14:26:39 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:26:39 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:26:39 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:26:44 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:26:44 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:26:44 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:26:50 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:26:50 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:26:50 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:28:02 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => av3.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\php9BF4.tmp
+            [error] => 0
+            [size] => 5836
+        )
+
+)
+
+2025-09-26 14:28:02 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [foto] => uploads/trabajadores/foto_68d686d26afee_av3.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:28:02 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:28:07 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [id] => 1
+)
+
+Array
+(
+    [foto] => Array
+        (
+            [name] => av3.png
+            [type] => image/png
+            [tmp_name] => C:\xamppNEW\tmp\phpAF01.tmp
+            [error] => 0
+            [size] => 5836
+        )
+
+)
+
+2025-09-26 14:28:07 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 10
+    [foto] => uploads/trabajadores/foto_68d686d74e7ef_av3.png
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:28:07 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:46:56 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:46:56 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:46:56 - Error al actualizar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'departamento_id' in 'field list'
+2025-09-26 14:47:04 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:47:04 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:47:04 - Error al actualizar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'departamento_id' in 'field list'
+2025-09-26 14:47:10 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:47:10 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:47:10 - Error al actualizar:
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'departamento_id' in 'field list'
+2025-09-26 14:52:57 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:52:57 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:52:57 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:53:02 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:53:02 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:53:02 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:53:07 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:53:07 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:53:07 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
+2025-09-26 14:53:12 - Parámetros recibidos:
+Array
+(
+    [module] => trabajadores
+    [method] => save
+    [action] => update
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [id] => 1
+)
+
+Array
+(
+)
+
+2025-09-26 14:53:12 - Intentando actualizar trabajador ID: 1
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley Roca
+    [sexo] => M
+    [carnet_identidad] => 85091212345
+    [edad] => 40
+    [direccion] => Calle 23 #456, Vedado, La Habana
+    [telefono] => +53 5 1234567
+    [email] => pedro.mandulsy@example.com
+    [nivel_educacional] => Universitario
+    [departamento_id] => 1
+    [cargos_id] => 1
+    [fecha_contratacion] => 2020-03-15
+    [fecha_baja] => 
+    [estatus] => activo
+    [bolsa_empleo_id] => 9
+    [foto] => 
+    [trabajador_eliminado] => 0
+)
+
+2025-09-26 14:53:12 - Error al actualizar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'PRIMARY'
