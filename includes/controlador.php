@@ -33,6 +33,7 @@ if (isset($_REQUEST['module'])) {
             break;
         case 'list-trabajadores':
         case 'trabajadores':
+        case 'ficha-trabajador':
         case 'delete-trabajadores':
         case 'bajas-trabajadores':
             include_once(BASE_CLASS . '/mdl.Trabajadores.php');

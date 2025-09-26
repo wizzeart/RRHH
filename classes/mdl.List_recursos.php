@@ -22,6 +22,10 @@ class List_recursos
             case 'checked':
                 // $this->_checked($param);
                 break;
+            case 'list-id':
+                $data = $this->_list_id($param);
+                print(json_encode($data));
+                break;
             case 'del':
                 $this->_del($param);
                 break;
@@ -29,6 +33,42 @@ class List_recursos
                 $this->_save($param);
                 break;
         }
+    }
+
+    private function _list_id($param)
+    {
+        $data = array();
+
+        // Construir la consulta base
+        $sql = "SELECT r.*
+                FROM recursos r
+                LEFT JOIN trabajadores t ON r.trabajador_id = t.id WHERE r.trabajador_id = :trabajador_id";
+
+        $params = array(
+            'trabajador_id' => $param['trabajador_id']
+        );
+
+        // Filtrar por estado si se proporciona
+        if (isset($_GET['estado']) && ($_GET['estado'] === '0' || $_GET['estado'] === '1')) {
+            $sql .= " WHERE r.estado = ?";
+            $params[] = (int)$_GET['estado'];
+        }
+
+        // Ordenar según corresponda
+        if (isset($_GET['estado']) && $_GET['estado'] === '0') {
+            $sql .= " ORDER BY r.fecha_entrega_a_rh DESC, r.id DESC";
+        } else {
+            $sql .= " ORDER BY r.fecha_entrega_a_t DESC, r.id DESC";
+        }
+
+        // Ejecutar la consulta
+        if (!empty($params)) {
+            $data = $this->db->fetchAll($sql, $params);
+        } else {
+            $data = $this->db->fetchAll($sql);
+        }
+
+        return $data;
     }
 
     private function _del($param)
@@ -269,44 +309,6 @@ class List_recursos
         return $data;
     }
 
-    private function _insert($data)
-    {
-        $response = array('success' => false, 'message' => '');
-
-        try {
-            // Validar campos requeridos
-            $required_fields = array('trabajador_id', 'nombre');
-            foreach ($required_fields as $field) {
-                if (empty($data[$field])) {
-                    throw new Exception("El campo $field es requerido");
-                }
-            }
-
-            // Preparar datos para la inserción
-            $insert_data = array(
-                'trabajador_id' => $data['trabajador_id'],
-                'nombre' => $data['nombre'],
-                'estado' => 1, // Por defecto, el recurso está en estado 1 (entregado)
-                'fecha_entrega_a_t' => date('Y-m-d H:i:s'), // Fecha actual para el registro
-                'fecha_entrega_a_rh' => null // Se actualizará cuando se entregue a RH
-            );
-
-            // Insertar en la base de datos
-            $result = $this->db->insert('recursos', $insert_data);
-
-            if ($result) {
-                $response['success'] = true;
-                $response['message'] = 'Recurso registrado correctamente';
-                $response['id'] = $this->db->lastInsertId();
-            } else {
-                throw new Exception('Error al registrar el recurso');
-            }
-        } catch (Exception $e) {
-            $response['message'] = $e->getMessage();
-        }
-
-        return $response;
-    }
 
     public function controlador($param)
     {
