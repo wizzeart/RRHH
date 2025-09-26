@@ -4,19 +4,29 @@
     <!-- </div>
 </div> -->
 
-<div class="panel">
-    <div class="form-control">
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato">Añadir Nuevo Subcontrato</button>
-    </div>
-</div>
+
 
 <!--Basic Toolbar-->
 <!--===================================================-->
 <div class="panel">
     <div class="panel-heading">
+        <div class="panel-control">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Subcontratos</a></li>
+                <li><a href="#" onclick="location.href='?module=delete-subcontratos'">Finalizar Subcontrato</a></li>
+                <li><a href="#" onclick="location.href='?module=bajas-subcontratos'">Listado de Finalizados</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="tab-listado">
+                <div class="panel">
+                    <div class="form-control">
+                        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato">Añadir Nuevo Subcontrato</button>
+                    </div>
+                </div>
         <table 
             id="table-panel"
             data-toggle="table"
@@ -43,10 +53,11 @@
                 </tr>
             </thead>
         </table>
+            </div>
+        </div>
     </div>
 </div>
 <!--===================================================-->
-
 <!--Modal para ver detalles del subcontrato-->
 <div class="modal fade" id="subcontratoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">

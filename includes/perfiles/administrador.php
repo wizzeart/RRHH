@@ -95,30 +95,13 @@
 
 <!--NEW MENU SUBCONTRATOS-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-    <i class="fa fa-street-view" aria-hidden="true"></i>
+<li class="<?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos', 'delete-subcontratos', 'bajas-subcontratos'))) print('active-link') ?>">
+    <a href="?module=list-subcontratos">
+        <i class="fa fa-street-view" aria-hidden="true"></i>
         <span class="menu-title">
             <strong>Subcontratos</strong>
         </span>
-        <i class="arrow"></i>
     </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos', 'delete-subcontratos', 'bajas-subcontratos'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos'))) print('active-link') ?>">
-            <a href="?module=list-subcontratos">Lista de Subcontratos</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('subcontratos'))) print('active-link') ?>">
-            <a href="?module=subcontratos">Registrar Subcontrato</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('delete-subcontratos'))) print('active-link') ?>">
-            <a href="?module=delete-subcontratos">Finalizar Subcontratos</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('bajas-subcontratos'))) print('active-link') ?>">
-            <a href="?module=bajas-subcontratos">Subcontratos Finalizados</a>
-        </li>
-    </ul>
 </li>
 <!--NEW MENU CONTRATOS-->
 <li class="list-divider"></li>
