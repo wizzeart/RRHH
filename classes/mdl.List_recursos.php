@@ -23,7 +23,7 @@ class List_recursos
                 // $this->_checked($param);
                 break;
             case 'del':
-                //$this->_del($param);
+                $this->_del($param);
                 break;
             case 'save':
                 $this->_save($param);
@@ -43,13 +43,13 @@ class List_recursos
         $where = array(
             'id' => $param['id']
         );
-        $this->app->db->delete('bolsa_empleo', $where);
+        $this->app->db->del('recursos', $where);
 
         $history = array(
-            'xentity' => 'BOLSA_EMPLEO',
-            'xaction' => 'DEL-POSTULACION',
-            'xid' => $param['id'],
-            'xobs' => 'DEL POSTULACION: ' . $param['id']
+            'xentity' => 'RECURSOS',
+            'xaction' => 'DEL-RECURSO',
+            //'xid' => $param['id'],
+            'xobs' => 'DEL RECURSO: ' . $param['id']
         );
         $this->app->add_history($history);
 

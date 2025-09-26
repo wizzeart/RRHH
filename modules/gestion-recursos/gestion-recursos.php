@@ -32,7 +32,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="control-label" for="f-trabajador">Trabajador</label>
+                                    <label class="control-label" for="f-trabajador">Trabajador <span class="text-danger">*</span></label>
                                     <select id="f-trabajador" name="trabajador_id" class="form-control" required <?php if (isset($data['trabajador_id'])) echo 'disabled'; ?>>
                                         <option value="">Seleccione un trabajador</option>
                                         <?php
@@ -55,7 +55,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="control-label" for="f-recurso">Recurso</label>
+                                    <label class="control-label" for="f-recurso">Recurso <span class="text-danger">*</span></label>
                                     <input type="text" id="f-recurso" name="recurso" class="form-control" placeholder="Recurso" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?> " <?php if (isset($data['nombre'])) echo 'disabled'; ?>>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="f-fecha-registro">Fecha Entrega</label>
+                                        <label class="control-label" for="f-fecha-registro">Fecha Entrega <span class="text-danger">*</span></label>
                                         <input type="date" id="f-fecha-registro" name="fecha_entrega_a_t" class="form-control" value="<?php if (isset($data['fecha_entrega_a_t'])) print($data['fecha_entrega_a_t']);else print(date('Y-m-d')); ?>">
                                     </div>
                                     </div>
