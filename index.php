@@ -305,7 +305,7 @@ $load_grid = true;
             <!-- Remove the class name "show-fixed" and "hide-fixed" to make the content always appears. -->
             <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-            <p class="pad-lft">&#0169; <?php print(date('Y')) ?> Mecánicas Bolea</p>
+            <p class="pad-lft">&#0169; <?php print(date('Y')) ?> Recursos Humanos IML</p>
 
 
 
