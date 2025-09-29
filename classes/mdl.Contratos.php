@@ -16,6 +16,10 @@ class Contrato {
                 $data = $this->_list($param);
                 print(json_encode($data));
                 break;
+            case 'list-id':
+                $data = $this->_list_id($param);
+                print(json_encode($data));
+                break;
             case 'save':
                 $this->_save($param);
                 break;
@@ -62,6 +66,21 @@ class Contrato {
                     LEFT JOIN trabajadores t ON t.id = c.trabajador_id
                     ORDER BY c.id DESC";
             $data = $this->db->fetchAll($sql);
+        } catch (Exception $e) {
+            $data = array();
+        }
+        return $data;
+    }
+
+    private function _list_id($param) {
+        $data = array();
+        try {
+            $sql = "SELECT c.*, t.nombre, t.apellidos, CONCAT(t.nombre, ' ', t.apellidos) as trabajador_nombre
+                    FROM contratos c
+                    LEFT JOIN trabajadores t ON t.id = c.trabajador_id
+                    WHERE c.trabajador_id=:id
+                    ORDER BY c.id DESC";
+            $data = $this->db->fetchAll($sql, array('id' => $param['id']));
         } catch (Exception $e) {
             $data = array();
         }

@@ -88,7 +88,7 @@ class Home {
                     $workers = $this->db->fetchAll($workersSql);
 
                     // Obtener lista de cargos
-                    $cargosSql = "SELECT id, departamento_id, nombre, descripcion, salario FROM cargos ORDER BY nombre";
+                    $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY nombre";
                     $cargos = $this->db->fetchAll($cargosSql);
 
                     // Intentar obtener departamentos si existe la tabla 'departamentos'
@@ -99,12 +99,12 @@ class Home {
                     } catch (Exception $e) {
                         // Si no existe tabla departamentos, construir lista a partir de cargos (por departamento_id)
                         $tmp = [];
-                        foreach ($cargos as $c) {
-                            $did = isset($c['departamento_id']) ? $c['departamento_id'] : null;
-                            if ($did !== null && !isset($tmp[$did])) {
-                                $tmp[$did] = ['id' => $did, 'nombre' => 'Departamento ' . $did];
-                            }
-                        }
+                        // foreach ($cargos as $c) {
+                        //     $did = isset($c['departamento_id']) ? $c['departamento_id'] : null;
+                        //     if ($did !== null && !isset($tmp[$did])) {
+                        //         $tmp[$did] = ['id' => $did, 'nombre' => 'Departamento ' . $did];
+                        //     }
+                        // }
                         $departamentos = array_values($tmp);
                     }
 
