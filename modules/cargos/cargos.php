@@ -28,7 +28,7 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label class="control-label" for="f-departamento">Departamento <span class="text-danger">*</span></label>
+                    <label class="control-label" for="f-departamento">Departamentso <span class="text-danger">*</span></label>
                     <select id="f-departamento" class="form-control">
                         <option value="">Seleccione departamento</option>
                         <?php if(isset($data_form['departamentos'])) { foreach($data_form['departamentos'] as $d) { ?>
