@@ -12,7 +12,7 @@
             <ul class="nav nav-tabs">
                 <li><a href="#" onclick="location.href='?module=list-subcontratos'">Listado de Subcontratos</a></li>
                 <li><a href="#" onclick="location.href='?module=delete-subcontratos'">Finalizar Subcontrato</a></li>
-                <li class="active"><a href="#tab-listado-bajas" data-toggle="tab" aria-expanded="true">Listado de Finalizados</a></li>
+                <li class="active"><a href="#tab-listado-bajas" data-toggle="tab" aria-expanded="true">Subcontratos Finalizados</a></li>
             </ul>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
