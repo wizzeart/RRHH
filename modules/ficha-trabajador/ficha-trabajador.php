@@ -63,9 +63,10 @@
     <div class="panel-heading">
         <div class="panel-control">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">Trabajador</a></li>
+                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">General</a></li>
                 <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false">Contacto</a></li>
-                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false">Recursos Asignados</a></li>
+                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false">Recursos</a></li>
+                <li><a href="#tab-contratacion" data-toggle="tab" aria-expanded="false">Contratación</a></li>
             </ul>
             <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del usuario</p>" data-html="true" title=""></a>
         </div>

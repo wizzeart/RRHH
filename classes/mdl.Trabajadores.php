@@ -85,7 +85,7 @@ class Trabajador {
                     //die();
 
                     $data = $row;
-                    $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['nombre'];
+                    $page['subtitle'] = 'Trabajador: ' . $row['nombre'];
                 }
                 $data_form = array();
                 break;
