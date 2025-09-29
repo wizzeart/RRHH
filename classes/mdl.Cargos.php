@@ -66,10 +66,10 @@ class Cargos {
     private function _list($param) {
         $where = [];
         $vals = [];
-        if (isset($param['departamento_id']) && trim($param['departamento_id']) !== '') {
-            $where[] = 'c.departamento_id = :departamento_id';
-            $vals['departamento_id'] = (int)$param['departamento_id'];
-        }
+        // if (isset($param['departamento_id']) && trim($param['departamento_id']) !== '') {
+        //     $where[] = 'c.departamento_id = :departamento_id';
+        //     $vals['departamento_id'] = (int)$param['departamento_id'];
+        // }
         // Búsqueda por nombre si llega el parámetro 'nombre' o 'search' (bootstrap-table)
         if (isset($param['nombre']) && trim($param['nombre']) !== '') {
             $where[] = 'c.nombre LIKE :nombre';
@@ -84,11 +84,9 @@ class Cargos {
             $cond = ' WHERE ' . implode(' AND ', $where);
         }
 
-        $sql = "SELECT c.id, c.nombre, c.descripcion, c.salario, c.departamento_id,
-                       COALESCE(d.nombre, 'Sin departamento') AS departamento_nombre
+        $sql = "SELECT c.id, c.nombre, c.descripcion, c.salario
                 FROM cargos c
-                LEFT JOIN departamentos d ON c.departamento_id = d.id" .
-                $cond .
+                " . $cond .
                 " ORDER BY c.nombre ASC";
 
         if (!empty($vals)) {
@@ -110,7 +108,7 @@ class Cargos {
         // Validaciones
         $required = array(
             'nombre' => 'Nombre',
-            'departamento_id' => 'Departamento'
+            //'departamento_id' => 'Departamento'
         );
         foreach ($required as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
@@ -125,7 +123,7 @@ class Cargos {
             'nombre' => $param['nombre'],
             'descripcion' => isset($param['descripcion']) ? $param['descripcion'] : '',
             'salario' => isset($param['salario']) && $param['salario'] !== '' ? floatval($param['salario']) : null,
-            'departamento_id' => intval($param['departamento_id'])
+            //'departamento_id' => intval($param['departamento_id'])
         );
 
         // Campos de control

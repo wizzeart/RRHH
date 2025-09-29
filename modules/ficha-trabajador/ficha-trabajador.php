@@ -63,9 +63,10 @@
     <div class="panel-heading">
         <div class="panel-control">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">Trabajador</a></li>
+                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">General</a></li>
                 <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false">Contacto</a></li>
-                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false">Recursos Asignados</a></li>
+                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false">Recursos</a></li>
+                <li><a href="#tab-contratacion" data-toggle="tab" aria-expanded="false">Contratación</a></li>
             </ul>
             <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del usuario</p>" data-html="true" title=""></a>
         </div>
@@ -82,15 +83,7 @@
 
                         <!-- Primera fila -->
                         <div class="row">
-                            <!-- <div class="col-md-3">
-            <div class="form-group">
-                <label class="control-label" for="f-id">Código del trabajador</label>
-                <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id'])) print($data['id']); ?>" disabled>
-                <small class="help-block">Identificador único</small>
-            </div>  
-                
-        </div> -->
-                            <div class="col-md-1">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <?php if (isset($data['foto']) && !empty($data['foto'])) { ?>
                                         <div class="mar-top">
@@ -151,11 +144,6 @@
                         </div>
 
                         <!-- Segunda fila -->
-
-
-
-
-                        <!-- Tercera fila -->
                         <div class="row">
 
                             <div class="col-md-4">
@@ -186,7 +174,7 @@
                             </div>
                         </div>
 
-                        <!-- Cuarta fila -->
+                        <!-- 3ra fila -->
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
@@ -236,11 +224,7 @@
                             </div>
 
                         </div>
-                        <div class="row">
-
-
-
-                        </div>
+                        
                         <div class="panel-footer text-center">
                             <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
                             <!-- <button id="btn-save" class="btn btn-info icon-lg" type="button">
@@ -332,10 +316,47 @@
 
                 </div>
             </div><!-- TAB RECURSOS ASIGNADOS -->
+            <!-- TAB CONTRATACIÓN -->
+            <div class="tab-pane fade" id="tab-contratacion">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Listado de contratos</h3>
+                    </div>
+    
+                    <div class="panel-body orm-padding">
+    
+    
+                        <table
+                            id="table-panel"
+                            data-toggle="table"
+                            data-url="api-app.php?module=contratos&method=list-id&trabajador_id=<?php print($data['id']); ?>"
+                            data-search="true"
+                            data-show-refresh="true"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="id"
+                            data-sort-order="desc"
+                            data-page-list="[20, 50, 100]"
+                            data-page-size="50"
+                            data-pagination="true" data-show-pagination-switch="true">
+                            <thead>
+                                <tr>
+                                    <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
+                                    <th data-field="trabajador_nombre" data-sortable="true">Trabajador</th>
+                                    <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
+                                    <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
+    
+                                    <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
+                                    <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
     <!-- =================================================== -->
     <!-- END BASIC FORM ELEMENTS -->
-</div>
-
 </div>
