@@ -99,7 +99,7 @@ $(document).ready(function() {
                 return;
             }
             cargos.forEach(c => {
-                const row = `<tr><td>${c.id||''}</td><td>${escapeHtml(c.departamento_id||'')}</td><td>${escapeHtml(c.nombre||'')}</td><td>${escapeHtml(c.salario||'')}</td></tr>`;
+                const row = `<tr><td>${c.id||''}</td><td>${escapeHtml(c.nombre||'')}</td><td>${escapeHtml(c.salario||'')}</td></tr>`;
                 $tbody.append(row);
             });
         }
