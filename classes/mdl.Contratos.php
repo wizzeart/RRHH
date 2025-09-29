@@ -75,12 +75,12 @@ class Contrato {
     private function _list_id($param) {
         $data = array();
         try {
-            $sql = "SELECT c.*, t.nombre, t.apellidos, CONCAT(t.nombre, ' ', t.apellidos) as trabajador_nombre
+            $sql = "SELECT c.*
                     FROM contratos c
                     LEFT JOIN trabajadores t ON t.id = c.trabajador_id
                     WHERE c.trabajador_id=:id
                     ORDER BY c.id DESC";
-            $data = $this->db->fetchAll($sql, array('id' => $param['id']));
+            $data = $this->db->fetchAll($sql, array('id' => $param['trabajador_id']));
         } catch (Exception $e) {
             $data = array();
         }
