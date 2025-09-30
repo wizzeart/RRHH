@@ -48,24 +48,6 @@
         }
     }
 
-    /* Aumentar tamaño de fuente para los campos del formulario */
-    #tab-general .form-control {
-        font-size: 1.1em;
-        height: auto;
-        padding: 8px 12px;
-    }
-
-    /* Aumentar tamaño de las etiquetas */
-    #tab-general .control-label {
-        font-size: 1.05em;
-        font-weight: 500;
-        margin-bottom: 5px;
-    }
-
-    /* Ajustar el espaciado entre campos */
-    #tab-general .form-group {
-        margin-bottom: 15px;
-    }
 </style>
 
 <script>
