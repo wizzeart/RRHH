@@ -16,6 +16,10 @@ class Prenomina {
                 $data = $this->_list_prenomina($param);
                 print(json_encode($data));
                 break;
+            case 'list-departamentos':
+                $data = $this->_list_departamentos();
+                print(json_encode($data));
+                break;
             case 'save-horas':
                 $this->_save_horas();
                 break;
@@ -40,12 +44,12 @@ class Prenomina {
 
     private function _list_prenomina($param) {
         $vals = [];
-        $whereParts = ["t.trabajador_eliminado = '0'"];
+        $whereParts = ["(t.trabajador_eliminado = 0 OR t.trabajador_eliminado = '0' OR t.trabajador_eliminado IS NULL)"];
 
-        // Filtro por pestaña (departamento o categoría)
+        // Filtro por pestaña (departamento por nombre) usando subconsulta contra trabajadores.departamento_id
         if (isset($param['tab']) && $param['tab'] !== '') {
             $vals['tab'] = $param['tab'];
-            $whereParts[] = 'LOWER(d.nombre) = LOWER(:tab)';
+            $whereParts[] = 't.departamento_id IN (SELECT id FROM departamentos WHERE TRIM(LOWER(nombre)) = TRIM(LOWER(:tab)))';
         }
 
         $cond = '';
@@ -190,10 +194,10 @@ class Prenomina {
         $month = isset($param['month']) ? intval($param['month']) : intval(date('n'));
         $vals = ['y' => $year, 'm' => $month];
 
-        // Filtro por tab
-        $where = ["t.trabajador_eliminado='0'"];
+        // Filtro por tab (por nombre de departamento) usando subconsulta contra trabajadores.departamento_id
+        $where = ["(t.trabajador_eliminado = 0 OR t.trabajador_eliminado = '0' OR t.trabajador_eliminado IS NULL)"];
         if (isset($param['tab']) && trim($param['tab']) !== '') {
-            $where[] = 'LOWER(d.nombre)=LOWER(:tab)';
+            $where[] = 't.departamento_id IN (SELECT id FROM departamentos WHERE TRIM(LOWER(nombre)) = TRIM(LOWER(:tab)))';
             $vals['tab'] = $param['tab'];
         }
         $cond = ' WHERE ' . implode(' AND ', $where);
@@ -292,5 +296,27 @@ class Prenomina {
         $writer = PHPExcel_IOFactory::createWriter($obj, 'Excel2007');
         $writer->save('php://output');
         exit;
+    }
+
+    private function _list_departamentos() {
+        // Devolver solo nombres de departamentos (tabs por nombre)
+        if (method_exists($this->app, 'get_list_departamentos')) {
+            $rows = $this->app->get_list_departamentos();
+        } else {
+            $rows = $this->db->fetchAll("SELECT id, nombre FROM departamentos ORDER BY nombre ASC");
+        }
+        $out = [];
+        foreach ($rows as $r) {
+            if (is_array($r)) {
+                if (isset($r['nombre'])) {
+                    $out[] = $r['nombre'];
+                } else {
+                    $out[] = (string)reset($r);
+                }
+            } else {
+                $out[] = (string)$r;
+            }
+        }
+        return $out;
     }
 }

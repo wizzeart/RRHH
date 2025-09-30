@@ -30,41 +30,38 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label class="control-label" for="f-nombre">Nombre <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="f-nombre" name="nombre" class="form-control"
-                                placeholder="Nombre del trabajador" value="<?php if (isset($data['nombre']))
-                                    print ($data['nombre']); ?>">
+                            <label class="control-label" for="f-nombre">Nombre <span class="text-danger">*</span></label>
+                            <input type="text" id="f-nombre" name="nombre" class="form-control" placeholder="Nombre del trabajador" value="<?php if (isset($data['nombre'])) print ($data['nombre']); ?>">
                             <!-- <small class="help-block">Nombre del trabajador</small> -->
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label class="control-label" for="f-apellidos">Apellidos <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="f-apellidos" name="apellidos" class="form-control"
-                                placeholder="Apellidos del trabajador" value="<?php if (isset($data['apellidos']))
-                                    print ($data['apellidos']); ?>">
-                            <!-- <small class="help-block">Apellidos del trabajador</small> -->
+                            <label class="control-label" for="f-apellidos">Apellidos <span class="text-danger">*</span></label>
+                            <input type="text" id="f-apellidos" name="apellidos" class="form-control" placeholder="Primer apellido" value="<?php if (isset($data['apellidos'])) print ($data['apellidos']); ?>">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label class="control-label" for="f-sexo">Sexo</label>
-                            <select id="f-sexo" name="sexo" class="form-control">
-                                <option value="">Seleccione sexo</option>
-                                <option value="M" <?php if (isset($data['sexo']) && $data['sexo'] == 'M')
-                                    print ('selected'); ?>>Masculino</option>
-                                <option value="F" <?php if (isset($data['sexo']) && $data['sexo'] == 'F')
-                                    print ('selected'); ?>>Femenino</option>
-                            </select>
-                            <!-- <small class="help-block">Sexo del trabajador</small> -->
+                            <label class="control-label" for="f-apellidos-segundos">Segundo Apellido <span class="text-danger">*</span></label>
+                            <input type="text" id="f-apellidos-segundos" name="apellidos_segundos" class="form-control" placeholder="Segundo apellido" value="<?php if (isset($data['apellidos_segundos'])) print ($data['apellidos_segundos']); ?>">
                         </div>
                     </div>
                 </div>
 
                 <!-- Segunda fila -->
                 <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-sexo">Sexo</label>
+                            <select id="f-sexo" name="sexo" class="form-control">
+                                <option value="">Seleccione sexo</option>
+                                <option value="M" <?php if (isset($data['sexo']) && $data['sexo'] == 'M') print ('selected'); ?>>Masculino</option>
+                                <option value="F" <?php if (isset($data['sexo']) && $data['sexo'] == 'F') print ('selected'); ?>>Femenino</option>
+                            </select>
+                            <!-- <small class="help-block">Sexo del trabajador</small> -->
+                        </div>
+                    </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label" for="f-ci">Carnet de Identidad <span
@@ -189,25 +186,6 @@
                             <input type="date" id="f-contratacion" name="fecha_contratacion" class="form-control" value="<?php if (isset($data['fecha_contratacion']))
                                 print ($data['fecha_contratacion']); ?>">
                             <!-- <small class="help-block">Inicio del Contrato</small> -->
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-baja">Fecha Baja</label>
-                            <div class="input-group">
-                                <input type="date" id="f-baja" name="fecha_baja" class="form-control" value="<?php if (isset($data['fecha_baja']))
-                                    print ($data['fecha_baja']); ?>" disabled>
-                                <div class="input-group-append"
-                                    style="display:flex; align-items:center; padding-left:8px;">
-                                    <div class="checkbox" style="margin:0;">
-                                        <label style="margin:0;">
-                                            <input type="checkbox" id="check-fecha-baja" <?php if (isset($data['fecha_baja']) && !empty($data['fecha_baja']))
-                                                print ('checked'); ?>>
-                                            Tiene baja
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="col-md-3">
