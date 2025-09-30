@@ -461,6 +461,24 @@ function formatoProducto(value, row) {
     return  s;
 }
 
+// Formatter para la columna Opciones -> Ver PDF
+function pdfFormatter(value, row, index) {
+    var url = value || row.archivo_contrato;
+    if (url && String(url).trim() !== '' && url !== 'null') {
+      var filename = (function(u){ try { var p = u.split('?')[0]; var parts = p.split('/'); return parts[parts.length-1] || 'contrato.pdf'; } catch(e){ return 'contrato.pdf'; } })(url);
+      return '<button type="button" class="btn btn-danger btn-sm btn-view-pdf" data-url="' + url + '" data-toggle="tooltip" title="' + filename + '"><i class="fa fa-file-pdf-o"></i></button>';
+    }
+    return '<button type="button" class="btn btn-default btn-sm" disabled data-toggle="tooltip" title="Sin archivo"><i class="fa fa-file-o"></i></button>';
+  }
+  
+
+function firmadoFormatter(value, row, index) {
+    var firmado = (value && String(value).trim() !== '' && value !== 'null' && value !== null);
+    if (firmado) {
+      return '<span class="label label-success">Firmado</span>';
+    }
+    return '<span class="label label-warning">No firmado</span>';
+  }
 
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';

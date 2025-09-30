@@ -91,6 +91,8 @@ class Home {
                     $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY nombre";
                     $cargos = $this->db->fetchAll($cargosSql);
 
+                    $quickStats['totalCargos'] = count($cargos);
+
                     // Intentar obtener departamentos si existe la tabla 'departamentos'
                     $departamentos = [];
                     try {

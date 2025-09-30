@@ -1,4 +1,17 @@
 <style>
+    /* Estilos para el campo de estatus */
+    .estatus-activo {
+        color: #28a745 !important;
+        font-weight: bold;
+        background-color: rgba(40, 167, 69, 0.1) !important;
+    }
+    
+    .estatus-inactivo {
+        color: #dc3545 !important;
+        font-weight: bold;
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
     /* Estilos específicos para campos deshabilitados y de solo lectura en la ficha del trabajador */
     #tab-general input[disabled],
     #tab-general input[readonly],
@@ -63,12 +76,12 @@
     <div class="panel-heading">
         <div class="panel-control">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true">General</a></li>
-                <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false">Contacto</a></li>
-                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false">Recursos</a></li>
-                <li><a href="#tab-contratacion" data-toggle="tab" aria-expanded="false">Contratación</a></li>
+                <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true"><i class="fa fa-user"></i> General</a></li>
+                <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false"><i class="fa fa-phone"></i> Contacto</a></li>
+                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false"><i class="fa fa-cubes"></i> Recursos</a></li>
+                <li><a href="#tab-contratacion" data-toggle="tab" aria-expanded="false"><i class="fa fa-file-text"></i> Contratación</a></li>
             </ul>
-            <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del usuario</p>" data-html="true" title=""></a>
+            <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del trabajador</p>" data-html="true" title=""></a>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
@@ -105,11 +118,20 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label class="control-label" for="f-apellidos">Apellidos </label>
+                                            <label class="control-label" for="f-apellidos">1er Apellido </label>
                                             <input type="text" id="f-apellidos" name="apellidos" class="form-control" placeholder="Apellidos del trabajador" value="<?php if (isset($data['apellidos'])) print($data['apellidos']); ?>" readonly>
                                             <!-- <small class="help-block">Apellidos del trabajador</small> -->
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="control-label" for="f-apellidos-segundos">2do Apellido </label>
+                                            <input type="text" id="f-apellidos-segundos" name="apellidos_segundos" class="form-control" placeholder="Apellidos del trabajador" value="<?php if (isset($data['apellidos_segundos'])) print($data['apellidos_segundos']); ?>" readonly>
+                                            <!-- <small class="help-block">Apellidos del trabajador</small> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="control-label" for="f-sexo">Sexo</label>
@@ -121,8 +143,6 @@
                                             <!-- <small class="help-block">Sexo del trabajador</small> -->
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="control-label" for="f-ci">Carnet de Identidad </label>
@@ -137,6 +157,7 @@
                                             <!-- <small class="help-block">Edad actual</small> -->
                                         </div>
                                     </div>
+
 
 
                                 </div>
@@ -164,26 +185,46 @@
                                 <div class="form-group">
                                     <label class="control-label" for="f-cargo">Cargo </label>
                                     <select id="f-cargo" name="cargos_id" class="form-control" disabled>
-                                        <option value=""></option>
-                                        <?php foreach ($data_form['cargos'] as $k => $v) { ?>
-                                            <option value="<?php print($v['id']) ?>"><?php print($v['nombre']) ?></option>
+                                        <?php
+                                        $sql = 'SELECT * FROM cargos';
+                                        $res = $app->db->fetchAll($sql);
+                                        $data_form['cargos'] = $res;
+
+                                        foreach ($data_form['cargos'] as $k => $v) { ?>
+                                            <option value="<?php print($v['id']) ?>" <?php if (isset($data['cargos_id']) && $data['cargos_id'] == $v['id']) print('selected'); ?>><?php print($v['nombre']) ?></option>
                                         <?php } ?>
                                     </select>
+
                                     <!-- <small class="help-block">Cargo asignado</small> -->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-departamento">Departamento </label>
+                                    <select id="f-departamento" name="departamento_id" class="form-control" disabled>
+                                        <?php
+                                        $sql = 'SELECT * FROM departamentos';
+                                        $res = $app->db->fetchAll($sql);
+                                        $data_form['departamentos'] = $res;
+
+                                        foreach ($data_form['departamentos'] as $k => $v) { ?>
+                                            <option value="<?php print($v['id']) ?>" <?php if (isset($data['departamento_id']) && $data['departamento_id'] == $v['id']) print('selected'); ?>><?php print($v['nombre']) ?></option>
+                                        <?php } ?>
+                                    </select>
+
                                 </div>
                             </div>
                         </div>
 
                         <!-- 3ra fila -->
                         <div class="row">
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-contratacion">Fecha Contratación </label>
                                     <input type="date" id="f-contratacion" name="fecha_contratacion" class="form-control" value="<?php if (isset($data['fecha_contratacion'])) print($data['fecha_contratacion']); ?>" readonly>
-                                    <!-- <small class="help-block">Inicio del Contrato</small> -->
                                 </div>
-                            </div>
-                            <div class="col-md-3">
+                            </div> -->
+                            <!-- <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-baja">Fecha Baja</label>
                                     <div class="input-group">
@@ -198,19 +239,55 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-estatus">Estatus </label>
-                                    <select id="f-estatus" name="estatus" class="form-control" disabled>
+                                    <?php 
+                                        $estatusClase = '';
+                                        if (isset($data['estatus'])) {
+                                            $estatusClase = ($data['estatus'] == 'activo') ? 'estatus-activo' : 'estatus-inactivo';
+                                        }
+                                    ?>
+                                    <select id="f-estatus" name="estatus" class="form-control <?php echo $estatusClase; ?>" disabled>
                                         <option value=""></option>
-                                        <option value="activo" <?php if (isset($data['estatus']) && $data['estatus'] == 'activo') print('selected'); ?>>Activo</option>
-                                        <option value="inactivo" <?php if (isset($data['estatus']) && $data['estatus'] == 'inactivo') print('selected'); ?>>Inactivo</option>
+                                        <option value="activo" class="estatus-activo" <?php if (isset($data['estatus']) && $data['estatus'] == 'activo') print('selected'); ?>>Activo</option>
+                                        <option value="inactivo" class="estatus-inactivo" <?php if (isset($data['estatus']) && $data['estatus'] == 'inactivo') print('selected'); ?>>Inactivo</option>
                                     </select>
                                     <!-- <small class="help-block">Estado actual</small> -->
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-licencia">Licencia de Conducción</label>
+                                    <?php
+                                    // Convertir la cadena de licencias a un array
+                                    $licencias = [];
+                                    if (isset($data['licencia_conduccion']) && !empty($data['licencia_conduccion']) && strtoupper($data['licencia_conduccion']) !== 'N/A') {
+                                        $licencias = array_map('trim', explode(' ', $data['licencia_conduccion']));
+                                    }
+
+                                    // Si no hay licencias, forzar a que muestre N/A
+                                    $title = empty($licencias) ? 'N/A' : 'Seleccione los tipos de licencia';
+                                    ?>
+                                    <select id="f-licencia" name="licencia_conduccion[]" class="form-control selectpicker" multiple title="<?php echo $title; ?>" disabled>
+                                        <?php if (empty($licencias)): ?>
+                                            <option value="N/A" selected>N/A - No posee licencia</option>
+                                        <?php endif; ?>
+                                        <option value="A1" <?php echo in_array('A1', $licencias) ? 'selected' : ''; ?>>A1 - Ciclomotor</option>
+                                        <option value="A" <?php echo in_array('A', $licencias) ? 'selected' : ''; ?>>A - Motocicleta</option>
+                                        <option value="B" <?php echo in_array('B', $licencias) ? 'selected' : ''; ?>>B - Automóvil</option>
+                                        <option value="C1" <?php echo in_array('C1', $licencias) ? 'selected' : ''; ?>>C1 - Camión ligero</option>
+                                        <option value="C" <?php echo in_array('C', $licencias) ? 'selected' : ''; ?>>C - Camión pesado</option>
+                                        <option value="D1" <?php echo in_array('D1', $licencias) ? 'selected' : ''; ?>>D1 - Microbús</option>
+                                        <option value="D" <?php echo in_array('D', $licencias) ? 'selected' : ''; ?>>D - Omnibus</option>
+                                        <option value="E" <?php echo in_array('E', $licencias) ? 'selected' : ''; ?>>E - Articulado</option>
+                                        <option value="F" <?php echo in_array('F', $licencias) ? 'selected' : ''; ?>>F - Agroindustrial y de construcción</option>
+                                        <option value="FE" <?php echo in_array('FE', $licencias) ? 'selected' : ''; ?>>FE - Tractor con remolque</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-bolsa">Bolsa de Empleo </label>
                                     <select id="f-bolsa" name="bolsa_empleo_id" class="form-control" disabled>
@@ -219,31 +296,12 @@
                                             <option value="<?php print($v['id']) ?>"><?php print($v['nombre']) ?></option>
                                         <?php } ?>
                                     </select>
-                                    <!-- <small class="help-block">Bolsa de empleo asociada</small> -->
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
-                        
-                        <div class="panel-footer text-center">
-                            <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
-                            <!-- <button id="btn-save" class="btn btn-info icon-lg" type="button">
-                                <i class="fa fa-check"></i>
-                                Guardar
-                            </button> -->
-                            <button id="btn-back" class="btn btn-default icon-lg" type="button">
-                                <i class="fa fa-undo"></i>
-                                Volver
-                            </button>
-                            <!-- <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                                <i class="fa fa-plus"></i>
-                                Nuevo
-                            </button> -->
 
-                            <!-- Sección de Foto del Trabajador -->
-                            <hr>
 
-                        </div>
                     </div>
                 </div><!-- TAB GENERAL -->
             </div>
@@ -318,14 +376,19 @@
             </div><!-- TAB RECURSOS ASIGNADOS -->
             <!-- TAB CONTRATACIÓN -->
             <div class="tab-pane fade" id="tab-contratacion">
+                <div>
+                    <!--agregar cargo y departamento-->
+
+                </div>
+
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Listado de contratos</h3>
                     </div>
-    
+
                     <div class="panel-body orm-padding">
-    
-    
+
+
                         <table
                             id="table-panel"
                             data-toggle="table"
@@ -342,10 +405,9 @@
                             <thead>
                                 <tr>
                                     <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
-                                    <th data-field="trabajador_nombre" data-sortable="true">Trabajador</th>
                                     <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
                                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
-    
+
                                     <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
                                     <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
                                 </tr>
@@ -353,6 +415,25 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="panel-footer text-center">
+                <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
+                <!-- <button id="btn-save" class="btn btn-info icon-lg" type="button">
+                                <i class="fa fa-check"></i>
+                                Guardar
+                            </button> -->
+                <button id="btn-back" class="btn btn-default icon-lg" type="button">
+                    <i class="fa fa-undo"></i>
+                    Volver
+                </button>
+                <!-- <button id="btn-new" class="btn btn-warning icon-lg" type="button">
+                                <i class="fa fa-plus"></i>
+                                Nuevo
+                            </button> -->
+
+                <!-- Sección de Foto del Trabajador -->
+                <hr>
+
             </div>
         </div>
 
