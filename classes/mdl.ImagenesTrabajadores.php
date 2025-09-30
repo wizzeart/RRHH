@@ -1,6 +1,34 @@
 <?php
 
 class ImagenesTrabajadores {
+    // Configuración CORS
+    private $allowedOrigins = [
+        'http://tudominio.com',
+        'https://tudominio.com',
+        'http://www.tudominio.com',
+        'https://www.tudominio.com'
+    ];
+    
+    private function setCorsHeaders() {
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+        
+        // Verificar si el origen está permitido
+        if (in_array($origin, $this->allowedOrigins)) {
+            header("Access-Control-Allow-Origin: $origin");
+        } else {
+            header('Access-Control-Allow-Origin: *'); // O puedes bloquear peticiones no autorizadas
+        }
+        
+        header('Access-Control-Allow-Methods: GET, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Content-Type');
+        header('Access-Control-Max-Age: 86400'); // 24 horas de caché para preflight
+        
+        // Manejar solicitud OPTIONS (preflight)
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
+    }
     // Usar la misma clave que para el login
     private function validarToken($token) {
         // Comparación segura de cadenas para evitar ataques de timing
@@ -33,6 +61,9 @@ class ImagenesTrabajadores {
     }
 
     public function api($param) {
+        // Configurar CORS
+        $this->setCorsHeaders();
+        
         // Verificar token de autenticación
         $token = '';
         
@@ -67,36 +98,40 @@ class ImagenesTrabajadores {
     }
 
     private function getImage($param) {
-        // Habilitar visualización de errores para depuración
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-        
-        if (!isset($param['id'])) {
-            $this->sendError('ID de trabajador no especificado');
+        // Validar ID del trabajador
+        if (!isset($param['id']) || !is_numeric($param['id'])) {
+            $this->sendError('ID de trabajador no válido o no especificado', 400);
             return;
         }
 
         $id = intval($param['id']);
         
-        // Obtener la ruta de la imagen desde la base de datos
-        $sql = "SELECT foto FROM trabajadores WHERE id = :id";
-        $result = $this->db->fetchRow($sql, ['id' => $id]);
-        
-        // Debug: Mostrar información de la consulta
-        error_log("Consulta a la base de datos para ID $id. Resultado: " . print_r($result, true));
+        try {
+            // Obtener la ruta de la imagen desde la base de datos
+            $sql = "SELECT id, foto, CONCAT(nombre, ' ', apellidos) as nombre_completo FROM trabajadores WHERE id = :id";
+            $result = $this->db->fetchRow($sql, ['id' => $id]);
+            
+            if (!$result) {
+                $this->sendError('Trabajador no encontrado', 404);
+                return;
+            }
 
-        if (!$result || empty($result['foto'])) {
-            error_log("No se encontró foto para el trabajador ID: $id");
-            $this->sendDefaultImage();
-            return;
-        }
+            // Si no hay foto, devolver la imagen por defecto
+            if (empty($result['foto'])) {
+                $this->sendDefaultImage();
+                return;
+            }
 
-        // Obtener la ruta de la imagen
-        $fotoPath = $result['foto'];
-        error_log("Ruta de la imagen desde BD: $fotoPath");
-        
-        // Si la ruta es relativa, construir la ruta completa
-        if (strpos($fotoPath, '/') !== 0 && strpos($fotoPath, 'http') !== 0) {
+            // Obtener la ruta de la imagen
+            $fotoPath = $result['foto'];
+            
+            // Si la ruta es una URL completa, redirigir a ella
+            if (filter_var($fotoPath, FILTER_VALIDATE_URL)) {
+                header('Location: ' . $fotoPath);
+                exit;
+            }
+            
+            // Si la ruta es relativa, construir la ruta completa
             // Si la ruta ya incluye 'uploads/trabajadores/', usarla directamente
             if (strpos($fotoPath, 'uploads/trabajadores/') === 0) {
                 $imagePath = __DIR__ . '/../' . $fotoPath;
@@ -106,7 +141,26 @@ class ImagenesTrabajadores {
                 $imagePath = $this->basePath . basename($fotoPath);
                 error_log("Ruta 2 (solo nombre de archivo): $imagePath");
             }
-        } else {
+
+            // Verificar si el archivo existe
+            if (!file_exists($imagePath)) {
+                error_log("Archivo no encontrado: $imagePath");
+                $this->sendDefaultImage();
+                return;
+            }
+
+            // Obtener información del archivo
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($fileInfo, $imagePath);
+            finfo_close($fileInfo);
+
+            // Enviar la imagen con las cabeceras adecuadas
+            header('Content-Type: ' . $mimeType);
+            header('Content-Length: ' . filesize($imagePath));
+            header('Content-Disposition: inline; filename="' . basename($imagePath) . '"');
+            header('Cache-Control: max-age=86400, public'); // 24 horas de caché
+            readfile($imagePath);
+            exit;
             $imagePath = $fotoPath;
             error_log("Ruta 3 (ruta absoluta o URL): $imagePath");
         }
@@ -150,18 +204,30 @@ class ImagenesTrabajadores {
             readfile($defaultImage);
         } else {
             // Si no hay imagen por defecto, enviar un error 404
-            header('HTTP/1.0 404 Not Found');
             echo 'Imagen no encontrada';
         }
         exit;
     }
 
-    private function sendError($message) {
+    private function sendError($message, $statusCode = 400) {
+        http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'error',
-            'message' => $message
-        ]);
+            'message' => $message,
+            'timestamp' => date('c')
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    private function sendSuccess($data = null, $message = 'Success') {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => $message,
+            'data' => $data,
+            'timestamp' => date('c')
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         exit;
     }
 }
