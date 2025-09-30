@@ -31,19 +31,12 @@
                     <button id="btn-prenom-save" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Guardar</button>
                 </div>
             </div>
-            <ul class="nav nav-tabs" id="tabs-prenomina">
-                <li class="active"><a href="#" data-tab="Administrativa">Administrativa</a></li>
-                <li><a href="#" data-tab="Almacen">Almacen</a></li>
-                <li><a href="#" data-tab="Comercial">Comercial</a></li>
-                <li><a href="#" data-tab="Diseño e Informatica">Diseño e Informatica</a></li>
-                <li><a href="#" data-tab="Taguasco">Taguasco</a></li>
-                <li><a href="#" data-tab="Choferes">Choferes</a></li>
-            </ul>
+            <ul class="nav nav-tabs" id="tabs-prenomina"></ul>
             <br />
             <table 
                 id="table-prenomina"
                 data-toggle="table"
-                data-url="api-app.php?module=prenomina&method=list-prenomina&tab=Administrativa"
+                data-url="api-app.php?module=prenomina&method=list-prenomina"
                 data-search="true"
                 data-show-refresh="true"
                 data-show-toggle="false"

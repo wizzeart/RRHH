@@ -237,6 +237,7 @@ class Trabajador {
             $required_fields = array(
                 'nombre' => 'Nombre',
                 'apellidos' => 'Apellidos',
+                'apellidos_segundos' => 'Segundo Apellido',
                 'sexo' => 'Sexo',
                 'carnet_identidad' => 'Carnet de Identidad',
                 'edad' => 'Edad',
@@ -258,7 +259,7 @@ class Trabajador {
 
         // Crear array de datos sin incluir campos de control
         $insert = array();
-        $allowed_fields = ['nombre', 'apellidos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        $allowed_fields = ['nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
         
         foreach ($allowed_fields as $field) {
             if (isset($param[$field])) {
@@ -314,6 +315,7 @@ class Trabajador {
                 'foto',
                 'nombre',
                 'apellidos',
+                'apellidos_segundos',
                 'carnet_identidad',
                 'sexo',
                 'edad',
@@ -455,6 +457,7 @@ class Trabajador {
                     'foto',
                     'nombre',
                     'apellidos',
+                    'apellidos_segundos',
                     'carnet_identidad',
                     'sexo',
                     'edad',
