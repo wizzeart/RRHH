@@ -1,6 +1,23 @@
 <?php
 
 class ImagenesTrabajadores {
+    // Token fijo para autenticación
+    private $API_TOKEN = 'hijklmn';
+    
+    private function validarToken($token) {
+        // Comparación segura de cadenas para evitar ataques de timing
+        return hash_equals($this->API_TOKEN, $token);
+    }
+    
+    private function enviarErrorAutenticacion() {
+        header('HTTP/1.0 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Token de autenticación inválido o no proporcionado'
+        ]);
+        exit;
+    }
     private $app;
     private $db;
     private $basePath;
@@ -18,6 +35,25 @@ class ImagenesTrabajadores {
     }
 
     public function api($param) {
+        // Verificar token de autenticación
+        $token = '';
+        
+        // Buscar el token en los headers o en los parámetros
+        $headers = getallheaders();
+        if (isset($headers['Authorization'])) {
+            $authHeader = $headers['Authorization'];
+            if (strpos($authHeader, 'Bearer ') === 0) {
+                $token = substr($authHeader, 7);
+            }
+        } elseif (isset($_GET['token'])) {
+            $token = $_GET['token'];
+        }
+        
+        // Validar el token
+        if (!$this->validarToken($token)) {
+            $this->enviarErrorAutenticacion();
+            return;
+        }
         if (!isset($param['method'])) {
             $this->sendError('Método no especificado');
             return;
