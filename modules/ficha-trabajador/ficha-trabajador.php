@@ -47,7 +47,6 @@
             text-overflow: '';
         }
     }
-
 </style>
 
 <script>
@@ -370,17 +369,17 @@
             <div class="tab-pane fade" id="tab-contratacion">
                 <div>
                     <!--agregar cargo y departamento-->
-    
+
                 </div>
-    
+
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Listado de contratos</h3>
                     </div>
-    
+
                     <div class="panel-body orm-padding">
-    
-    
+
+
                         <table
                             id="table-panel"
                             data-toggle="table"
@@ -399,7 +398,7 @@
                                     <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
                                     <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
                                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
-    
+
                                     <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
                                     <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
                                 </tr>
@@ -408,7 +407,7 @@
                     </div>
                 </div>
             </div>
-    
+
             <div class="tab-pane fade" id="tab-capacitaciones">
                 <div class="panel">
                     <div class="panel-heading">
@@ -443,7 +442,7 @@
                         </table>
                     </div>
                 </div>
-    
+
             </div>
             <div class="tab-pane fade" id="tab-salario">
                 <div class="panel">
@@ -451,10 +450,105 @@
                         <h3 class="panel-title">Salario</h3>
                     </div>
                     <div class="panel-body">
-
+                        <table id="table-salarios"
+                            data-toggle="table"
+                            data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
+                            data-search="true"
+                            data-show-refresh="false"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="year"
+                            data-sort-order="desc"
+                            data-page-list="[10, 25, 50]"
+                            data-page-size="10"
+                            data-pagination="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="year" data-sortable="true">Período</th>
+                                    <th data-field="month" data-sortable="true">Mes</th>
+                                    <th data-field="horas" data-sortable="true">Horas</th>
+                                    <th data-field="tarifa" data-sortable="true">Tarifa/hora (CUP)</th>
+                                    <th data-field="a_cobrar" data-sortable="true">Total Bruto (CUP)</th>
+                                    <!-- <th data-field="bonif" data-sortable="true">Bonif.</th> -->
+                                    <!-- <th data-field="sal_dev" data-sortable="true">Sal. Dev.</th> -->
+                                    <!-- <th data-field="ausencias" data-sortable="true">Ausencias</th> -->
+                                    <!-- <th data-field="vacaciones" data-sortable="true">Vacaciones</th> -->
+                                    <!-- <th data-field="pago_vac" data-sortable="true">Pago Vac.</th> -->
+                                    <th data-field="salario_neto" data-sortable="true">Sal. Neto (CUP)</th>
+                                    <th data-field="seg_social" data-sortable="true">Seg. Social (CUP)</th>
+                                    <th data-field="ing_pers" data-sortable="true">Ing. Pers. (CUP)</th>
+                                    <th data-field="salario_pagar" data-sortable="true">Neto a Pagar (CUP)</th>
+                                    <th data-field="cargo" data-sortable="true">Cargo</th>
+                                    <th data-field="departamento" data-sortable="true">Departamento</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
+
+            </div>
             
+            <div class="tab-pane fade" id="tab-vacaciones">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Vacaciones</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table id="table-vacaciones"
+                            data-toggle="table"
+                            data-url="api-app.php?module=vacaciones&method=list-id&trabajador_id=<?php print($data['id']); ?>"
+                            data-search="true"
+                            data-show-refresh="false"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="year"
+                            data-sort-order="desc"
+                            data-page-list="[10, 25, 50]"
+                            data-page-size="10"
+                            data-pagination="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="dias" data-sortable="true">Días</th>
+                                    <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
+                                    <th data-field="fecha_aprobacion" data-formatter="formatoAprobacion" data-sortable="true">Estado</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-documentos">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Documentos</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table id="table-salarios"
+                            data-toggle="table"
+                            data-url="api-app.php?module=documentos&method=list-id&trabajador_id=<?php print($data['id']); ?>"
+                            data-search="true"
+                            data-show-refresh="false"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="year"
+                            data-sort-order="desc"
+                            data-page-list="[10, 25, 50]"
+                            data-page-size="10"
+                            data-pagination="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="tipo" data-sortable="true">Tipo</th>
+                                    <!--<th data-field="archivo"data-align="center" data-width="140">Archivo</th>-->
+                                    <th data-field="fecha_upload" data-sortable="true">Fecha Subida</th>
+                                    <th data-field="archivo" data-formatter="pdfFormatter" data-align="center" data-width="140">Descargar</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div class="panel-footer text-center">

@@ -23,6 +23,16 @@ if ($app->user_id == '' && !in_array($_REQUEST['module'], array('login', 'reset'
 }
 
 switch ($_REQUEST['module']) {
+    case 'documentos':
+        include_once(BASE_CLASS . '/mdl.Document.php');
+        $mdl = new Document($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'vacaciones':
+        include_once(BASE_CLASS . '/mdl.Vacaciones.php');
+        $mdl = new Vacaciones($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'gestion-recursos':
         include_once(BASE_CLASS . '/mdl.List_recursos.php');
         $mdl = new List_recursos($app);

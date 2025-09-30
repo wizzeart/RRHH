@@ -16,6 +16,10 @@ class Prenomina {
                 $data = $this->_list_prenomina($param);
                 print(json_encode($data));
                 break;
+            case 'list-prenomina-id':
+                $data = $this->_list_prenomina_id($param);
+                print(json_encode($data));
+                break;
             case 'save-horas':
                 $this->_save_horas();
                 break;
@@ -23,6 +27,40 @@ class Prenomina {
                 $this->_export_excel($param);
                 break;
         }
+    }
+
+    private function _list_prenomina_id($param) {
+        $data = array();
+        $sql = "SELECT 
+                    p.id,
+                    p.trabajador_id,
+                    p.year,
+                    p.month,
+                    p.horas,
+                    p.tarifa,
+                    p.a_cobrar,
+                    p.bonif,
+                    p.sal_dev,
+                    p.ausencias,
+                    p.vacaciones,
+                    p.pago_vac,
+                    p.salario_neto,
+                    p.seg_social,
+                    p.ing_pers,
+                    p.salario_pagar,
+                    CONCAT(t.nombre, ' ', t.apellidos) AS nombre_trabajador,
+                    t.carnet_identidad AS ci,
+                    c.nombre AS cargo,
+                    d.nombre AS departamento
+                FROM prenomina p
+                INNER JOIN trabajadores t ON p.trabajador_id = t.id
+                LEFT JOIN cargos c ON t.cargos_id = c.id
+                LEFT JOIN departamentos d ON t.departamento_id = d.id
+                WHERE p.trabajador_id = :trabajador_id
+                ORDER BY p.year DESC, p.month DESC";
+        
+        $data = $this->db->fetchAll($sql, array('trabajador_id' => $param['trabajador_id']));
+        return $data;
     }
 
     public function controlador($param) {

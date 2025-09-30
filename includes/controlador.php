@@ -19,12 +19,13 @@ if (in_array($app->rol, array('1', '3', '9', '12', '16'))) {
 if (isset($_REQUEST['module'])) {
     switch ($_REQUEST['module']) {
         case 'list-partes-trabajo':
-     
+            
         case 'config':
             include_once(BASE_CLASS . '/mdl.Config.php');
             $mdl = new Config($app);
             $mdl->controlador($_REQUEST);
             break;
+        
         case 'list-usuarios':
         case 'usuarios':
             include_once(BASE_CLASS . '/mdl.Usuarios.php');

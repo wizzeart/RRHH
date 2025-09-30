@@ -463,13 +463,28 @@ function formatoProducto(value, row) {
 
 // Formatter para la columna Opciones -> Ver PDF
 function pdfFormatter(value, row, index) {
-    var url = value || row.archivo_contrato;
-    if (url && String(url).trim() !== '' && url !== 'null') {
-      var filename = (function(u){ try { var p = u.split('?')[0]; var parts = p.split('/'); return parts[parts.length-1] || 'contrato.pdf'; } catch(e){ return 'contrato.pdf'; } })(url);
-      return '<button type="button" class="btn btn-danger btn-sm btn-view-pdf" data-url="' + url + '" data-toggle="tooltip" title="' + filename + '"><i class="fa fa-file-pdf-o"></i></button>';
+    var url = value || row.archivo || row.archivo_contrato;
+    var filename = (function(u){ 
+        try { 
+            var p = u.split('?')[0]; 
+            var parts = p.split('/'); 
+            var parts2 = p.split('\\');
+            return parts2[parts2.length-1] || 'contrato.pdf'; 
+        } catch(e){ 
+            return 'contrato.pdf'; 
+        } 
+    })(url);
+    
+    // Verificar si es una URL válida
+    if (!url) {
+        return '<span class="text-muted">No disponible</span>';
     }
-    return '<button type="button" class="btn btn-default btn-sm" disabled data-toggle="tooltip" title="Sin archivo"><i class="fa fa-file-o"></i></button>';
-  }
+    
+    return '<div class="btn-group">' +
+           '<a href="' + url + '" download="' + filename + '" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
+           '<a href="' + url + '" target="_blank" class="btn btn-info btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
+           '</div>';
+}
   
 
 function firmadoFormatter(value, row, index) {
@@ -478,7 +493,15 @@ function firmadoFormatter(value, row, index) {
       return '<span class="label label-success">Firmado</span>';
     }
     return '<span class="label label-warning">No firmado</span>';
-  }
+}
+
+// Formateador para la columna de aprobación
+function formatoAprobacion(value, row, index) {
+    if (value && value.trim() !== '' && value !== 'null' && value !== null) {
+        return '<span class="label label-success">Aceptado</span>';
+    }
+    return '<span class="text-muted">Pendiente</span>';
+}
 
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
