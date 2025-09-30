@@ -151,19 +151,19 @@ class Trabajador {
         );
 
         $update = array(
-            'trabajador_eliminado' => 1,
             'fecha_baja' => date('Y-m-d')
         );
         $where = array(
             'id' => $param['id']
         );
-        $this->app->db->update('trabajadores', $update, $where);
+        // Ejecutar baja lógica del trabajador
+        $this->db->update('trabajadores', $update, $where);
 
+        // Registrar en historial
         $history = array(
-            'xentity' => 'TRABAJADORES',
-            'xaction' => 'DEL-TRABAJADORES',
+            'xentity' => 'TRABAJADOR',
+            'xaction' => 'BAJA-TRABAJADOR',
             'xid' => $param['id'],
-            'xobs' => 'BAJA TRABAJADOR: ' . $param['id'] . ' - Fecha: ' . date('Y-m-d')
         );
         $this->app->add_history($history);
 
@@ -256,34 +256,52 @@ class Trabajador {
             }
         }
 
-        $insert = array(
-            'nombre' => $param['nombre'],
-            'apellidos' => $param['apellidos'],
-            'sexo' => $param['sexo'],
-            'carnet_identidad' => $param['carnet_identidad'],
-            'edad' => intval($param['edad']),
-            'direccion' => $param['direccion'],
-            'telefono' => $param['telefono'],
-            'email' => $param['email'],
-            'nivel_educacional' => $param['nivel_educacional'],
-            'departamento_id' => intval($param['departamento_id']),
-            'cargos_id' => intval($param['cargos_id']),
-            'fecha_contratacion' => $param['fecha_contratacion'],
-            'fecha_baja' => !empty($param['fecha_baja']) ? $param['fecha_baja'] : null,
-            'estatus' => $param['estatus'],
-            'bolsa_empleo_id' => !empty($param['bolsa_empleo_id']) ? intval($param['bolsa_empleo_id']) : null,
-            'foto' => isset($param['foto']) ? $param['foto'] : '',
-            'trabajador_eliminado' => '0'
-        );
+        // Crear array de datos sin incluir campos de control
+        $insert = array();
+        $allowed_fields = ['nombre', 'apellidos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        
+        foreach ($allowed_fields as $field) {
+            if (isset($param[$field])) {
+                switch ($field) {
+                    case 'edad':
+                    case 'departamento_id':
+                    case 'cargos_id':
+                        $insert[$field] = intval($param[$field]);
+                        break;
+                    case 'bolsa_empleo_id':
+                        $insert[$field] = !empty($param[$field]) ? intval($param[$field]) : null;
+                        break;
+                    case 'fecha_baja':
+                        $insert[$field] = !empty($param[$field]) ? $param[$field] : null;
+                        break;
+                    case 'foto':
+                        $insert[$field] = isset($param[$field]) ? $param[$field] : '';
+                        break;
+                    default:
+                        $insert[$field] = $param[$field];
+                        break;
+                }
+            }
+        }
+        $insert['trabajador_eliminado'] = 0;
 
         $data['action'] = $param['action'];
+
+        // Validar parámetro action
+        if (empty($param['action']) || !in_array($param['action'], ['insert', 'update'])) {
+            $data['status'] = 0;
+            $data['msg'] = 'Error: Parámetro action inválido';
+            print(json_encode($data));
+            return;
+        }
 
         // Remover campos que no pertenecen a la tabla trabajadores
         unset($insert['module']);
         unset($insert['method']);
         unset($insert['action']);
+        unset($insert['id']); // Asegurar que el ID no se incluya en los datos a insertar/actualizar
 
-        if ($data['action'] == 'insert') {
+        if ($param['action'] == 'insert') {
             // Establecer fecha de contratación si no está definida
             if (!isset($insert['fecha_contratacion']) || empty($insert['fecha_contratacion'])) {
                 $insert['fecha_contratacion'] = date('Y-m-d');
@@ -333,7 +351,6 @@ class Trabajador {
                         $history = array(
                             'xentity' => 'TRABAJADOR',
                             'xaction' => 'INSERT-TRABAJADOR',
-                            'id' => $lastId,
                             'xobs' => 'TRABAJADOR: ' . $lastId . ' ' . $insert['nombre']
                         );
                         $this->app->add_history($history);
@@ -372,6 +389,14 @@ class Trabajador {
 
             try {
                 $id = intval($param['id']);
+                
+                // Debug: verificar que el ID existe
+                if (empty($id)) {
+                    $data['status'] = 0;
+                    $data['msg'] = 'Error: ID de trabajador no proporcionado para actualización';
+                    print(json_encode($data));
+                    return;
+                }
 
                 // Verificar si el carnet de identidad ya existe en otro registro
                 if (isset($param['carnet_identidad'])) {
@@ -440,17 +465,18 @@ class Trabajador {
                     'fecha_contratacion',
                     'fecha_baja',
                     'estatus',
-                    'bolsa_empleo_id',
                     'trabajador_eliminado'
                 ];
                 
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
-
+                
+                // Asegurar que el ID no esté en los datos de actualización
+                unset($update_filtered['id']);
 
                 // Actualizar el trabajador
                 $where = array('id' => $id);
-                $result = $this->app->db->update('trabajadores', $update_filtered, $where);
+                $result = $this->db->update('trabajadores', $update_filtered, $where);
 
                 if ($result) {
                     // Preparar respuesta exitosa
@@ -463,7 +489,7 @@ class Trabajador {
                     $history = array(
                         'xentity' => 'TRABAJADOR',
                         'xaction' => 'UPDATE-TRABAJADOR',
-                        'id' => $id,
+                        'xid' => $id,
                         'xobs' => 'TRABAJADOR: ' . $id . ' ' . $insert['nombre']
                     );
                     $this->app->add_history($history);
@@ -481,7 +507,14 @@ class Trabajador {
                     $friendly = 'Violación de integridad de datos.';
                 }
                 if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                    $friendly = 'Conflicto de clave primaria. El registro ya existe con ese identificador.';
+                    if (strpos($e->getMessage(), 'carnet_identidad') !== false) {
+                        $friendly = 'Ya existe otro trabajador con el mismo carnet de identidad.';
+                    } elseif (strpos($e->getMessage(), 'email') !== false) {
+                        $friendly = 'Ya existe otro trabajador con el mismo email.';
+                    } else {
+                        // Mostrar el error completo para diagnosticar
+                        $friendly = 'Error de duplicado: ' . $e->getMessage();
+                    }
                 }
                 $data['msg'] = $friendly !== '' ? $friendly : ('Error al actualizar el registro: ' . $e->getMessage());
             }
