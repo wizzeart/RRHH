@@ -48,6 +48,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Bolsas_empleos($app);
         $mdl->api($_REQUEST);
         break;
+    case 'imagenes-trabajadores':
+        include_once(BASE_CLASS . '/mdl.ImagenesTrabajadores.php');
+        $mdl = new ImagenesTrabajadores($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'config':
         include_once(BASE_CLASS . '/mdl.Config.php');
         $mdl = new Config($app);
