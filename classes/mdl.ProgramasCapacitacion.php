@@ -23,6 +23,10 @@ class ProgramaCapacitacion {
                 $data = $this->_list($param);
                 print(json_encode($data));
                 break;
+            case 'list-id':
+                $data = $this->_list_id($param);
+                print(json_encode($data));
+                break;
             case 'list-finalizados':
                 $data = $this->_list_finalizados($param);
                 print(json_encode($data));
@@ -281,6 +285,25 @@ class ProgramaCapacitacion {
                 ORDER BY p.id DESC";
         
         $data = $this->db->fetchAll($sql);
+        return $data;
+    }
+    
+    private function _list_id($param){
+        $data = array();
+        $sql = "SELECT 
+                pc.id,
+                pc.responsable,
+                pc.tema,
+                pc.modalidad,
+                pc.horas,
+                pc.fecha_estimada,
+                pc.fecha_finalizacion,
+                rc.resultados
+                FROM registro_capacitacion rc
+                INNER JOIN programas_capacitacion pc ON rc.programa_id = pc.id
+                WHERE rc.trabajador_id = :trabajador_id";
+        
+        $data = $this->db->fetchAll($sql, array('trabajador_id' => $param['trabajador_id']));
         return $data;
     }
 
