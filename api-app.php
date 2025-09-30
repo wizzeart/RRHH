@@ -78,6 +78,16 @@ switch ($_REQUEST['module']) {
         $mdl = new Cargos($app);
         $mdl->api($_REQUEST);
         break;
+    case 'saldos':
+        include_once(BASE_CLASS . '/mdl.Saldos.php');
+        $mdl = new Saldos($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'prenomina':
+        include_once(BASE_CLASS . '/mdl.Prenomina.php');
+        $mdl = new Prenomina($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'contratos':
         include_once(BASE_CLASS . '/mdl.Contratos.php');
         $mdl = new Contrato($app);

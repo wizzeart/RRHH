@@ -82,6 +82,17 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Cargos($app);
             $mdl->controlador($_REQUEST);
             break;
+        case 'list-saldos':
+        case 'saldos':
+            include_once(BASE_CLASS . '/mdl.Saldos.php');
+            $mdl = new Saldos($app);
+            $mdl->controlador($_REQUEST);
+            break;
+        case 'prenomina':
+            include_once(BASE_CLASS . '/mdl.Prenomina.php');
+            $mdl = new Prenomina($app);
+            $mdl->controlador($_REQUEST);
+            break;
         case 'list-programas-capacitacion':
         case 'programas-capacitacion':
         case 'delete-programas-capacitacion':

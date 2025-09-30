@@ -174,6 +174,34 @@
     </ul>
 </li>
 
+<!--NEW MENU SALDOS-->
+<li class="list-divider"></li>
+<li>
+    <a href="javascript:void(0);">
+        <i class="fa fa-money"></i>
+        <span class="menu-title">
+            <strong>Saldos</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-saldos', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-saldos', 'saldos'))) print('active-link') ?>">
+            <a href="?module=list-saldos">Tarifas por Hora</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('prenomina', 'prenomina'))) print('active-link') ?>">
+            <a href="?module=prenomina">Prenómina</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('ayudas-trabajadores', 'list-ayudas-trabajadores'))) print('active-link') ?>">
+            <a href="?module=list-ayudas-trabajadores">Ayudas a Trabajadores</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('deudas', 'list-deudas'))) print('active-link') ?>">
+            <a href="?module=list-deudas">Deudas</a>
+        </li>
+    </ul>
+</li>
+
 <!--NEW MENU BOLSAS EMPLEO-->
 <li class="list-divider"></li>
 <li>
