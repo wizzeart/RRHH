@@ -17,7 +17,7 @@ $(function(){
             nombre: $('#f-nombre').val(),
             descripcion: $('#f-descripcion').val(),
             salario: $('#f-salario').val(),
-            departamento_id: $('#f-departamento').val()
+            
         };
         if(action==='update'){ payload.id=$('#f-id').val(); }
         $.ajax({ url:'api-app.php', type:'POST', data:payload, dataType:'json'

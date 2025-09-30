@@ -26,17 +26,7 @@
                     <input type="number" id="f-salario" class="form-control" placeholder="0.00" step="0.01" value="<?php if (isset($data['salario'])) print($data['salario']); ?>" />
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label class="control-label" for="f-departamento">Departamentso <span class="text-danger">*</span></label>
-                    <select id="f-departamento" class="form-control">
-                        <option value="">Seleccione departamento</option>
-                        <?php if(isset($data_form['departamentos'])) { foreach($data_form['departamentos'] as $d) { ?>
-                            <option value="<?php print($d['id']); ?>" <?php if (isset($data['departamento_id']) && $data['departamento_id']==$d['id']) print('selected'); ?>><?php print($d['nombre']); ?></option>
-                        <?php } } ?>
-                    </select>
-                </div>
-            </div>
+            
         </div>
         <div class="row">
             <div class="col-md-12">

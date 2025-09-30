@@ -195,9 +195,12 @@ public function __construct($host, $db, $user, $pwd) {
         $r = null;
 
         $sql = 'UPDATE ' . $table . ' SET ';
+        $params = array();
+        
         if (is_array($update)) {
             foreach ($update as $k => $v) {
-                $sql .= $k . "=:" . $k . ',';
+                $sql .= $k . "=:upd_" . $k . ',';
+                $params['upd_' . $k] = $v;
             }
         } else {
             $sql .= $update;
@@ -207,16 +210,23 @@ public function __construct($host, $db, $user, $pwd) {
         $sql .= ' WHERE ';
         if (is_array($where)) {
             foreach ($where as $k => $v) {
-                $sql .= $k . "=:" . $k . " AND ";
+                $sql .= $k . "=:whr_" . $k . " AND ";
+                $params['whr_' . $k] = $v;
             }
             $sql = substr($sql, 0, -5);
         } else {
             $sql .= $where;
         }
+        
         if ($this->debug)
             print($sql);
+        
+        // Debug temporal: mostrar la consulta y parámetros
+        error_log("DEBUG SQL: " . $sql);
+        error_log("DEBUG PARAMS: " . json_encode($params));
+        
         $consulta = $this->conn->prepare($sql);
-        $r = $consulta->execute(array_merge($update, $where));
+        $r = $consulta->execute($params);
         //$rr = odbc_exec($this->conn, $msql) or die('La consulta falló: ' . odbc_error() . ' sql--> ' . $msql);
         return $r;
     }
