@@ -5,13 +5,13 @@
         font-weight: bold;
         background-color: rgba(40, 167, 69, 0.1) !important;
     }
-    
+
     .estatus-inactivo {
         color: #dc3545 !important;
         font-weight: bold;
         background-color: rgba(220, 53, 69, 0.1) !important;
     }
-    
+
     /* Estilos específicos para campos deshabilitados y de solo lectura en la ficha del trabajador */
     #tab-general input[disabled],
     #tab-general input[readonly],
@@ -78,8 +78,12 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true"><i class="fa fa-user"></i> General</a></li>
                 <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false"><i class="fa fa-phone"></i> Contacto</a></li>
-                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false"><i class="fa fa-cubes"></i> Recursos</a></li>
+                <li><a href="#tab-salario" data-toggle="tab" aria-expanded="false"><i class="fa fa-dollar"></i> Salario</a></li>
                 <li><a href="#tab-contratacion" data-toggle="tab" aria-expanded="false"><i class="fa fa-file-text"></i> Contratación</a></li>
+                <li><a href="#tab-recursos" data-toggle="tab" aria-expanded="false"><i class="fa fa-cubes"></i> Recursos</a></li>
+                <li><a href="#tab-vacaciones" data-toggle="tab" aria-expanded="false"><i class="fa fa-umbrella"></i> Vacaciones</a></li>
+                <li><a href="#tab-capacitaciones" data-toggle="tab" aria-expanded="false"><i class="fa fa-graduation-cap"></i> Capacitaciones</a></li>
+                <li><a href="#tab-documentos" data-toggle="tab" aria-expanded="false"><i class="fa fa-folder"></i> Documentos</a></li>
             </ul>
             <a class="fa fa-question-circle fa-lg fa-fw unselectable add-tooltip" href="#" data-original-title="<h4 class='text-thin'>Información</h4><p style='width:150px'>Ficha del trabajador</p>" data-html="true" title=""></a>
         </div>
@@ -92,6 +96,9 @@
         <div class="tab-content">
             <div class="tab-pane fade active in" id="tab-general">
                 <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">General</h3>
+                    </div>
                     <div class="panel-body orm-padding"><!-- form-horizontal -->
 
                         <!-- Primera fila -->
@@ -243,11 +250,11 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="control-label" for="f-estatus">Estatus </label>
-                                    <?php 
-                                        $estatusClase = '';
-                                        if (isset($data['estatus'])) {
-                                            $estatusClase = ($data['estatus'] == 'activo') ? 'estatus-activo' : 'estatus-inactivo';
-                                        }
+                                    <?php
+                                    $estatusClase = '';
+                                    if (isset($data['estatus'])) {
+                                        $estatusClase = ($data['estatus'] == 'activo') ? 'estatus-activo' : 'estatus-inactivo';
+                                    }
                                     ?>
                                     <select id="f-estatus" name="estatus" class="form-control <?php echo $estatusClase; ?>" disabled>
                                         <option value=""></option>
@@ -309,6 +316,9 @@
             <!-- TAB CONTACTO -->
             <div class="tab-pane fade" id="tab-contacto">
                 <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Contacto</h3>
+                    </div>
                     <div class="panel-body orm-padding">
                         <div class="row">
                             <div class="col-md-6">
@@ -343,52 +353,52 @@
             <!-- TAB RECURSOS ASIGNADOS -->
             <div class="tab-pane fade" id="tab-recursos">
                 <div class="panel">
-                    <div id="todos" class="tab-pane fade in active">
-                        <div class="panel-body">
-                            <table
-                                id="table-todos"
-                                data-toggle="table"
-                                data-url="api-app.php?module=gestion-recursos&method=list-id&trabajador_id=<?php print($data['id']) ?>"
-                                data-search="true"
-                                data-show-refresh="true"
-                                data-show-toggle="false"
-                                data-show-columns="false"
-                                data-sort-name="fecha_entrega_a_t"
-                                data-sort-order="desc"
-                                data-page-list="[20, 50, 100]"
-                                data-page-size="50"
-                                data-pagination="true"
-                                data-show-pagination-switch="true">
-                                <thead>
-                                    <tr>
-                                        <th data-field="nombre" data-sortable="true">Recurso</th>
-                                        <th data-field="estado" data-sortable="true" data-formatter="formatoEstado">Estado</th>
-                                        <th data-field="fecha_entrega_a_t" data-sortable="true" data-formatter="formatoFecha">Fecha Entrega</th>
-                                        <th data-field="fecha_entrega_a_rh" data-sortable="true" data-formatter="formatoFecha">Fecha Devolución</th>
-                                        <!--<th data-field="toolbar" data-align="center" data-formatter="formatoToolbar" data-sortable="false">Opciones</th>-->
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Recursos Asignados</h3>
                     </div>
-
+                    <div class="panel-body">
+                        <table
+                            id="table-todos"
+                            data-toggle="table"
+                            data-url="api-app.php?module=gestion-recursos&method=list-id&trabajador_id=<?php print($data['id']) ?>"
+                            data-search="true"
+                            data-show-refresh="true"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="fecha_entrega_a_t"
+                            data-sort-order="desc"
+                            data-page-list="[20, 50, 100]"
+                            data-page-size="50"
+                            data-pagination="true"
+                            data-show-pagination-switch="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="nombre" data-sortable="true">Recurso</th>
+                                    <th data-field="estado" data-sortable="true" data-formatter="formatoEstado">Estado</th>
+                                    <th data-field="fecha_entrega_a_t" data-sortable="true" data-formatter="formatoFecha">Fecha Entrega</th>
+                                    <th data-field="fecha_entrega_a_rh" data-sortable="true" data-formatter="formatoFecha">Fecha Devolución</th>
+                                    <!--<th data-field="toolbar" data-align="center" data-formatter="formatoToolbar" data-sortable="false">Opciones</th>-->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
-            </div><!-- TAB RECURSOS ASIGNADOS -->
-            <!-- TAB CONTRATACIÓN -->
+
+            </div>
             <div class="tab-pane fade" id="tab-contratacion">
                 <div>
                     <!--agregar cargo y departamento-->
-
+    
                 </div>
-
+    
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Listado de contratos</h3>
                     </div>
-
+    
                     <div class="panel-body orm-padding">
-
-
+    
+    
                         <table
                             id="table-panel"
                             data-toggle="table"
@@ -407,7 +417,7 @@
                                     <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
                                     <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
                                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
-
+    
                                     <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
                                     <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
                                 </tr>
@@ -416,6 +426,55 @@
                     </div>
                 </div>
             </div>
+    
+            <div class="tab-pane fade" id="tab-capacitaciones">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Capacitaciones</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table
+                            id="table-panel"
+                            data-toggle="table"
+                            data-url="api-app.php?module=programas-capacitacion&method=list-id&trabajador_id=<?php print($data['id']); ?>"
+                            data-search="true"
+                            data-show-refresh="true"
+                            data-show-toggle="false"
+                            data-show-columns="false"
+                            data-sort-name="id"
+                            data-sort-order="desc"
+                            data-page-list="[20, 50, 100]"
+                            data-page-size="50"
+                            data-pagination="true" data-show-pagination-switch="true">
+                            <thead>
+                                <tr>
+                                    <th data-field="tema" data-sortable="true">Tema</th>
+                                    <th data-field="responsable" data-sortable="true">Responsable</th>
+                                    <th data-field="fecha_estimada" data-sortable="true">Fecha Estimada</th>
+                                    <th data-field="fecha_finalizacion" data-sortable="true">Fecha Finalización</th>
+                                    <th data-field="modalidad" data-sortable="true">Modalidad</th>
+                                    <th data-field="horas" data-sortable="true">Horas</th>
+                                    <th data-field="resultados" data-sortable="true">Resultados</th>
+                                    <!-- <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Opciones</th> -->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+    
+            </div>
+            <div class="tab-pane fade" id="tab-salario">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Salario</h3>
+                    </div>
+                    <div class="panel-body">
+
+                    </div>
+                </div>
+            
+            </div>
+
             <div class="panel-footer text-center">
                 <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
                 <!-- <button id="btn-save" class="btn btn-info icon-lg" type="button">
@@ -435,7 +494,8 @@
                 <hr>
 
             </div>
-        </div>
+        </div><!-- TAB RECURSOS ASIGNADOS -->
+        <!-- TAB CONTRATACIÓN -->
 
     </div>
     <!-- =================================================== -->
