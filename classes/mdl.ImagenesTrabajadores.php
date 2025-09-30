@@ -1,12 +1,10 @@
 <?php
 
 class ImagenesTrabajadores {
-    // Token fijo para autenticación
-    private $API_TOKEN = 'hijklmn';
-    
+    // Usar la misma clave que para el login
     private function validarToken($token) {
         // Comparación segura de cadenas para evitar ataques de timing
-        return hash_equals($this->API_TOKEN, $token);
+        return hash_equals(KEYWEB, $token);
     }
     
     private function enviarErrorAutenticacion() {
