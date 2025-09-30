@@ -5,14 +5,51 @@
   }
   function reloadForTab(tabName){
     var $table = $('#table-prenomina');
+    if (!$table.data('bootstrap.table')) { $table.bootstrapTable(); }
     var url = 'api-app.php?module=prenomina&method=list-prenomina&tab=' + encodeURIComponent(tabName);
     $table.bootstrapTable('refreshOptions', { url: url });
+  }
+
+  // Build tabs from departamentos (names) and set first as active
+  function buildTabs(){
+    fetch('api-app.php?module=prenomina&method=list-departamentos')
+      .then(function(r){ return r.json(); })
+      .then(function(list){
+        var $ul = $('#tabs-prenomina');
+        $ul.empty();
+        if (Array.isArray(list) && list.length){
+          list.forEach(function(name, idx){
+            var active = idx === 0 ? ' class="active"' : '';
+            var li = '<li'+active+'><a href="#" data-tab="'+ (name||'') +'">'+ (name||'') +'</a></li>';
+            $ul.append(li);
+          });
+          var first = $ul.find('li.active a');
+          if (first.length){
+            setTimeout(function(){ reloadForTab(first.data('tab')); }, 0);
+          }
+        } else {
+          // fallback: no tabs, base URL
+          var $table = $('#table-prenomina');
+          if (!$table.data('bootstrap.table')) { $table.bootstrapTable(); }
+          $table.bootstrapTable('refreshOptions', { url: 'api-app.php?module=prenomina&method=list-prenomina' });
+        }
+      })
+      .catch(function(){
+        var $table = $('#table-prenomina');
+        if (!$table.data('bootstrap.table')) { $table.bootstrapTable(); }
+        $table.bootstrapTable('refreshOptions', { url: 'api-app.php?module=prenomina&method=list-prenomina' });
+      });
   }
   $(document).on('click', '#tabs-prenomina a', function(e){
     e.preventDefault();
     var tabName = $(this).data('tab');
     setActiveTab(this);
     reloadForTab(tabName);
+  });
+
+  // init dynamic tabs
+  $(function(){
+    buildTabs();
   });
 
   // formatters used in the table

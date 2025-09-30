@@ -89,6 +89,11 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Saldos($app);
             $mdl->controlador($_REQUEST);
             break;
+        case 'list-ayudas-trabajadores':
+            include_once(BASE_CLASS . '/mdl.Ayudas.php');
+            $mdl = new Ayudas($app);
+            $mdl->controlador($_REQUEST);
+            break;
         case 'prenomina':
             include_once(BASE_CLASS . '/mdl.Prenomina.php');
             $mdl = new Prenomina($app);
