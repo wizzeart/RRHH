@@ -84,6 +84,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Contenedor para campos extras según tipo de contrato -->
+            <div id="extra-contrato-fields" class="row" style="margin-top:10px;"></div>
         </form>
 
         <div class="panel-footer text-center">
@@ -91,6 +93,20 @@
             <button id="btn-save" class="btn btn-info icon-lg" type="button">
                 <i class="fa fa-check"></i>
                 Guardar
+            </button>
+            <button id="btn-open-template" class="btn btn-primary icon-lg" type="button">
+                <i class="fa fa-file-pdf-o"></i>
+                Generar Contrato
+            </button>
+            <button type="button" id="btn-save-and-generate" class="btn btn-primary">
+                <i class="fa fa-file-pdf-o"></i> Guardar y Generar
+            </button>
+            <button type="button" id="btn-download-pdf" class="btn btn-success">
+                <i class="fa fa-download"></i> Descargar PDF
+            </button>
+            <button id="btn-generate-fpdf" class="btn btn-info icon-lg" type="button">
+                <i class="fa fa-file-pdf-o"></i>
+                Generar PDF (FPDF)
             </button>
             <button id="btn-back" class="btn btn-default icon-lg" type="button">
                 <i class="fa fa-undo"></i>
@@ -103,3 +119,7 @@
         </div>
     </div>
 </div>
+
+<!-- In-page template preview (full page) -->
+<div id="contrato-template-container" style="margin-top:20px; border:1px solid #e1e1e1; padding:12px; max-height:80vh; overflow:auto; background:#fff;">Seleccione tipo y haga clic en "Generar Contrato" para cargar la plantilla aquí.</div>
+
