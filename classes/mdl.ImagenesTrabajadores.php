@@ -6,17 +6,23 @@ class ImagenesTrabajadores {
         'http://tudominio.com',
         'https://tudominio.com',
         'http://www.tudominio.com',
-        'https://www.tudominio.com'
+        'http://192.168.8.7/'
     ];
     
     private function setCorsHeaders() {
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
-        
+        // Normalize origin (strip trailing slash) to match entries like 'http://192.168.8.7' or with slash
+        $originNorm = rtrim($origin, '/');
+        $allowed = false;
+        foreach ($this->allowedOrigins as $ao) {
+            if (rtrim($ao, '/') === $originNorm && $originNorm !== '') { $allowed = true; break; }
+        }
         // Verificar si el origen está permitido
-        if (in_array($origin, $this->allowedOrigins)) {
+        if ($allowed) {
             header("Access-Control-Allow-Origin: $origin");
         } else {
-            header('Access-Control-Allow-Origin: *'); // O puedes bloquear peticiones no autorizadas
+            // Si prefieres bloquear orígenes no autorizados, reemplaza '*' por nada y responde 403.
+            header('Access-Control-Allow-Origin: *'); // mantener compatibilidad por ahora
         }
         
         header('Access-Control-Allow-Methods: GET, OPTIONS');
@@ -97,103 +103,85 @@ class ImagenesTrabajadores {
         }
     }
 
-    private function getImage($param) {
-        // Validar ID del trabajador
-        if (!isset($param['id']) || !is_numeric($param['id'])) {
-            $this->sendError('ID de trabajador no válido o no especificado', 400);
-            return;
-        }
+  private function getImage($param) {
+    // Validar ID del trabajador
+    if (!isset($param['id']) || !is_numeric($param['id'])) {
+        $this->sendError('ID de trabajador no válido o no especificado', 400);
+        return;
+    }
 
-        $id = intval($param['id']);
-        
-        try {
-            // Obtener la ruta de la imagen desde la base de datos
-            $sql = "SELECT id, foto, CONCAT(nombre, ' ', apellidos) as nombre_completo FROM trabajadores WHERE id = :id";
-            $result = $this->db->fetchRow($sql, ['id' => $id]);
-            
-            if (!$result) {
-                $this->sendError('Trabajador no encontrado', 404);
-                return;
-            }
+    $id = intval($param['id']);
+    // Obtener la ruta de la imagen desde la base de datos
+    $sql = "SELECT id, foto, CONCAT(nombre, ' ', apellidos) as nombre_completo FROM trabajadores WHERE id = :id";
+    $result = $this->db->fetchRow($sql, ['id' => $id]);
 
-            // Si no hay foto, devolver la imagen por defecto
-            if (empty($result['foto'])) {
-                $this->sendDefaultImage();
-                return;
-            }
+    if (!$result) {
+        $this->sendError('Trabajador no encontrado', 404);
+        return;
+    }
 
-            // Obtener la ruta de la imagen
-            $fotoPath = $result['foto'];
-            
-            // Si la ruta es una URL completa, redirigir a ella
-            if (filter_var($fotoPath, FILTER_VALIDATE_URL)) {
-                header('Location: ' . $fotoPath);
-                exit;
-            }
-            
-            // Si la ruta es relativa, construir la ruta completa
-            // Si la ruta ya incluye 'uploads/trabajadores/', usarla directamente
-            if (strpos($fotoPath, 'uploads/trabajadores/') === 0) {
-                $imagePath = __DIR__ . '/../' . $fotoPath;
-                error_log("Ruta 1 (con 'uploads/trabajadores/'): $imagePath");
-            } else {
-                // Si solo es el nombre del archivo, usar la ruta base
-                $imagePath = $this->basePath . basename($fotoPath);
-                error_log("Ruta 2 (solo nombre de archivo): $imagePath");
-            }
+    // Si no hay foto, devolver la imagen por defecto
+    if (empty($result['foto'])) {
+        $this->sendDefaultImage();
+        return;
+    }
 
-            // Verificar si el archivo existe
-            if (!file_exists($imagePath)) {
-                error_log("Archivo no encontrado: $imagePath");
-                $this->sendDefaultImage();
-                return;
-            }
+    $fotoPath = trim($result['foto']);
 
-            // Obtener información del archivo
-            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($fileInfo, $imagePath);
-            finfo_close($fileInfo);
-
-            // Enviar la imagen con las cabeceras adecuadas
-            header('Content-Type: ' . $mimeType);
-            header('Content-Length: ' . filesize($imagePath));
-            header('Content-Disposition: inline; filename="' . basename($imagePath) . '"');
-            header('Cache-Control: max-age=86400, public'); // 24 horas de caché
-            readfile($imagePath);
-            exit;
-            $imagePath = $fotoPath;
-            error_log("Ruta 3 (ruta absoluta o URL): $imagePath");
-        }
-
-        // Verificar si el archivo existe
-        if (!file_exists($imagePath)) {
-            error_log("Imagen no encontrada en: " . $imagePath);
-            $this->sendDefaultImage();
-            return;
-        }
-
-        // Obtener la extensión del archivo
-        $extension = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
-        
-        // Determinar el tipo MIME
-        $mimeTypes = [
-            'jpg' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'gif' => 'image/gif',
-            'bmp' => 'image/bmp',
-            'webp' => 'image/webp'
-        ];
-
-        $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
-
-        // Enviar la imagen
-        header('Content-Type: ' . $mimeType);
-        header('Content-Length: ' . filesize($imagePath));
-        header('Cache-Control: max-age=604800, public'); // Cache por 1 semana
-        readfile($imagePath);
+    // Si la ruta es una URL completa, redirigir a ella
+    if (filter_var($fotoPath, FILTER_VALIDATE_URL)) {
+        header('Location: ' . $fotoPath);
         exit;
     }
+
+    // Normalizar y construir ruta segura en servidor
+    // Eliminar barras iniciales para unir rutas de manera consistente
+    $fotoPathNoLead = ltrim($fotoPath, '/\\');
+
+    // Si la ruta contiene uploads/trabajadores/, usarla relativa al proyecto
+    if (strpos($fotoPathNoLead, 'uploads/trabajadores/') === 0) {
+        $candidate = __DIR__ . '/../' . $fotoPathNoLead;
+    } else {
+        // Si parece solo un nombre de archivo, usar la carpeta base
+        $candidate = $this->basePath . basename($fotoPathNoLead);
+    }
+
+    // Resolver realpath para evitar path traversal
+    $realCandidate = realpath($candidate);
+    $realBase = realpath($this->basePath);
+
+    if ($realCandidate === false || $realBase === false) {
+        error_log("Imagen no encontrada (realpath fallo): $candidate");
+        $this->sendDefaultImage();
+        return;
+    }
+
+    // Asegurarnos que el archivo esté dentro del directorio permitido
+    if (strpos($realCandidate, $realBase) !== 0) {
+        error_log("Intento de acceso fuera del directorio permitido: $realCandidate");
+        $this->sendDefaultImage();
+        return;
+    }
+
+    if (!is_file($realCandidate) || !file_exists($realCandidate)) {
+        error_log("Archivo no encontrado: $realCandidate");
+        $this->sendDefaultImage();
+        return;
+    }
+
+    // Obtener tipo MIME de forma segura
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $realCandidate);
+    finfo_close($finfo);
+
+    // Enviar la imagen con cabeceras apropiadas
+    header('Content-Type: ' . $mimeType);
+    header('Content-Length: ' . filesize($realCandidate));
+    header('Content-Disposition: inline; filename="' . basename($realCandidate) . '"');
+    header('Cache-Control: max-age=604800, public'); // Cache por 1 semana
+    readfile($realCandidate);
+    exit;
+}
 
     private function sendDefaultImage() {
         $defaultImage = __DIR__ . '/../img/default-user.png';
