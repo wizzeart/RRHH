@@ -33,10 +33,35 @@ class Chat {
                         $createTableSQL = "CREATE TABLE IF NOT EXISTS chat (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(50) NOT NULL, content TEXT NOT NULL, date DATETIME NOT NULL) DEFAULT CHARSET=utf8;";
                         $this->db->directExec($createTableSQL);
                     }
-                    $sql = "SELECT id, user, content, date FROM chat ORDER BY date DESC LIMIT 100";
+                    // Get the last 50 messages (most recent), then reverse so we return oldest->newest
+                    $sql = "SELECT id, user, content, date FROM chat ORDER BY date DESC LIMIT 50";
                     $result = $this->db->fetchAll($sql);
-                    if (!$result) $result = array();
-                    echo json_encode(array('status' => 1, 'messages' => $result));
+                    if (!$result) {
+                        $result = array();
+                    } else {
+                        $result = array_reverse($result);
+                    }
+                    // Determinar el usuario actual: preferir $_SESSION['usuario'], sino buscar en tabla usuarios por id de sesión
+                    $currentUser = '';
+                    if (session_status() == PHP_SESSION_NONE) session_start();
+                    if (isset($_SESSION['usuario']) && $_SESSION['usuario'] !== '') {
+                        $currentUser = $_SESSION['usuario'];
+                    } else {
+                        if (isset($_SESSION['guser_id']) && $_SESSION['guser_id'] !== '') {
+                            try {
+                                $rowu = $this->db->fetchRow("SELECT xusuario FROM usuarios WHERE xusuario_id = :id", array('id' => $_SESSION['guser_id']));
+                                if ($rowu && isset($rowu['xusuario']) && $rowu['xusuario'] !== '') {
+                                    $currentUser = $rowu['xusuario'];
+                                }
+                            } catch (Exception $e) {
+                                // ignore
+                            }
+                        }
+                    }
+                    foreach ($result as $k => $row) {
+                        $result[$k]['is_current'] = ($row['user'] === $currentUser);
+                    }
+                    echo json_encode(array('status' => 1, 'messages' => $result, 'currentUser' => $currentUser));
                 } catch (Exception $ex) {
                     echo json_encode(array('status' => 0, 'msg' => $ex->getMessage()));
                 }
@@ -57,7 +82,21 @@ class Chat {
                         $createTableSQL = "CREATE TABLE IF NOT EXISTS chat (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(50) NOT NULL, content TEXT NOT NULL, date DATETIME NOT NULL) DEFAULT CHARSET=utf8;";
                         $this->db->directExec($createTableSQL);
                     }
-                    $user = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : 'Anónimo';
+                    if (session_status() == PHP_SESSION_NONE) session_start();
+                    $user = '';
+                    if (isset($_SESSION['usuario']) && $_SESSION['usuario'] !== '') {
+                        $user = $_SESSION['usuario'];
+                    } else if (isset($_SESSION['guser_id']) && $_SESSION['guser_id'] !== '') {
+                        try {
+                            $rowu = $this->db->fetchRow("SELECT xusuario FROM usuarios WHERE xusuario_id = :id", array('id' => $_SESSION['guser_id']));
+                            if ($rowu && isset($rowu['xusuario']) && $rowu['xusuario'] !== '') {
+                                $user = $rowu['xusuario'];
+                            }
+                        } catch (Exception $e) {
+                            // ignore
+                        }
+                    }
+                    if ($user === '') $user = 'Anónimo';
                     $sql = "INSERT INTO chat (user, content, date)
                             SELECT ?, ?, NOW()
                             FROM DUAL

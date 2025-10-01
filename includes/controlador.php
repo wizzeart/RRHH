@@ -57,11 +57,7 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Home($app);
             $mdl->controlador($_REQUEST);
             break;
-        case 'chat':
-            // Render the chat UI as a standalone module page
-            // If you want the chat included inside another page, include modules/chat/chat.php where appropriate
-            include_once(__DIR__ . '/../modules/chat/chat.php');
-            break;
+        
         case 'historial':
             include_once(BASE_CLASS . '/mdl.Historial.php');
             $mdl = new Historial($app);

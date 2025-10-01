@@ -13,6 +13,18 @@ $(function() {
     var Chat = {
         updateTimer: null,
 
+        // simple enterprise color palette
+        palette: [
+            '#1F4E79', // dark blue
+            '#2A73B7', // blue
+            '#1B6F5A', // teal green
+            '#2E8B57', // sea green
+            '#4F6D7A', // slate
+            '#6C7A89', // gray-blue
+            '#8C6D3F', // warm bronze
+            '#3B3F44'  // charcoal
+        ],
+
         init: function() {
             this.setupEventListeners();
             this.startUpdates();
@@ -67,17 +79,37 @@ $(function() {
                         if (res.messages.length === 0) {
                             html = '<tr><td colspan="3" class="text-center">No hay mensajes</td></tr>';
                         } else {
+                            // Keep track of seen users for deterministic color mapping
+                            var userColors = {};
+                            function userColor(name) {
+                                if (!name) return '#888';
+                                if (userColors[name]) return userColors[name];
+                                // simple hash to pick a color from palette
+                                var h = 0;
+                                for (var i = 0; i < name.length; i++) h = (h << 5) - h + name.charCodeAt(i);
+                                var idx = Math.abs(h) % Chat.palette.length;
+                                userColors[name] = Chat.palette[idx];
+                                return userColors[name];
+                            }
+
                             res.messages.forEach(function(m) {
-                                html += '<tr>' +
-                                        '<td>' + escapeHtml(m.user) + '</td>' +
+                                var color = userColor(m.user || '');
+                                var badge = '<span class="chat-user-badge" style="background:' + color + '"></span>';
+                                var isCurrent = m.is_current || (typeof window.CHAT_CURRENT_USER !== 'undefined' && window.CHAT_CURRENT_USER === m.user);
+                                var rowClass = (isCurrent ? 'table-primary' : '');
+                                html += '<tr class="' + rowClass + '">' +
+                                        '<td>' + badge + '<strong>' + escapeHtml(m.user) + '</strong></td>' +
                                         '<td>' + escapeHtml(m.content) + '</td>' +
-                                        '<td>' + escapeHtml(m.date) + '</td>' +
+                                        '<td class="text-center">' + escapeHtml(m.date) + '</td>' +
                                         '</tr>';
                             });
                         }
                         $('#chat-messages tbody').html(html);
                         var chatDiv = document.getElementById('chat-messages');
-                        if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+                        if (chatDiv) {
+                            // Scroll to bottom so the latest messages are visible
+                            chatDiv.scrollTop = chatDiv.scrollHeight;
+                        }
                     }
                 },
                 error: function(xhr) {
