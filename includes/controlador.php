@@ -58,6 +58,7 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Home($app);
             $mdl->controlador($_REQUEST);
             break;
+        
         case 'historial':
             include_once(BASE_CLASS . '/mdl.Historial.php');
             $mdl = new Historial($app);

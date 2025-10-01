@@ -53,6 +53,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Home($app);
         $mdl->api($_REQUEST);
         break;
+    case 'chat':
+        include_once(BASE_CLASS . '/mdl.Chat.php');
+        $mdl = new Chat($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'bolsas_empleos':
         include_once(BASE_CLASS . '/mdl.Bolsas_empleos.php');
         $mdl = new Bolsas_empleos($app);
