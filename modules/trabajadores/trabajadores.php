@@ -93,17 +93,7 @@
                             <!-- <small class="help-block">Dirección del trabajador</small> -->
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-telefono">Teléfono <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="f-telefono" name="telefono" class="form-control"
-                                placeholder="Teléfono de contacto"
-                                value="<?php if (isset($data['telefono']))
-                                    print ($data['telefono']); ?>">
-                            <!-- <small class="help-block">Teléfono de contacto</small> -->
-                        </div>
-                    </div>
+
                 </div>
 
 
@@ -117,6 +107,17 @@
                                 placeholder="Correo electrónico" value="<?php if (isset($data['email']))
                                     print ($data['email']); ?>">
                             <!-- <small class="help-block">Correo electrónico</small> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-telefono">Teléfono <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="f-telefono" name="telefono" class="form-control"
+                                placeholder="Teléfono de contacto"
+                                value="<?php if (isset($data['telefono']))
+                                    print ($data['telefono']); ?>">
+                            <!-- <small class="help-block">Teléfono de contacto</small> -->
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -163,18 +164,7 @@
                             <!-- <small class="help-block">Departamento donde trabajará</small> -->
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-cargo">Cargo <span class="text-danger">*</span></label>
-                            <select id="f-cargo" name="cargos_id" class="form-control">
-                                <option value="">Seleccione cargo</option>
-                                <?php foreach ($data_form['cargos'] as $k => $v) { ?>
-                                    <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
-                                <?php } ?>
-                            </select>
-                            <!-- <small class="help-block">Cargo asignado</small> -->
-                        </div>
-                    </div>
+
                 </div>
 
                 <!-- Cuarta fila -->
@@ -213,6 +203,18 @@
                                 <?php } ?>
                             </select>
                             <!-- <small class="help-block">Bolsa de empleo asociada</small> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-cargo">Cargo <span class="text-danger">*</span></label>
+                            <select id="f-cargo" name="cargos_id" class="form-control">
+                                <option value="">Seleccione cargo</option>
+                                <?php foreach ($data_form['cargos'] as $k => $v) { ?>
+                                    <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
+                                <?php } ?>
+                            </select>
+                            <!-- <small class="help-block">Cargo asignado</small> -->
                         </div>
                     </div>
                 </div>
