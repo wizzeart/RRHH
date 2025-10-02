@@ -91,21 +91,29 @@ public function __construct($host, $db, $user, $pwd) {
         $consulta = null;
 
         $consulta = $this->conn->prepare($sql);
-        if ($param != '')
-            $consulta->execute($param);
-        else
-            $consulta->execute();
 
+        // If debug mode is enabled, show the interpolated SQL but do not re-run the statement.
         if ($this->debug == true) {
-            $this->debug = false;
             $sqld = $sql;
-            foreach ($param as $k => $v) {
-                $sqld = str_replace(':' . $k, "'" . $v . "'", $sqld);
+            if (is_array($param) && count($param) > 0) {
+                foreach ($param as $k => $v) {
+                    // Support both named (:name) and positional params — replace conservatively
+                    if (is_string($k)) {
+                        $sqld = str_replace(':' . $k, "'" . $v . "'", $sqld);
+                    } else {
+                        // positional: replace first occurrence of ? with quoted value
+                        $sqld = preg_replace('/\?/', "'" . addslashes($v) . "'", $sqld, 1);
+                    }
+                }
             }
             print($sqld);
         }
 
-        $r = $consulta->execute($sql);
+        if ($param != '')
+            $r = $consulta->execute($param);
+        else
+            $r = $consulta->execute();
+
         return $r;
     }
 

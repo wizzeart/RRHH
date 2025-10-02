@@ -24,7 +24,8 @@ class App
         $this->rol_name = '';
         session_start();
 
-        $this->db = new MsSql(_DB_SERVER_, _DB_NAME_, _DB_USER_, _DB_PASSWD_, '3306'); //sql server
+    $this->db = new MsSql(_DB_SERVER_, _DB_NAME_, _DB_USER_, _DB_PASSWD_, '3306'); //sql server
+    // Debug flag removed
 
         if (isset($_SESSION['guser_id'])) {
             $this->user_id = $_SESSION['guser_id'];

@@ -181,14 +181,27 @@ class Trabajador {
         print(json_encode($data));
     }
     
-    private function _save($param) {
+    /**
+     * Obtiene el próximo ID disponible en la tabla usuarios
+     */
+    private function getNextUsuarioId() {
+        $sql = "SELECT IFNULL(MAX(xusuario_id), 0) + 1 as next_id FROM usuarios";
+        $result = $this->db->fetchRow($sql);
+        return $result ? (int)$result['next_id'] : 1;
+    }
 
+    private function _save($param) {
         $data = array(
             'status' => 1,
             'msg_title' => '',
             'msg' => '',
             'action' => isset($param['action']) ? $param['action'] : 'insert'
         );
+        
+        // Obtener el próximo ID de usuario disponible para nuevos registros
+        if ($data['action'] === 'insert') {
+            $param['usuario_id'] = $this->getNextUsuarioId();
+        }
 
         // Procesar foto si se subió
         if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
@@ -218,18 +231,18 @@ class Trabajador {
                 }
             }
 
-            // Verificar si el email ya existe (insert)
-            if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
-                $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
-                $val = array('email' => $param['email']);
-                $existing = $this->db->fetchRow($sql, $val);
-                if ($existing) {
-                    $data['status'] = 0;
-                    $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
-                    print(json_encode($data));
-                    return;
-                }
-            }
+            // // Verificar si el email ya existe (insert)
+            // if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
+            //     $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
+            //     $val = array('email' => $param['email']);
+            //     $existing = $this->db->fetchRow($sql, $val);
+            //     if ($existing) {
+            //         $data['status'] = 0;
+            //         $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
+            //         print(json_encode($data));
+            //         return;
+            //     }
+            // }
 
             // Verificar si el nombre completo ya existe (insert)
             if ($data['action'] == 'insert' && isset($param['nombre']) && isset($param['apellidos'])) {
@@ -254,7 +267,7 @@ class Trabajador {
                 'edad' => 'Edad',
                 'direccion' => 'Dirección',
                 'telefono' => 'Teléfono',
-                'email' => 'Email',
+                // 'email' => 'Email',
                 'nivel_educacional' => 'Nivel Educacional',
                 'departamento_id' => 'Departamento',
                 'cargos_id' => 'Cargo',
@@ -270,7 +283,7 @@ class Trabajador {
 
         // Crear array de datos sin incluir campos de control
         $insert = array();
-        $allowed_fields = ['nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
         
         foreach ($allowed_fields as $field) {
             if (isset($param[$field])) {
@@ -319,41 +332,85 @@ class Trabajador {
                 $insert['fecha_contratacion'] = date('Y-m-d');
             }
             
-            // Asegurar que solo se insertan los campos que existen en la tabla
-            $campos_validos = [
-                'cargos_id',
-                'departamento_id',
-                'foto',
-                'nombre',
-                'apellidos',
-                'apellidos_segundos',
-                'carnet_identidad',
-                'sexo',
-                'edad',
-                'direccion',
-                'telefono',
-                'email',
-                'nivel_educacional',
-                'fecha_contratacion',
-                'fecha_baja',
-                'estatus',
-                'bolsa_empleo_id',
-                'trabajador_eliminado'
-            ];
-            
-            // Filtrar solo los campos válidos
-            $insert_filtered = array_intersect_key($insert, array_flip($campos_validos));
-            
-
             try {
-                // Insertar el trabajador usando solo los campos filtrados
+                // Primero insertar en la tabla usuarios
+                $email = strtolower($insert['nombre'] . substr($insert['apellidos'], 0, 3) . '@allnovu.net');
+                
+                // Crear instancia de la clase Usuario
+                require_once 'mdl.Usuarios.php';
+                $usuario = new Usuario($this->app);
+                
+                // Preparar datos del usuario
+                $usuarioData = [
+                    'method' => 'save',
+                    'action' => 'insert',
+                    'xusuario' => $insert['nombre'] . ' ' . $insert['apellidos'],
+                    'xemail' => $email,
+                    'xpwd' => $insert['carnet_identidad'],
+                    'xactivo' => 'S',
+                    'xrol_id' => 2,
+                    'xdatealta' => date('Y-m-d H:i:s'),
+                    'xdatemodif' => date('Y-m-d H:i:s')
+                ];
+
+                // Usar el método api de la clase Usuario para manejar el guardado
+                ob_start(); // Capturar salida de api()
+                $usuario->api($usuarioData);
+                $apiResponse = ob_get_clean();
+                
+                // Decodificar la respuesta JSON
+                $usuarioInserted = json_decode($apiResponse, true);
+                
+                // Verificar si la inserción fue exitosa
+                if (json_last_error() !== JSON_ERROR_NONE || !isset($usuarioInserted['status']) || $usuarioInserted['status'] != 1) {
+                    $errorMsg = json_last_error_msg();
+                    throw new Exception('Error al crear el usuario: ' . ($usuarioInserted['msg'] ?? $errorMsg ?? 'Error desconocido'));
+                }
+                
+                // Obtener el ID del usuario recién creado
+                $usuarioId = $this->db->last_id();
+                
+                if (!$usuarioId) {
+                    throw new Exception('No se pudo obtener el ID del usuario creado');
+                }
+                
+                // Asegurar que solo se insertan los campos que existen en la tabla
+                $campos_validos = [
+                    'cargos_id',
+                    'departamento_id',
+                    'foto',
+                    'nombre',
+                    'apellidos',
+                    'apellidos_segundos',
+                    'carnet_identidad',
+                    'sexo',
+                    'edad',
+                    'direccion',
+                    'telefono',
+                    'usuario_id',
+                    'nivel_educacional',
+                    'fecha_contratacion',
+                    'fecha_baja',
+                    'estatus',
+                    'bolsa_empleo_id',
+                    'trabajador_eliminado'
+                ];
+                
+                // Filtrar solo los campos válidos
+                $insert_filtered = array_intersect_key($insert, array_flip($campos_validos));
+                
+                // Agregar el usuario_id al registro del trabajador
+                $insert_filtered['usuario_id'] = $usuarioId;
+                
+                // Insertar el trabajador
                 $result = $this->db->insert('trabajadores', $insert_filtered);
                 
                 if ($result) {
-                    // Obtener el último ID insertado
+                    // Obtener el ID del trabajador insertado
                     $lastId = $this->db->last_id();
                     
                     if ($lastId) {
+
                         // Preparar respuesta exitosa
                         $data['msg_title'] = 'Operación exitosa';
                         $data['msg'] = 'Registro insertado correctamente';

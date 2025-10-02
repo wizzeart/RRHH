@@ -20,8 +20,17 @@ class Contrato {
                 $data = $this->_list_id($param);
                 print(json_encode($data));
                 break;
+            case 'getTemplate':
+                $this->_getTemplate($param);
+                break;
             case 'save':
                 $this->_save($param);
+                break;
+            case 'generatePdfFromHtml':
+                $this->_generatePdfFromHtml($param);
+                break;
+            case 'generatePdfWithFpdf':
+                $this->_generatePdfWithFpdf($param);
                 break;
         }
     }
@@ -56,6 +65,172 @@ class Contrato {
                 }
                 break;
         }
+    }
+
+    // Devuelve plantilla HTML según tipo (lee de /docs)
+    private function _getTemplate($param) {
+        $tipo = isset($param['tipo']) ? $param['tipo'] : '';
+        $map = array(
+            'Contrato por Tiempo Indeterminado' => BASE . '/docs/contrato-de-trabajo-indeterminado/contrato-de-trabajo-indeterminado.html',
+            'Contrato por Tiempo Determinado' => BASE . '/docs/cotrato_pedriodo_prueba/contrato-de-trabajo-periodo-de-prueba-1.php',
+            'Suplemento' => BASE . '/docs/suplemento/suplemento-al-contrato-de-trabajo.php'
+        );
+        $path = isset($map[$tipo]) ? $map[$tipo] : null;
+        if ($path && file_exists($path)) {
+            // Entregamos el HTML tal cual para que el frontend lo procese
+            header('Content-Type: text/html; charset=utf-8');
+            readfile($path);
+            return;
+        }
+        // No encontrado
+        header('HTTP/1.1 404 Not Found');
+        print('Plantilla no encontrada');
+    }
+
+    // Genera PDF a partir del HTML enviado (ya con valores reemplazados)
+    private function _generatePdfFromHtml($param) {
+        $response = array('status'=>0,'msg'=>'');
+        $html = isset($param['html']) ? $param['html'] : '';
+        $tipo = isset($param['tipo']) ? $param['tipo'] : 'contrato';
+        $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
+
+        if (empty($html)) { $response['msg'] = 'HTML vacío'; print(json_encode($response)); return; }
+
+        // Cargar mPDF
+        $autoloads = array(
+            BASE . '/plugins/mpdf/vendor/autoload.php',
+            BASE . '/plugins/mpdf/autoload.php',
+            __DIR__ . '/../plugins/mpdf/vendor/autoload.php',
+            __DIR__ . '/../plugins/mpdf/autoload.php'
+        );
+        foreach ($autoloads as $auto) { if (file_exists($auto)) { require_once($auto); break; } }
+        if (!class_exists('Mpdf\\Mpdf')) { $response['msg']='mPDF no disponible'; print(json_encode($response)); return; }
+
+        try {
+            $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir()]);
+            // opcional: añadir CSS base
+            $mpdf->WriteHTML($html);
+
+            $upload_dir = 'uploads/contratos/'; if (!file_exists($upload_dir)) { @mkdir($upload_dir, 0777, true); }
+            $fileId = $contrato_id ? $contrato_id : time();
+            $fileName = 'contrato_' . $fileId . '_' . preg_replace('/[^a-z0-9_\-]/i','',str_replace(' ','_',substr($tipo,0,50))) . '.pdf';
+            $fullPath = rtrim($upload_dir, '/\\') . '/' . $fileName;
+            $mpdf->Output($fullPath, 'F');
+
+            $response['status']=1; $response['file_url'] = $fullPath; $response['msg']='OK';
+            // Si contrato_id fue proporcionado actualizamos la columna archivo_contrato
+            if ($contrato_id) {
+                try { $this->db->update('contratos', array('archivo_contrato'=>$fullPath), array('id'=>$contrato_id)); } catch(Exception $e) { /* silencio */ }
+            }
+        } catch (Exception $e) {
+            $response['msg'] = 'Error al generar PDF: ' . $e->getMessage();
+        }
+        print(json_encode($response));
+    }
+
+    // Genera PDF usando la librería FPDF (texto plano a partir de plantilla PHP)
+    private function _generatePdfWithFpdf($param) {
+        $response = array('status'=>0,'msg'=>'', 'file_url'=>'');
+        $tipo = isset($param['tipo']) ? $param['tipo'] : '';
+        $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
+        $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
+
+        // Recover extras (JSON string expected)
+        $extras = array();
+        if (isset($param['extras']) && $param['extras']) {
+            $e = json_decode($param['extras'], true);
+            if (is_array($e)) $extras = $e;
+        }
+
+        // Map tipo to PHP template path (use the php files)
+        $map = array(
+            'Contrato por Tiempo Indeterminado' => BASE . '/docs/contrato-de-trabajo-indeterminado/contrato-de-trabajo-indeterminado.php',
+            'Contrato por Tiempo Determinado' => BASE . '/docs/cotrato_pedriodo_prueba/contrato-de-trabajo-periodo-de-prueba-1.php',
+            'Suplemento' => BASE . '/docs/suplemento/suplemento-al-contrato-de-trabajo.php'
+        );
+        $path = isset($map[$tipo]) ? $map[$tipo] : null;
+        if (!$path || !file_exists($path)) { $response['msg']='Plantilla no encontrada'; print(json_encode($response)); return; }
+
+        // Make template variables available: extras keys + trabajador data
+        $tplData = array();
+        foreach ($extras as $k=>$v) { $tplData[$k] = $v; }
+        if ($trabajador_id) {
+            try { $trab = $this->db->fetchRow("SELECT nombre, apellidos, carnet_identidad FROM trabajadores WHERE id = :id", array('id'=>$trabajador_id));
+                if ($trab) { $tplData['trabajador_nombre'] = trim(($trab['nombre'] ?? '') . ' ' . ($trab['apellidos'] ?? '')); $tplData['trabajador_ci'] = $trab['carnet_identidad'] ?? ''; }
+            } catch(Exception $e) { /* ignore */ }
+        }
+
+        // Render template into HTML string by capturing include output and replacing named placeholders
+        ob_start();
+        // make $tplData available to template
+        $__tpl = $tplData;
+        // include template in separate scope
+        try {
+            include $path;
+        } catch(Exception $e) {
+            ob_end_clean();
+            $response['msg'] = 'Error al procesar plantilla: ' . $e->getMessage(); print(json_encode($response)); return;
+        }
+        $html = ob_get_clean();
+
+        // Normalize extras: map formas_pago array to readable text and ensure keys match placeholders
+        if (isset($tplData['formas_pago']) && is_array($tplData['formas_pago'])) {
+            $mapFormas = array('1' => 'A sueldo', '2' => 'Por tarifa horaria', '3' => 'Por resultados', '4' => 'A Destajo');
+            $pieces = array();
+            foreach ($tplData['formas_pago'] as $f) { $pieces[] = isset($mapFormas[$f]) ? $mapFormas[$f] : $f; }
+            $tplData['formas_pago'] = implode(', ', $pieces);
+        }
+        // Also set common aliases
+        if (isset($tplData['cargo_nombre'])) { $tplData['cargo'] = $tplData['cargo_nombre']; }
+
+        // Replace placeholders like {{DE_NOMBRE}} etc with extras (if appear)
+        foreach ($tplData as $k=>$v) {
+            $ph = '{{' . strtoupper($k) . '}}';
+            $html = str_replace($ph, $v, $html);
+        }
+
+        // Load FPDF
+        $fpdfPath = __DIR__ . '/fpdf/fpdf.php';
+        if (!file_exists($fpdfPath)) { $response['msg'] = 'FPDF no encontrado en classes/fpdf/'; print(json_encode($response)); return; }
+        require_once($fpdfPath);
+
+        // Very simple approach: strip tags and write lines to PDF
+        $text = strip_tags($html);
+        // Normalize whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        try {
+            $pdf = new FPDF();
+            $pdf->AddPage();
+            $pdf->SetFont('Arial','',12);
+            $maxWidth = 190; // approx mm
+            $pdf->SetAutoPageBreak(true, 10);
+            // split text into words and assemble lines
+            $words = explode(' ', $text);
+            $line = '';
+            foreach ($words as $w) {
+                $test = trim($line . ' ' . $w);
+                if ($pdf->GetStringWidth($test) > $maxWidth) {
+                    $pdf->Cell(0, 6, utf8_decode(trim($line)), 0, 1);
+                    $line = $w;
+                } else { $line = $test; }
+            }
+            if (trim($line) !== '') $pdf->Cell(0, 6, utf8_decode(trim($line)), 0, 1);
+
+            $upload_dir = 'uploads/contratos/'; if (!file_exists($upload_dir)) { @mkdir($upload_dir, 0777, true); }
+            $fileId = $contrato_id ? $contrato_id : time();
+            $fileName = 'contrato_fpdf_' . $fileId . '.pdf';
+            $fullPath = rtrim($upload_dir, '/\\') . '/' . $fileName;
+            $pdf->Output('F', $fullPath);
+
+            $response['status'] = 1; $response['file_url'] = $fullPath; $response['msg'] = 'OK';
+            if ($contrato_id) { try { $this->db->update('contratos', array('archivo_contrato'=>$fullPath), array('id'=>$contrato_id)); } catch(Exception $e) { }
+            }
+        } catch(Exception $e) {
+            $response['msg'] = 'Error FPDF: ' . $e->getMessage();
+        }
+
+        print(json_encode($response));
     }
 
     private function _list($param) {
