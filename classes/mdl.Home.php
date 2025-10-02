@@ -216,6 +216,15 @@ class Home {
 
         switch ($param['module']) {
             case 'home':
+                // Si el usuario tiene rol de trabajador, redirigir a su ficha
+                if ($this->app->rol == 2) {
+                    // Obtener el ID del trabajador asociado al usuario
+
+                    header("Location: index.php?module=ficha-trabajador&usuario_id=" . $this->app->user_id);
+                    exit();
+                }
+                
+                // Si no es trabajador o no tiene trabajador asociado, cargar el dashboard normal
                 $data = array();
                 $page['title'] = 'Inicio';
                 $page['subtitle'] = 'Resumen situación';

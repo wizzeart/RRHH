@@ -68,15 +68,26 @@ class Trabajador {
             case 'ficha-trabajador':
                 $data = array();
                 $page['title'] = 'Ficha de Trabajador';
-                $page['subtitle'] = 'Ficha de Trabajador';
-
-                $val = array(
-                    'id' => $param['id']
-                );
-                $sql = "select *"
-                        . " from " . 'trabajadores'
-                        . " where id=:id";
-                $row = $this->db->fetchRow($sql, $val);
+                //$page['subtitle'] = 'Ficha de Trabajador';
+                
+                if (isset($param['id'])) {
+                    $val = array(
+                        'id' => $param['id']
+                    );
+                    $sql = "select *"
+                            . " from " . 'trabajadores'
+                            . " where id=:id";
+                    $row = $this->db->fetchRow($sql, $val);
+                }
+                else {
+                    $val = array(
+                        'usuario_id' => $param['usuario_id']
+                    );
+                    $sql = "select *"
+                            . " from " . 'trabajadores'
+                            . " where usuario_id=:usuario_id";
+                    $row = $this->db->fetchRow($sql, $val);
+                }
                 if ($row) {
 
                     //$row['almacenes'] = $this->app->get_list_usuarios_almacenes($row['xusuario_id']);
@@ -85,7 +96,7 @@ class Trabajador {
                     //die();
 
                     $data = $row;
-                    $page['subtitle'] = 'Trabajador: ' . $row['nombre'];
+                    $page['title'] = 'Ficha de Trabajador: ' . $row['nombre'] . ' ' . $row['apellidos'] . ' ' . $row['apellidos_segundos'];
                 }
                 $data_form = array();
                 break;

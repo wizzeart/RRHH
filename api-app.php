@@ -28,6 +28,8 @@ switch ($_REQUEST['module']) {
         $mdl = new Document($app);
         $mdl->api($_REQUEST);
         break;
+    case 'planificacion-vacaciones':
+        
     case 'vacaciones':
         include_once(BASE_CLASS . '/mdl.Vacaciones.php');
         $mdl = new Vacaciones($app);
