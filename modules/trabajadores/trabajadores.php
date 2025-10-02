@@ -264,3 +264,20 @@
     </div>
 
 </div>
+<script>
+    // Generar email automáticamente al cambiar los campos de nombre y apellidos
+    document.getElementById('f-nombre').addEventListener('input', generarEmail);
+    document.getElementById('f-apellidos').addEventListener('input', generarEmail);
+    document.getElementById('f-apellidos-segundos').addEventListener('input', generarEmail);
+
+    function generarEmail() {
+        const nombre = document.getElementById('f-nombre').value.trim().toLowerCase().replace(/\s+/g, '');
+        const apellidos = document.getElementById('f-apellidos').value.trim().toLowerCase().replace(/\s+/g, '');
+        const apellidosSegundos = document.getElementById('f-apellidos-segundos').value.trim().toLowerCase().replace(/\s+/g, '');
+
+        if (nombre && apellidos) {
+            const email = `${nombre}${apellidos.substring(0, 3)}@allnovu.net`;
+            document.getElementById('f-email').value = email;
+        }
+    }
+</script>
