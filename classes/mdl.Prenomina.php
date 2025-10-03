@@ -131,63 +131,81 @@ class Prenomina {
         $raw = file_get_contents('php://input');
         $payload = json_decode($raw, true);
         $resp = ['status' => 1, 'msg' => 'Guardado', 'errors' => [], 'affected' => 0];
-
+    
         if (!is_array($payload)) {
             $resp['status'] = 0;
             $resp['msg'] = 'JSON inválido';
-            print(json_encode($resp));
-            return;
+            echo json_encode($resp);
+            exit;
         }
-
+    
         $year = isset($payload['year']) ? intval($payload['year']) : intval(date('Y'));
         $month = isset($payload['month']) ? intval($payload['month']) : intval(date('n'));
         $rows = isset($payload['rows']) && is_array($payload['rows']) ? $payload['rows'] : [];
         if (empty($rows)) {
             $resp['status'] = 0;
             $resp['msg'] = 'Sin filas a guardar';
-            print(json_encode($resp));
-            return;
+            echo json_encode($resp);
+            exit;
         }
-
+    
         foreach ($rows as $r) {
             $trabajador_id = isset($r['trabajador_id']) ? intval($r['trabajador_id']) : 0;
             $horas = isset($r['horas']) ? floatval($r['horas']) : 0.0;
+    
             if ($trabajador_id <= 0) {
                 $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'trabajador_id inválido'];
                 continue;
             }
-
+    
             // Verificar si ya existe registro del periodo
             $sqlSel = "SELECT id, tarifa FROM prenomina WHERE trabajador_id=:tid AND `year`=:y AND `month`=:m";
             $row = $this->db->fetchRow($sqlSel, ['tid' => $trabajador_id, 'y' => $year, 'm' => $month]);
-
+    
+            // Obtener tarifa
             if ($row) {
-                // Mantener tarifa guardada
                 $tarifa = floatval($row['tarifa']);
-                $a_cobrar = $horas * $tarifa;
-                $seg_social = round($a_cobrar * 0.05, 2);
-                $ing_pers = round($a_cobrar * 0.0375, 2);
-                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
-
-                // Obtener conteo de ausencias
-                $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
-                $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
-                $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
-
-                // Obtener suma de días de vacaciones
-                $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones FROM registro_vacaciones WHERE trabajador_id = :tid AND dias_disfrutados > 0";
-                $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
-                $vacaciones = $vacacionesRow ? $vacacionesRow['total_dias_vacaciones'] : 0;
-
-                // Calcular pago por vacaciones: ((tarifa * 8) * vacaciones)
-                $pago_vac = round((($tarifa * 8) * $vacaciones), 2);
-                
-                // Salario neto incluye el pago por vacaciones
-                $salario_neto = $a_cobrar + $pago_vac;
-                
-                // Salario a pagar: salario_neto - descuentos
-                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
-               
+            } else {
+                $sqlTar = "SELECT COALESCE(c.salario,0) AS tarifa 
+                           FROM trabajadores t 
+                           LEFT JOIN cargos c ON t.cargos_id=c.id 
+                           WHERE t.id=:tid";
+                $trow = $this->db->fetchRow($sqlTar, ['tid' => $trabajador_id]);
+                $tarifa = $trow ? floatval($trow['tarifa']) : 0.0;
+            }
+    
+            // Calcular salario base
+            $a_cobrar = $horas * $tarifa;
+    
+            // Obtener ausencias
+            $sqlAusencias = "SELECT COUNT(*) as total_ausencias 
+                             FROM registro_asistencia 
+                             WHERE trabajador_id = :tid AND ausencia = '1'";
+            $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
+            $ausencias = $ausenciasRow ? intval($ausenciasRow['total_ausencias']) : 0;
+    
+            // Obtener vacaciones
+            $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones 
+                              FROM registro_vacaciones 
+                              WHERE trabajador_id = :tid AND dias_disfrutados > 0";
+            $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
+            $vacaciones = $vacacionesRow ? intval($vacacionesRow['total_dias_vacaciones']) : 0;
+    
+            // Calcular pago por vacaciones
+            $pago_vac = round(($tarifa * 8) * $vacaciones, 2);
+    
+            // Salario neto incluye pago por vacaciones
+            $salario_neto = $a_cobrar + $pago_vac;
+    
+            // Descuentos
+            $seg_social = round($a_cobrar * 0.05, 2);
+            $ing_pers   = round($a_cobrar * 0.0375, 2);
+    
+            // Salario final a pagar
+            $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
+    
+            if ($row) {
+                // Update
                 $upd = [
                     'horas' => $horas,
                     'a_cobrar' => $a_cobrar,
@@ -200,44 +218,10 @@ class Prenomina {
                     'vacaciones' => $vacaciones,
                     'pago_vac' => $pago_vac,
                 ];
-                $where = [
-                    'trabajador_id' => $trabajador_id,
-                    '`year`' => $year,
-                    '`month`' => $month,
-                ];
-                // Nuestra utilidad update necesita where sin backticks en claves
-                $where = [ 'trabajador_id' => $trabajador_id, 'year' => $year, 'month' => $month ];
+                $where = ['trabajador_id' => $trabajador_id, 'year' => $year, 'month' => $month];
                 $this->db->update('prenomina', $upd, $where);
-                $resp['affected']++;
             } else {
-                // Tomar tarifa desde cargos del trabajador
-                $sqlTar = "SELECT COALESCE(c.salario,0) AS tarifa FROM trabajadores t LEFT JOIN cargos c ON t.cargos_id=c.id WHERE t.id=:tid";
-                $trow = $this->db->fetchRow($sqlTar, ['tid' => $trabajador_id]);
-                $tarifa = $trow ? floatval($trow['tarifa']) : 0.0;
-                $a_cobrar = $horas * $tarifa;
-                $seg_social = round($a_cobrar * 0.05, 2);
-                $ing_pers = round($a_cobrar * 0.0375, 2);
-                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
-
-                // Obtener conteo de ausencias
-                $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
-                $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
-                $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
-
-                // Obtener suma de días de vacaciones
-                $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones FROM registro_vacaciones WHERE trabajador_id = :tid AND dias_disfrutados > 0";
-                $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
-                $vacaciones = $vacacionesRow ? $vacacionesRow['total_dias_vacaciones'] : 0;
-
-                // Calcular pago por vacaciones: ((tarifa * 8) * vacaciones)
-                $pago_vac = round((($tarifa * 8) * $vacaciones), 2);
-                
-                // Salario neto incluye el pago por vacaciones
-                $salario_neto = $a_cobrar + $pago_vac;
-                
-                // Salario a pagar: salario_neto - descuentos
-                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
-
+                // Insert
                 $ins = [
                     'trabajador_id' => $trabajador_id,
                     'year' => $year,
@@ -257,15 +241,19 @@ class Prenomina {
                 ];
                 try {
                     $this->db->insert('prenomina', $ins);
-                    $resp['affected']++;
                 } catch (Exception $e) {
                     $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => $e->getMessage()];
+                    continue;
                 }
             }
+    
+            $resp['affected']++;
         }
-
-        print(json_encode($resp));
+    
+        echo json_encode($resp);
+        exit;
     }
+    
 
     private function _export_excel($param) {
         // Parámetros de periodo
@@ -291,13 +279,13 @@ class Prenomina {
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS a_cobrar,
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
-                    (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,
-                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,
-                    ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,
-                    ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,
+                    NULL AS ausencias,
+                    NULL AS vacaciones,
+                    NULL AS pago_vac,
+                    (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS salario_neto,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) AS seg_social,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2) AS ing_pers,
-                    ROUND(((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) + ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2)), 2) AS salario_pagar
+                    ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) - (((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05) + ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375)), 2) AS salario_pagar
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
@@ -376,6 +364,7 @@ class Prenomina {
         $writer->save('php://output');
         exit;
     }
+
 
     private function _list_departamentos() {
         // Devolver solo nombres de departamentos (tabs por nombre)
