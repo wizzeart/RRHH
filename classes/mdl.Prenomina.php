@@ -101,30 +101,22 @@ class Prenomina {
                     t.id AS expediente,
                     CONCAT(t.nombre, ' ', t.apellidos) AS nombre,
                     t.carnet_identidad AS ci,
-                    COALESCE(c.salario, 0) AS tarifa,
-                    192.00 AS horas,
-                    (192.00 * COALESCE(c.salario, 0)) AS a_cobrar,
-                    NULL AS bonif,
-                    (192.00 * COALESCE(c.salario, 0)) AS sal_dev,
-                    COALESCE(ausencias_count.total_ausencias, 0) AS ausencias,
-                    NULL AS vacaciones,
-                    NULL AS pago_vac,
-                    (192.00 * COALESCE(c.salario, 0)) AS salario_neto,
-                    ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) AS seg_social,
-                    ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) AS ing_pers,
-                    ROUND((192.00 * COALESCE(c.salario, 0)) - (((192.00 * COALESCE(c.salario, 0)) * 0.05) + ((192.00 * COALESCE(c.salario, 0)) * 0.0375)), 2) AS salario_pagar,
-                    COALESCE(d.nombre, '') AS departamento
+                    COALESCE(c.salario, 0) AS tarifa,                                                                                                                                                    -- Tarifa por hora del cargo
+                    192.00 AS horas,                                                                                                                                                                    -- Horas trabajadas por defecto (192 horas mensuales)
+                    (192.00 * COALESCE(c.salario, 0)) AS a_cobrar,                                                                                                                                     -- Salario base: horas × tarifa
+                    NULL AS bonif,                                                                                                                                                                      -- Bonificaciones (no calculadas automáticamente)
+                    (192.00 * COALESCE(c.salario, 0)) AS sal_dev,                                                                                                                                      -- Salario devengado (igual al salario base)
+                    (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,                                                                  -- Conteo de ausencias desde registro_asistencia
+                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,                               -- Suma de días de vacaciones disfrutadas
+                    ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,  -- Pago por vacaciones: (tarifa × 8) × días_vacaciones
+                    ((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,  -- Salario neto: salario_base + pago_vacaciones
+                    ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) AS seg_social,                                                                                                               -- Descuento seguridad social: 5% del salario base
+                    ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) AS ing_pers,                                                                                                              -- Descuento ingresos personales: 3.75% del salario base
+                    ROUND(((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) + ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2)), 2) AS salario_pagar,                -- Salario a pagar: salario_neto - (seg_social + ing_pers)
+                    COALESCE(d.nombre, '') AS departamento                                                                                                                                             -- Nombre del departamento
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
-                LEFT JOIN (
-                    SELECT 
-                        trabajador_id,
-                        COUNT(*) as total_ausencias
-                    FROM registro_asistencia 
-                    WHERE ausencia = '1'
-                    GROUP BY trabajador_id
-                ) ausencias_count ON t.id = ausencias_count.trabajador_id
                 " . $cond .
                 " ORDER BY t.id ASC";
 
@@ -175,22 +167,38 @@ class Prenomina {
                 $a_cobrar = $horas * $tarifa;
                 $seg_social = round($a_cobrar * 0.05, 2);
                 $ing_pers = round($a_cobrar * 0.0375, 2);
-                $salario_pagar = round($a_cobrar - ($seg_social + $ing_pers), 2);
+                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
 
                 // Obtener conteo de ausencias
                 $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
                 $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
                 $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
 
+                // Obtener suma de días de vacaciones
+                $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones FROM registro_vacaciones WHERE trabajador_id = :tid AND dias_disfrutados > 0";
+                $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
+                $vacaciones = $vacacionesRow ? $vacacionesRow['total_dias_vacaciones'] : 0;
+
+                // Calcular pago por vacaciones: ((tarifa * 8) * vacaciones)
+                $pago_vac = round((($tarifa * 8) * $vacaciones), 2);
+                
+                // Salario neto incluye el pago por vacaciones
+                $salario_neto = $a_cobrar + $pago_vac;
+                
+                // Salario a pagar: salario_neto - descuentos
+                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
+               
                 $upd = [
                     'horas' => $horas,
                     'a_cobrar' => $a_cobrar,
                     'sal_dev' => $a_cobrar,
-                    'salario_neto' => $a_cobrar,
+                    'salario_neto' => $salario_neto,
                     'seg_social' => $seg_social,
                     'ing_pers' => $ing_pers,
                     'salario_pagar' => $salario_pagar,
                     'ausencias' => $ausencias,
+                    'vacaciones' => $vacaciones,
+                    'pago_vac' => $pago_vac,
                 ];
                 $where = [
                     'trabajador_id' => $trabajador_id,
@@ -209,12 +217,26 @@ class Prenomina {
                 $a_cobrar = $horas * $tarifa;
                 $seg_social = round($a_cobrar * 0.05, 2);
                 $ing_pers = round($a_cobrar * 0.0375, 2);
-                $salario_pagar = round($a_cobrar - ($seg_social + $ing_pers), 2);
+                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
 
                 // Obtener conteo de ausencias
                 $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
                 $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
                 $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
+
+                // Obtener suma de días de vacaciones
+                $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones FROM registro_vacaciones WHERE trabajador_id = :tid AND dias_disfrutados > 0";
+                $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
+                $vacaciones = $vacacionesRow ? $vacacionesRow['total_dias_vacaciones'] : 0;
+
+                // Calcular pago por vacaciones: ((tarifa * 8) * vacaciones)
+                $pago_vac = round((($tarifa * 8) * $vacaciones), 2);
+                
+                // Salario neto incluye el pago por vacaciones
+                $salario_neto = $a_cobrar + $pago_vac;
+                
+                // Salario a pagar: salario_neto - descuentos
+                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
 
                 $ins = [
                     'trabajador_id' => $trabajador_id,
@@ -226,9 +248,9 @@ class Prenomina {
                     'bonif' => null,
                     'sal_dev' => $a_cobrar,
                     'ausencias' => $ausencias,
-                    'vacaciones' => null,
-                    'pago_vac' => null,
-                    'salario_neto' => $a_cobrar,
+                    'vacaciones' => $vacaciones,
+                    'pago_vac' => $pago_vac,
+                    'salario_neto' => $salario_neto,
                     'seg_social' => $seg_social,
                     'ing_pers' => $ing_pers,
                     'salario_pagar' => $salario_pagar,
@@ -269,25 +291,17 @@ class Prenomina {
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS a_cobrar,
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
-                    COALESCE(ausencias_count.total_ausencias, 0) AS ausencias,
-                    NULL AS vacaciones,
-                    NULL AS pago_vac,
-                    (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS salario_neto,
+                    (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,
+                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,
+                    ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,
+                    ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) AS seg_social,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2) AS ing_pers,
-                    ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) - (((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05) + ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375)), 2) AS salario_pagar
+                    ROUND(((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) + ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2)), 2) AS salario_pagar
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
                 LEFT JOIN prenomina p ON p.trabajador_id = t.id AND p.year = :y AND p.month = :m
-                LEFT JOIN (
-                    SELECT 
-                        trabajador_id,
-                        COUNT(*) as total_ausencias
-                    FROM registro_asistencia 
-                    WHERE ausencia = '1'
-                    GROUP BY trabajador_id
-                ) ausencias_count ON t.id = ausencias_count.trabajador_id
                 " . $cond .
                 " ORDER BY t.id ASC";
 
