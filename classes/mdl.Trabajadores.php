@@ -388,6 +388,39 @@ class Trabajador {
                 // Agregar el usuario_id al registro del trabajador
                 $insert_filtered['usuario_id'] = $usuarioId;
                 
+                // Procesar foto si se subió
+                if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                    $upload_dir = 'uploads/trabajadores/';
+                    if (!file_exists($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+                    
+                    // Obtener la extensión del archivo original
+                    $file_extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+                    
+                    // Usar el UUID generado como nombre de archivo
+                    if (isset($param['uuid'])) {
+                        $foto_name = $param['uuid'] . '.' . $file_extension;
+                        $foto_path = $upload_dir . $foto_name;
+                        
+                        // Mover el archivo temporal a la ubicación final
+                        if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
+                            $insert_filtered['foto'] = $foto_path;
+                        } else {
+                            error_log('Error al mover el archivo subido: ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
+                        }
+                    } else {
+                        // Si por alguna razón no hay UUID, usar un nombre único
+                        $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
+                        $foto_path = $upload_dir . $foto_name;
+                        if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
+                            $insert_filtered['foto'] = $foto_path;
+                        } else {
+                            error_log('Error al mover el archivo subido (sin UUID): ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
+                        }
+                    }
+                }
+                
                 // Insertar el trabajador
                 $result = $this->db->insert('trabajadores', $insert_filtered);
                 
@@ -651,22 +684,54 @@ class Trabajador {
 
     private function _list($param) {
         $data = array();
+        
+        // Primero probamos sin JOIN para confirmar que funciona
         $sql = "SELECT 
-                t.*,
-                p.id as pase_id, 
-                p.areas_acceso, 
-                p.fecha_generacion, 
-                p.vigente,
-                c.nombre as cargo_nombre,
-                c.id as cargo_id_original
+                t.id,
+                t.nombre,
+                t.apellidos,
+                t.carnet_identidad,
+                t.sexo,
+                t.edad,
+                t.estatus,
+                t.cargos_id,
+                CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
                 FROM trabajadores t 
-                LEFT JOIN pases_acceso p ON t.id = p.trabajador_id 
-                LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
                 WHERE t.trabajador_eliminado = '0'
-                ORDER BY t.id";
-        //print($sql);
-        //die();
+                ORDER BY t.apellidos, t.nombre";
+                
+        error_log("Consulta sin JOIN: " . $sql);
         $data = $this->db->fetchAll($sql);
+        error_log("Registros sin JOIN: " . count($data));
+        
+        // Si funciona sin JOIN, probamos con JOIN
+        if (!empty($data)) {
+            $sqlWithJoin = "SELECT 
+                    t.id,
+                    t.nombre,
+                    t.apellidos,
+                    t.carnet_identidad,
+                    t.sexo,
+                    t.edad,
+                    t.estatus,
+                    t.cargos_id,
+                    COALESCE(c.nombre, 'Sin cargo') as cargo_nombre,
+                    CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
+                    FROM trabajadores t 
+                    LEFT JOIN cargos c ON t.cargos_id = c.id
+                    WHERE t.trabajador_eliminado = '0'
+                    ORDER BY t.apellidos, t.nombre";
+                    
+            error_log("Consulta con JOIN: " . $sqlWithJoin);
+            $dataWithJoin = $this->db->fetchAll($sqlWithJoin);
+            error_log("Registros con JOIN: " . count($dataWithJoin));
+            
+            // Si el JOIN funciona, usar esos datos
+            if (!empty($dataWithJoin)) {
+                $data = $dataWithJoin;
+            }
+        }
+        
         return $data;
     }
 

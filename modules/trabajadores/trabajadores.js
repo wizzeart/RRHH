@@ -310,11 +310,6 @@ $(document).ready(function () {
                 formDataObj.append('foto', $('#f-foto')[0].files[0]);
             }
             
-            // Agregar foto si se ha seleccionado
-            if ($('#f-foto')[0].files[0]) {
-                formDataObj.append('foto', $('#f-foto')[0].files[0]);
-            }
-            
             // Agregar parámetros de control
             formDataObj.append('module', 'trabajadores');
             formDataObj.append('method', 'save');
