@@ -279,10 +279,10 @@ class Prenomina {
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS a_cobrar,
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
-                    NULL AS ausencias,
-                    NULL AS vacaciones,
-                    NULL AS pago_vac,
-                    (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS salario_neto,
+                    (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,
+                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,
+                    ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,
+                    ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) AS seg_social,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2) AS ing_pers,
                     ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) - (((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05) + ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375)), 2) AS salario_pagar
@@ -304,7 +304,38 @@ class Prenomina {
         $sheet = $obj->setActiveSheetIndex(0);
         $sheet->setTitle('Prenomina');
 
-        // Encabezados
+        // Obtener nombre del mes
+        $meses = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+        $nombreMes = isset($meses[$month]) ? $meses[$month] : 'Mes ' . $month;
+
+        // Obtener nombre de usuario (si está disponible en sesión)
+        $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Sistema';
+
+        // Obtener nombre del departamento (si hay filtro por tab)
+        $departamento = isset($param['tab']) && trim($param['tab']) !== '' ? $param['tab'] : 'Todos los Departamentos';
+
+        // Encabezado principal
+        $sheet->setCellValue('A1', 'Prenómina Correspondiente al Mes de ' . $nombreMes . ' de ' . $year);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->mergeCells('A1:O1');
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A2', 'Elaborado Por: ' . $nombreUsuario);
+        $sheet->getStyle('A2')->getFont()->setBold(true);
+        $sheet->mergeCells('A2:G2');
+
+        $sheet->setCellValue('H2', 'Área: ' . $departamento);
+        $sheet->getStyle('H2')->getFont()->setBold(true);
+        $sheet->mergeCells('H2:O2');
+
+        // Línea en blanco
+        $sheet->setCellValue('A3', '');
+
+        // Encabezados de columnas
         $headers = [
             'A' => 'No. Exp',
             'B' => 'Nombre y Apellido',
@@ -323,12 +354,12 @@ class Prenomina {
             'O' => 'Salario a pagar',
         ];
         foreach ($headers as $col => $title) {
-            $sheet->setCellValue($col . '1', $title);
-            $sheet->getStyle($col . '1')->getFont()->setBold(true);
+            $sheet->setCellValue($col . '4', $title);
+            $sheet->getStyle($col . '4')->getFont()->setBold(true);
         }
 
         // Datos
-        $rowNum = 2;
+        $rowNum = 5;
         foreach ($data as $r) {
             $sheet->setCellValueExplicit('A' . $rowNum, $r['expediente'], PHPExcel_Cell_DataType::TYPE_NUMERIC);
             $sheet->setCellValue('B' . $rowNum, $r['nombre']);
@@ -349,8 +380,8 @@ class Prenomina {
         }
 
         // Formatos numéricos
-        $sheet->getStyle('D2:D' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
-        $sheet->getStyle('E2:O' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('D5:D' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('E5:O' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
         foreach (array_keys($headers) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
