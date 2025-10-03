@@ -203,35 +203,6 @@ class Trabajador {
             $param['uuid'] = $this->generarUuidV4();
         }
 
-        // Procesar foto si se subió
-        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = 'uploads/trabajadores/';
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            
-            // Obtener la extensión del archivo original
-            $file_extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-            
-            // Usar el UUID generado como nombre de archivo
-            if (isset($param['uuid'])) {
-                $foto_name = $param['uuid'] . '.' . $file_extension;
-                $foto_path = $upload_dir . $foto_name;
-                
-                // Mover el archivo temporal a la ubicación final
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                    $param['foto'] = $foto_path;
-                }
-            } else {
-                // Si por alguna razón no hay UUID, mantener el comportamiento anterior
-                $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
-                $foto_path = $upload_dir . $foto_name;
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                    $param['foto'] = $foto_path;
-                }
-            }
-        }
-
             // Verificar si el carnet de identidad ya existe
             if ($data['action'] == 'insert' && isset($param['carnet_identidad'])) {
                 $sql = "SELECT id FROM trabajadores WHERE carnet_identidad = :ci AND trabajador_eliminado = '0'";
