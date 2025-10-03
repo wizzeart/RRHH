@@ -124,6 +124,7 @@
     </ul>
 </li>
 
+<li class="list-divider"></li>
 <li>
     <a href="?module=list-asistencias">
         <i class="fa fa-calendar"></i>
