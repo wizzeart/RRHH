@@ -120,6 +120,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Contrato($app);
         $mdl->api($_REQUEST);
         break;
+    case 'asistencias':
+        include_once(BASE_CLASS . '/mdl.Asistencias.php');
+        $mdl = new Asistencia($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'login':
         $data = array(
             'status' => 0,

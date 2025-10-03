@@ -19,6 +19,11 @@ if (in_array($app->rol, array('1', '3', '9', '12', '16'))) {
 if (isset($_REQUEST['module'])) {
     switch ($_REQUEST['module']) {
 
+        case 'list-asistencias':
+            include_once(BASE_CLASS . '/mdl.Asistencias.php');
+            $mdl = new Asistencia($app);
+            $mdl->controlador($_REQUEST);
+            break;
         case 'list-partes-trabajo':
 
         case 'config':
@@ -38,7 +43,6 @@ if (isset($_REQUEST['module'])) {
         case 'list-trabajadores':
         case 'trabajadores':
         case 'ficha-trabajador':
-
         case 'delete-trabajadores':
         case 'bajas-trabajadores':
             include_once(BASE_CLASS . '/mdl.Trabajadores.php');

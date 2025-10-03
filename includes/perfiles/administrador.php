@@ -124,6 +124,15 @@
     </ul>
 </li>
 
+<li>
+    <a href="?module=list-asistencias">
+        <i class="fa fa-calendar"></i>
+        <span class="menu-title">
+            <strong>Asistencias</strong>
+        </span>
+    </a>
+</li>
+
 <!--NEW MENU PROGRAMAS CAPACITACION-->
 <li class="list-divider"></li>
 <li>
