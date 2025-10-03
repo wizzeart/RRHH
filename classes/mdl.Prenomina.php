@@ -106,7 +106,7 @@ class Prenomina {
                     (192.00 * COALESCE(c.salario, 0)) AS a_cobrar,
                     NULL AS bonif,
                     (192.00 * COALESCE(c.salario, 0)) AS sal_dev,
-                    NULL AS ausencias,
+                    COALESCE(ausencias_count.total_ausencias, 0) AS ausencias,
                     NULL AS vacaciones,
                     NULL AS pago_vac,
                     (192.00 * COALESCE(c.salario, 0)) AS salario_neto,
@@ -117,6 +117,14 @@ class Prenomina {
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
+                LEFT JOIN (
+                    SELECT 
+                        trabajador_id,
+                        COUNT(*) as total_ausencias
+                    FROM registro_asistencia 
+                    WHERE ausencia = '1'
+                    GROUP BY trabajador_id
+                ) ausencias_count ON t.id = ausencias_count.trabajador_id
                 " . $cond .
                 " ORDER BY t.id ASC";
 
@@ -169,6 +177,11 @@ class Prenomina {
                 $ing_pers = round($a_cobrar * 0.0375, 2);
                 $salario_pagar = round($a_cobrar - ($seg_social + $ing_pers), 2);
 
+                // Obtener conteo de ausencias
+                $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
+                $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
+                $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
+
                 $upd = [
                     'horas' => $horas,
                     'a_cobrar' => $a_cobrar,
@@ -177,6 +190,7 @@ class Prenomina {
                     'seg_social' => $seg_social,
                     'ing_pers' => $ing_pers,
                     'salario_pagar' => $salario_pagar,
+                    'ausencias' => $ausencias,
                 ];
                 $where = [
                     'trabajador_id' => $trabajador_id,
@@ -197,6 +211,11 @@ class Prenomina {
                 $ing_pers = round($a_cobrar * 0.0375, 2);
                 $salario_pagar = round($a_cobrar - ($seg_social + $ing_pers), 2);
 
+                // Obtener conteo de ausencias
+                $sqlAusencias = "SELECT COUNT(*) as total_ausencias FROM registro_asistencia WHERE trabajador_id = :tid AND ausencia = '1'";
+                $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
+                $ausencias = $ausenciasRow ? $ausenciasRow['total_ausencias'] : 0;
+
                 $ins = [
                     'trabajador_id' => $trabajador_id,
                     'year' => $year,
@@ -206,7 +225,7 @@ class Prenomina {
                     'a_cobrar' => $a_cobrar,
                     'bonif' => null,
                     'sal_dev' => $a_cobrar,
-                    'ausencias' => null,
+                    'ausencias' => $ausencias,
                     'vacaciones' => null,
                     'pago_vac' => null,
                     'salario_neto' => $a_cobrar,
@@ -250,7 +269,7 @@ class Prenomina {
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS a_cobrar,
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
-                    NULL AS ausencias,
+                    COALESCE(ausencias_count.total_ausencias, 0) AS ausencias,
                     NULL AS vacaciones,
                     NULL AS pago_vac,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS salario_neto,
@@ -261,6 +280,14 @@ class Prenomina {
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
                 LEFT JOIN prenomina p ON p.trabajador_id = t.id AND p.year = :y AND p.month = :m
+                LEFT JOIN (
+                    SELECT 
+                        trabajador_id,
+                        COUNT(*) as total_ausencias
+                    FROM registro_asistencia 
+                    WHERE ausencia = '1'
+                    GROUP BY trabajador_id
+                ) ausencias_count ON t.id = ausencias_count.trabajador_id
                 " . $cond .
                 " ORDER BY t.id ASC";
 
