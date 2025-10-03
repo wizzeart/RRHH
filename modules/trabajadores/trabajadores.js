@@ -310,11 +310,6 @@ $(document).ready(function () {
                 formDataObj.append('foto', $('#f-foto')[0].files[0]);
             }
             
-            // Agregar foto si se ha seleccionado
-            if ($('#f-foto')[0].files[0]) {
-                formDataObj.append('foto', $('#f-foto')[0].files[0]);
-            }
-            
             // Agregar parámetros de control
             formDataObj.append('module', 'trabajadores');
             formDataObj.append('method', 'save');
@@ -345,22 +340,33 @@ $(document).ready(function () {
                         if (d.action == 'insert') {
                             action = 'update';
                             $('#f-id').val(d.id);
+                            // Mostrar mensaje de éxito y redirigir después de 1.5 segundos
+                            notify(
+                                'success',
+                                '¡Éxito!',
+                                'El trabajador ha sido registrado correctamente. Redirigiendo...',
+                                1500
+                            );
+                            setTimeout(function() {
+                                window.location.href = '?module=list-trabajadores';
+                            }, 1500);
+                        } else {
+                            // Para actualizaciones, solo mostrar el mensaje sin redirigir
+                            notify(
+                                'success',
+                                '¡Éxito!',
+                                'Los datos del trabajador han sido actualizados correctamente.',
+                                3000
+                            );
                         }
                         $('#f-pass').val('');
-                        notify(
-                            'success',
-                            '¡Éxito!',
-                            action === 'insert' ? 'El trabajador ha sido registrado correctamente.' : 'Los datos del trabajador han sido actualizados correctamente.',
-                            5000
-                        );
                     } else {
-                        notify('danger', 'Guardar datos', d.msg, 3000);
+                        notify('danger', 'Error al guardar', d.msg, 3000);
                     }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $('#img-loading').addClass('hidden');
                     $('#btn-save').attr('disabled', false);
-                    var response = XMLHttpRequest && XMLHttpRequest.responseText ? XMLHttpRequest.responseText : (errorThrown || textStatus || 'Error desconocido');
                     notify('danger', 'Error al guardar', response, 5000);
                 }
             });
