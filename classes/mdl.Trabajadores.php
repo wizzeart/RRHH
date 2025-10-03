@@ -178,7 +178,16 @@ class Trabajador {
         $result = $this->db->fetchRow($sql);
         return $result ? (int)$result['next_id'] : 1;
     }
-
+    private function generarUuidV4() {
+        $data = random_bytes(16);
+    
+        // Ajustar los bits según la especificación UUID v4
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+    
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+    
     private function _save($param) {
         $data = array(
             'status' => 1,
@@ -190,6 +199,8 @@ class Trabajador {
         // Obtener el próximo ID de usuario disponible para nuevos registros
         if ($data['action'] === 'insert') {
             $param['usuario_id'] = $this->getNextUsuarioId();
+            // Generar UUID para el nuevo trabajador
+            $param['uuid'] = $this->generarUuidV4();
         }
 
         // Procesar foto si se subió
@@ -199,10 +210,25 @@ class Trabajador {
                 mkdir($upload_dir, 0777, true);
             }
             
-            $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
-            $foto_path = $upload_dir . $foto_name;
-            if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                $param['foto'] = $foto_path;
+            // Obtener la extensión del archivo original
+            $file_extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+            
+            // Usar el UUID generado como nombre de archivo
+            if (isset($param['uuid'])) {
+                $foto_name = $param['uuid'] . '.' . $file_extension;
+                $foto_path = $upload_dir . $foto_name;
+                
+                // Mover el archivo temporal a la ubicación final
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
+                    $param['foto'] = $foto_path;
+                }
+            } else {
+                // Si por alguna razón no hay UUID, mantener el comportamiento anterior
+                $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
+                $foto_path = $upload_dir . $foto_name;
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
+                    $param['foto'] = $foto_path;
+                }
             }
         }
 
@@ -399,6 +425,42 @@ class Trabajador {
                     $lastId = $this->db->last_id();
                     
                     if ($lastId) {
+                        // Guardar información bancaria si se proporcionó
+                        if (!empty($param['tarjeta_salario']) || !empty($param['cuenta_estandar'])) {
+                            error_log('Guardando información bancaria para trabajador ID: ' . $lastId);
+                            error_log('Tarjeta de salario: ' . ($param['tarjeta_salario'] ?? 'vacío'));
+                            error_log('Cuenta estándar: ' . ($param['cuenta_estandar'] ?? 'vacío'));
+                            
+                            $bancoData = array(
+                                'trabajador_id' => $lastId,
+                                'numero_tarjeta_salario' => $param['tarjeta_salario'] ?? '',
+                                'numero_cuenta_estandar' => $param['cuenta_estandar'] ?? ''
+                            );
+                            
+                            try {
+                                // Verificar si ya existe un registro para este trabajador
+                                $sql = "SELECT id FROM bancos WHERE trabajador_id = :trabajador_id";
+                                error_log('Ejecutando consulta: ' . $sql . ' con trabajador_id: ' . $lastId);
+                                
+                                $existingBanco = $this->db->fetchRow($sql, ['trabajador_id' => $lastId]);
+                                
+                                if ($existingBanco) {
+                                    error_log('Actualizando registro existente en bancos con ID: ' . $existingBanco['id']);
+                                    $result = $this->db->update('bancos', $bancoData, ['id' => $existingBanco['id']]);
+                                    error_log('Resultado de actualización: ' . ($result ? 'éxito' : 'fallo'));
+                                } else {
+                                    error_log('Insertando nuevo registro en bancos');
+                                    $result = $this->db->insert('bancos', $bancoData);
+                                    error_log('Resultado de inserción: ' . ($result ? 'éxito' : 'fallo'));
+                                    if ($result) {
+                                        $bancoId = $this->db->last_id();
+                                        error_log('Nuevo ID de banco: ' . $bancoId);
+                                    }
+                                }
+                            } catch (Exception $e) {
+                                error_log('Error al guardar información bancaria: ' . $e->getMessage());
+                            }
+                        }
 
                         // Preparar respuesta exitosa
                         $data['msg_title'] = 'Operación exitosa';
@@ -474,21 +536,7 @@ class Trabajador {
                     }
                 }
 
-                // Verificar si el email ya existe en otro registro (update)
-                if (isset($param['email']) && trim($param['email']) !== '') {
-                    $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
-                    $val = array(
-                        'email' => $param['email'],
-                        'id' => $id
-                    );
-                    $existing = $this->db->fetchRow($sql, $val);
-                    if ($existing) {
-                        $data['status'] = 0;
-                        $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
-                        print(json_encode($data));
-                        return;
-                    }
-                }
+            
 
                 // Verificar si el nombre completo ya existe en otro registro (update)
                 if (isset($param['nombre']) && isset($param['apellidos'])) {
@@ -539,6 +587,53 @@ class Trabajador {
                 $result = $this->db->update('trabajadores', $update_filtered, $where);
 
                 if ($result) {
+                    // Guardar o actualizar información bancaria si se proporcionó
+                    if (isset($param['tarjeta_salario']) || isset($param['cuenta_estandar'])) {
+                        error_log('Actualizando información bancaria para trabajador ID: ' . $id);
+                        error_log('Tarjeta de salario: ' . ($param['tarjeta_salario'] ?? 'vacío'));
+                        error_log('Cuenta estándar: ' . ($param['cuenta_estandar'] ?? 'vacío'));
+                        
+                        $bancoData = array(
+                            'trabajador_id' => $id,
+                            'numero_tarjeta_salario' => $param['tarjeta_salario'] ?? '',
+                            'numero_cuenta_estandar' => $param['cuenta_estandar'] ?? ''
+                        );
+                        
+                        try {
+                            // Verificar si ya existe un registro para este trabajador
+                            $sql = "SELECT id FROM bancos WHERE trabajador_id = :trabajador_id";
+                            error_log('Ejecutando consulta: ' . $sql . ' con trabajador_id: ' . $id);
+                            
+                            error_log('Buscando registro existente en tabla bancos para trabajador_id: ' . $id);
+                            $existingBanco = $this->db->fetchRow($sql, ['trabajador_id' => $id]);
+                            
+                            if ($existingBanco) {
+                                error_log('Registro existente encontrado en bancos con ID: ' . $existingBanco['id']);
+                                error_log('Datos a actualizar: ' . print_r($bancoData, true));
+                                $result = $this->db->update('bancos', $bancoData, ['id' => $existingBanco['id']]);
+                                error_log('Resultado de actualización: ' . ($result ? 'éxito' : 'fallo'));
+                                if (!$result) {
+                                    $errorInfo = $this->db->errorInfo();
+                                    error_log('Error al actualizar banco: ' . print_r($errorInfo, true));
+                                }
+                            } else if (!empty($param['tarjeta_salario']) || !empty($param['cuenta_estandar'])) {
+                                error_log('No se encontró registro existente. Insertando nuevo registro en bancos');
+                                error_log('Datos a insertar: ' . print_r($bancoData, true));
+                                $result = $this->db->insert('bancos', $bancoData);
+                                error_log('Resultado de inserción: ' . ($result ? 'éxito' : 'fallo'));
+                                if ($result) {
+                                    $bancoId = $this->db->last_id();
+                                    error_log('Nuevo registro creado con ID: ' . $bancoId);
+                                } else {
+                                    $errorInfo = $this->db->errorInfo();
+                                    error_log('Error al insertar en banco: ' . print_r($errorInfo, true));
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log('Error al guardar información bancaria: ' . $e->getMessage());
+                        }
+                    }
+
                     // Preparar respuesta exitosa
                     $data['msg_title'] = 'Operación exitosa';
                     $data['msg'] = 'Registro actualizado correctamente';

@@ -217,19 +217,33 @@
                             <!-- <small class="help-block">Cargo asignado</small> -->
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-telefono">Tarjeta de Salario</label>
+                            <input type="text" id="f-tarjeta_salario" name="tarjeta_salario" class="form-control"
+                                placeholder="Numero de Tarjeta de Salario"
+                                value="<?php if (isset($data['tarjeta_salario']))
+                                    print ($data['tarjeta_salario']); ?>">
+                            <!-- <small class="help-block">Teléfono de contacto</small> -->
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-cuenta_estandar">Cuenta Estándar</label>
+                            <input type="number" id="f-cuenta_estandar" name="cuenta_estandar" class="form-control"
+                                placeholder="Numero de Cuenta Estándar"
+                                value="<?php if (isset($data['cuenta_estandar']))
+                                    print ($data['cuenta_estandar']); ?>">
+                            <!-- <small class="help-block">Teléfono de contacto</small> -->
+                        </div>
+                    </div>
                 </div>
+                <!-- Sección de foto -->
                 <div class="row">
-
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label class="control-label" for="f-foto">Adjuntar Foto</label>
+                            <label class="control-label" for="f-foto">Foto del Trabajador</label>
                             <input type="file" id="f-foto" name="foto" class="form-control" accept="image/*">
-                            <?php if (isset($data['foto']) && !empty($data['foto'])) { ?>
-                                <div class="mar-top">
-                                    <img src="<?php print ($data['foto']); ?>" alt="Foto del trabajador"
-                                        class="img-thumbnail" style="max-width: 150px; height: auto;">
-                                </div>
-                            <?php } ?>
                             <small class="help-block">Seleccione una foto del trabajador (opcional)</small>
                         </div>
                     </div>
