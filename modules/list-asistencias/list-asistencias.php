@@ -25,113 +25,115 @@
                       <input type="date" class="form-control" id="fecha-desde" value="<?php echo date('Y-m-01'); ?>">
                     </div>
                   </div>
-                  <!-- Fecha hasta -->
                   <div class="col-md-2">
                     <div class="form-group">
+                      <!-- Fecha hasta -->
                       <label>Fecha hasta</label>
                       <input type="date" class="form-control" id="fecha-hasta" value="<?php echo date('Y-m-d'); ?>">
                     </div>
                   </div>
-                  <!-- Trabajador -->
-                  <div class="col-md-3">
-                    <div class="form-group">
-                      <label>Trabajador</label>
-                      <select class="form-control select2" id="filtro-trabajador" style="width: 100%;">
-                        <option value="">Todos los trabajadores</option>
-                        <?php
-                        $trabajadores = $app->db->fetchAll("SELECT id, CONCAT(nombre, ' ', apellidos) as nombre_completo FROM trabajadores WHERE trabajador_eliminado = '0' ORDER BY nombre");
-                        foreach ($trabajadores as $t) {
-                          echo "<option value='" . $t['id'] . "'>" . htmlspecialchars($t['nombre_completo']) . "</option>";
-                        }
-                        ?>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Estado de asistencia -->
-                  <div class="col-md-2">
-                    <div class="form-group">
-                      <label>Estado</label>
-                      <select class="form-control" id="filtro-estado">
-                        <option value="">Todos</option>
-                        <option value="1">Presente</option>
-                        <option value="2">Ausente</option>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Tipo de ausencia -->
-                  <div class="col-md-2" id="filtro-tipo-ausencia-container">
-                    <div class="form-group">
-                      <label>Tipo de Ausencia</label>
-                      <select class="form-control" id="filtro-tipo-ausencia">
-                        <option value="">Todos los tipos</option>
-                        <option value="RRHH">RRHH</option>
-                        <option value="Justificada">Justificada</option>
-                        <option value="Enfermedad">Enfermedad</option>
-                        <option value="Vacaciones">Vacaciones</option>
-                        <option value="Licencia de Maternidad">Licencia de Maternidad</option>
-                      </select>
-                    </div>
-                  </div>
                 </div>
               </div>
-              <div class="col-sm-2">
-                <button id="btn-filtrar" class="btn btn-primary">
-                  <i class="fa fa-search"></i> Filtrar
-                </button>
+              <!-- Buscador de Trabajador -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label>Buscar Trabajador</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="buscar-trabajador" placeholder="Buscar trabajador..." autocomplete="off">
+                    <input type="hidden" id="filtrar-trabajador" value="">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" id="limpiar-busqueda">
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </span>
+                  </div>
+                  <div id="resultados-busqueda" class="suggestions-dropdown" style="display: none; position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px;"></div>
+                </div>
+              </div>
+              <!-- Estado de asistencia -->
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Estado</label>
+                  <select class="form-control" id="filtro-estado">
+                    <option value="">Todos</option>
+                    <option value="1">Presente</option>
+                    <option value="2">Ausente</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Tipo de ausencia -->
+              <div class="col-md-2" id="filtro-tipo-ausencia-container">
+                <div class="form-group">
+                  <label>Tipo de Ausencia</label>
+                  <select class="form-control" id="filtro-tipo-ausencia">
+                    <option value="">Todos los tipos</option>
+                    <option value="RRHH">RRHH</option>
+                    <option value="Justificada">Justificada</option>
+                    <option value="Enfermedad">Enfermedad</option>
+                    <option value="Vacaciones">Vacaciones</option>
+                    <option value="Licencia de Maternidad">Licencia de Maternidad</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
+          <div class="col-sm-2">
+            <button id="btn-filtrar" class="btn btn-primary">
+              <i class="fa fa-search"></i> Filtrar
+            </button>
+          </div>
         </div>
-        <table
-          id="table-panel"
-          data-toggle="table"
-          data-url="api-app.php?module=asistencias&method=list-filter"
-          data-search="true"
-          data-show-refresh="true"
-          data-show-toggle="false"
-          data-show-columns="true"
-          data-sort-name="fecha"
-          data-sort-order="desc"
-          data-page-list="[10, 25, 50, 100]"
-          data-page-size="25"
-          data-pagination="true"
-          data-show-pagination-switch="true"
-          data-show-export="true"
-          data-export-data-type="all"
-          data-export-types="['excel', 'pdf']">
-          <thead>
-            <tr class="bg-primary">
-              <th data-field="fecha" data-sortable="true" data-width="100">
-                <i class="fa fa-calendar"></i> Fecha
-              </th>
-              <th data-field="nombre_completo" data-sortable="true" data-formatter="formatoNombreCompleto">
-                <i class="fa fa-user"></i> Trabajador
-              </th>
-              <th data-field="cargo_nombre" data-sortable="true">
-                <i class="fa fa-briefcase"></i> Cargo
-              </th>
-              <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120">
-                <i class="fa fa-sign-in"></i> Entrada
-              </th>
-              <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
-                <i class="fa fa-sign-out"></i> Salida
-              </th>
-              <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
-                <i class="fa fa-times-circle"></i> Ausencia
-              </th>
-              <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
-                Tipo Ausencia
-              </th>
-              <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="100">
-                <i class="fa fa-cog"></i> Acciones
-              </th>
-            </tr>
-          </thead>
-        </table>
       </div>
     </div>
+    <table
+      id="table-panel"
+      data-toggle="table"
+      data-url="api-app.php?module=asistencias&method=list-filter"
+      data-search="true"
+      data-show-refresh="true"
+      data-show-toggle="false"
+      data-show-columns="true"
+      data-sort-name="fecha"
+      data-sort-order="desc"
+      data-page-list="[10, 25, 50, 100]"
+      data-page-size="25"
+      data-pagination="true"
+      data-show-pagination-switch="true"
+      data-show-export="true"
+      data-export-data-type="all"
+      data-export-types="['excel', 'pdf']">
+      <thead>
+        <tr class="bg-primary">
+          <th data-field="fecha" data-sortable="true" data-width="100">
+            <i class="fa fa-calendar"></i> Fecha
+          </th>
+          <th data-field="nombre_completo" data-sortable="true" data-formatter="formatoNombreCompleto">
+            <i class="fa fa-user"></i> Trabajador
+          </th>
+          <th data-field="cargo_nombre" data-sortable="true">
+            <i class="fa fa-briefcase"></i> Cargo
+          </th>
+          <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120">
+            <i class="fa fa-sign-in"></i> Entrada
+          </th>
+          <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
+            <i class="fa fa-sign-out"></i> Salida
+          </th>
+          <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
+            <i class="fa fa-times-circle"></i> Ausencia
+          </th>
+          <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
+            Tipo Ausencia
+          </th>
+          <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="100">
+            <i class="fa fa-cog"></i> Acciones
+          </th>
+        </tr>
+      </thead>
+    </table>
   </div>
 </div>
+
 
 <!-- Formulario de registro de asistencia -->
 <div class="modal fade" id="modalAsistencia" tabindex="-1" role="dialog" aria-labelledby="modalAsistenciaLabel">

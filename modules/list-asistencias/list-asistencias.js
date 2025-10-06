@@ -173,7 +173,7 @@ function buildFilterUrl() {
     var params = [];
     var fechaDesde = $('#fecha-desde').val();
     var fechaHasta = $('#fecha-hasta').val();
-    var trabajador = $('#filtro-trabajador').val();
+    var trabajador = $('#filtrar-trabajador').val();
     var estado = $('#filtro-estado').val();
     var tipoAusencia = $('#filtro-tipo-ausencia').val();
 
@@ -193,11 +193,135 @@ $('#btn-filtrar').click(function() {
     });
 });
 
+// Variable para almacenar el timeout de búsqueda
+var searchTimeout;
+
+// Función para buscar trabajadores
+function buscarTrabajadores(termino) {
+    if (termino.length < 2) {
+        $('#resultados-busqueda').hide().empty();
+        return;
+    }
+
+    // Cancelar búsqueda anterior si existe
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+
+    // Configurar un nuevo timeout para la búsqueda
+    searchTimeout = setTimeout(function() {
+        $.ajax({
+            url: 'api-app.php',
+            type: 'GET',
+            data: {
+                module: 'trabajadores',
+                method: 'list',
+                termino: termino
+            },
+            dataType: 'json',
+            success: function(response) {
+                const resultadosOrdenados = response
+                    .map(trabajador => {
+                        // Crear un string de búsqueda que incluya todos los campos relevantes
+                        const searchStr = (
+                            (trabajador.nombre || '') + ' ' +
+                            (trabajador.apellidos || '') + ' ' +
+                            (trabajador.carnet_identidad || '') + ' ' +
+                            (trabajador.cargo || '')
+                        ).toLowerCase();
+                        
+                        // Calcular el índice de la primera coincidencia
+                        const index = searchStr.indexOf(termino.toLowerCase());
+                        
+                        // Si no hay coincidencia, devolver un puntaje bajo
+                        if (index === -1) return { ...trabajador, _score: 0 };
+                        
+                        // Calcular puntaje basado en:
+                        // 1. Posición de la coincidencia (más cerca del inicio = mejor)
+                        // 2. Longitud del término (términos más largos = mejor coincidencia)
+                        const positionScore = 1 / (index + 1);
+                        const lengthScore = termino.length / searchStr.length;
+                        const score = positionScore * 0.7 + lengthScore * 0.3;
+                        
+                        return { ...trabajador, _score: score };
+                    })
+                    .filter(trabajador => trabajador._score > 0) // Filtrar resultados sin coincidencias
+                    .sort((a, b) => b._score - a._score) // Ordenar por puntaje descendente
+                    .map(({ _score, ...trabajador }) => trabajador); // Eliminar el campo _score del resultado final
+
+                mostrarResultadosBusqueda(resultadosOrdenados);
+            },
+            error: function() {
+                console.error('Error al buscar trabajadores');
+            }
+        });
+    }, 300); // Esperar 300ms después de la última tecla
+}
+
+// Mostrar resultados de búsqueda
+function mostrarResultadosBusqueda(resultados) {
+    var $resultados = $('#resultados-busqueda');
+    $resultados.empty();
+    
+    if (resultados.length === 0) {
+        $resultados.append('<div class="list-group-item">No se encontraron resultados</div>');
+    } else {
+        resultados.forEach(function(trabajador) {
+            $resultados.append(
+                '<div class="list-group-item list-group-item-action" data-id="' + trabajador.id + '">' +
+                '   <strong>' + trabajador.nombre + ' ' + trabajador.apellidos + '</strong><br>' +
+                '   <small class="text-muted">' + (trabajador.cargo || '') + ' - CI: ' + trabajador.carnet_identidad + '</small>' +
+                '</div>'
+            );
+        });
+    }
+    
+    $resultados.show();
+}
+
+// Eventos para el buscador de trabajadores
+$(document).on('input', '#buscar-trabajador', function() {
+    var termino = $(this).val().trim();
+    buscarTrabajadores(termino);
+});
+
+// Seleccionar un trabajador de los resultados
+$(document).on('click', '#resultados-busqueda .list-group-item', function() {
+    var id = $(this).data('id');
+    var nombre = $(this).find('strong').text();
+    
+    $('#filtrar-trabajador').val(id);
+    $('#buscar-trabajador').val(nombre);
+    $('#resultados-busqueda').hide();
+    
+    // Opcional: Aplicar filtro automáticamente al seleccionar
+    // $('#btn-filtrar').click();
+});
+
+// Limpiar búsqueda
+$('#limpiar-busqueda').click(function() {
+    $('#buscar-trabajador').val('');
+    $('#filtrar-trabajador').val('');
+    $('#resultados-busqueda').hide();
+    // Opcional: Aplicar filtro automáticamente al limpiar
+    // $('#btn-filtrar').click();
+});
+
+// Ocultar resultados al hacer clic fuera
+$(document).on('click', function(e) {
+    if (!$(e.target).closest('#buscar-trabajador, #resultados-busqueda').length) {
+        $('#resultados-busqueda').hide();
+    }
+});
+
 // Inicializar la tabla con los filtros por defecto
 $(document).ready(function() {
     $('#table-panel').bootstrapTable('refresh', {
         url: buildFilterUrl()
     });
+    
+    // Asegurarse de que el campo de búsqueda esté vacío al cargar la página
+    $('#buscar-trabajador').val('');
 });
 
 
