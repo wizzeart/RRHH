@@ -1,65 +1,31 @@
 $(document).ready(function() {
     var calendarEl = document.getElementById('calendar');
-    var selectedDates = []; // Almacenará las fechas seleccionadas
+    var selectedPeriods = []; // Almacenará los períodos de vacaciones seleccionados
     var vacaciones_planificadas = [];
     var calendar;
 
     // Inicializar el calendario
     function initCalendar() {
-        
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            locale: 'es',
+            locale: 'es-CU',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            selectable: true,
+            selectable: false, // Desactivar selección directa en el calendario
             
             eventClick: function(info) {
-                // Eliminar fecha al hacer clic o tocar un evento
-                var dateStr = info.event.start.toISOString().split('T')[0];
-                selectedDates = selectedDates.filter(d => d !== dateStr);
-                updateCalendarEvents();
+                // Eliminar período al hacer clic en un evento
+                if (confirm('¿Desea eliminar este período de vacaciones?')) {
+                    const eventId = info.event.id;
+                    selectedPeriods = selectedPeriods.filter(p => p.id !== eventId);
+                    updateCalendarEvents();
+                }
                 return false; // Previene el comportamiento por defecto
             },
-            // Manejar clic en días del calendario
-            dateClick: function(info) {
-                // Verificar si la fecha es anterior a hoy
-                const clickedDate = new Date(info.dateStr);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                if (clickedDate < today) {
-                    notify('warning', 'Fecha no válida', 'No se pueden seleccionar fechas pasadas', 3000);
-                    return;
-                }
-                
-                // Verificar si ya hay un evento en esta fecha
-                const eventosEnFecha = calendar.getEvents().filter(event => {
-                    const eventDate = event.start ? event.start.toISOString().split('T')[0] : null;
-                    return eventDate === info.dateStr;
-                });
-
-                // Si hay eventos y alguno es de vacaciones planificadas, no hacer nada
-                if (eventosEnFecha.some(event => event.title === 'Planificadas')) {
-                    return;
-                }
-
-                var dateStr = info.dateStr;
-                var index = selectedDates.indexOf(dateStr);
-                
-                if (index === -1) {
-                    // Si la fecha no está seleccionada, la agregamos
-                    selectedDates.push(dateStr);
-                } else {
-                    // Si la fecha ya está seleccionada, la quitamos
-                    selectedDates.splice(index, 1);
-                }
-                
-                updateCalendarEvents();
-            },
+            
             // Mejorar la interacción táctil
             eventDidMount: function(info) {
                 info.el.style.cursor = 'pointer';
@@ -68,54 +34,147 @@ $(document).ready(function() {
             }
         });
         
-        // Inicializar el calendario
+        // Inicializar el calendatorio
         calendar.render();
+        
+        // Configurar el formulario para agregar vacaciones
+        $('#vacation-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Crear fechas sin considerar la hora local
+            const fechaInicioStr = $('#fecha_inicio').val();
+            const fechaFinStr = $('#fecha_fin').val();
+            
+            if (!fechaInicioStr || !fechaFinStr) {
+                notify('warning', 'Error', 'Por favor complete ambas fechas', 3000);
+                return;
+            }
+            
+            // Crear fechas en formato YYYY-MM-DD sin ajuste de zona horaria
+            const fechaInicio = new Date(fechaInicioStr + 'T00:00:00');
+            const fechaFin = new Date(fechaFinStr + 'T00:00:00');
+            
+            // Fecha actual sin considerar la hora
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            // Validaciones
+            if (!fechaInicio || !fechaFin) {
+                notify('warning', 'Error', 'Por favor complete ambas fechas', 3000);
+                return;
+            }
+            
+            if (fechaInicio < hoy) {
+                notify('warning', 'Fecha no válida', 'La fecha de inicio no puede ser anterior a hoy', 3000);
+                return;
+            }
+            
+            if (fechaFin < fechaInicio) {
+                notify('warning', 'Error', 'La fecha de fin no puede ser anterior a la fecha de inicio', 3000);
+                return;
+            }
+            
+            // Crear un ID único para este período
+            const periodoId = 'periodo-' + Date.now();
+            
+            // Agregar el período a la lista
+            selectedPeriods.push({
+                id: periodoId,
+                start: fechaInicio,
+                end: fechaFin,
+                title: 'Vacaciones Solicitadas',
+                color: '#5cb85c'
+            });
+            
+            // Actualizar el calendario
+            updateCalendarEvents();
+            
+            // Limpiar el formulario
+            $('#fecha_inicio').val('');
+            $('#fecha_fin').val('');
+        });
+        
         return calendar;
     }
-
+    
     // Actualizar eventos del calendario
     function updateCalendarEvents() {
-        // Eliminar solo los eventos de vacaciones seleccionadas (no los planificados)
+        // Eliminar todos los eventos de vacaciones seleccionadas (no los planificados)
         calendar.getEvents().forEach(event => {
-            // Solo eliminar si es un evento de vacaciones seleccionadas (no planificadas)
-            if (event.title === 'Vacaciones') {
+            if (event.extendedProps && (event.extendedProps.tipo === 'seleccionado')) {
                 event.remove();
             }
         });
         
-        // Agregar nuevos eventos de vacaciones seleccionadas
-        selectedDates.forEach(dateStr => {
+        // Agregar los períodos de vacaciones seleccionados
+        selectedPeriods.forEach(periodo => {
             calendar.addEvent({
-                title: 'Vacaciones',
-                start: dateStr,
+                id: periodo.id,
+                title: periodo.title,
+                start: periodo.start,
+                end: new Date(periodo.end.getTime() + 24 * 60 * 60 * 1000), // Añadir un día para incluir el último día
                 allDay: true,
-                backgroundColor: '#5cb85c',
-                borderColor: '#4cae4c'
+                backgroundColor: periodo.color || '#5cb85c',
+                borderColor: '#4cae4c',
+                extendedProps: {
+                    tipo: 'seleccionado'
+                }
             });
         });
+        
+        // Actualizar el resumen de días seleccionados
+        updateSelectedDaysSummary();
+    }
+
+    // Función para actualizar el resumen de días seleccionados
+    function updateSelectedDaysSummary() {
+        const allDates = [];
+        
+        // Obtener todos los días de los períodos seleccionados
+        selectedPeriods.forEach(periodo => {
+            const currentDate = new Date(periodo.start);
+            const endDate = new Date(periodo.end);
+            
+            while (currentDate <= endDate) {
+                // No incluir fines de semana
+                if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+                    allDates.push(new Date(currentDate));
+                }
+                currentDate.setDate(currentDate.getDate()+1);
+            }
+        });
+        
+        // Ordenar fechas
+        allDates.sort((a, b) => a - b);
+        
+        // Formatear fechas para mostrar
+        const formattedDates = allDates.map(date => {
+            return '<li>' + date.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }) + '</li>';
+        }).join('');
+        
+        // Mostrar resumen
+        const summaryElement = $('#dias-seleccionados');
+        if (formattedDates) {
+            summaryElement.html('<p>Días laborables seleccionados:</p><ul class="list-unstyled">' + formattedDates + '</ul>');
+        } else {
+            summaryElement.html('<p>No hay días laborables seleccionados en el rango especificado.</p>');
+        }
     }
 
     // Mostrar resumen de fechas seleccionadas
     function showConfirmationModal() {
-        if (selectedDates.length === 0) {
-            alert('Por favor seleccione al menos un día de vacaciones.');
+        if (selectedPeriods.length === 0) {
+            notify('warning', 'Atención', 'Por favor agregue al menos un período de vacaciones.', 3000);
             return;
         }
-
-        var datesList = selectedDates
-            .sort()
-            .map(date => {
-                var d = new Date(date);
-                return '<li>' + d.toLocaleDateString('es-ES', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }) + '</li>';
-            })
-            .join('');
-
-        $('#dias-seleccionados').html('<ul class="list-unstyled">' + datesList + '</ul>');
+        
+        // Actualizar el resumen antes de mostrar el modal
+        updateSelectedDaysSummary();
         $('#modalConfirmacion').modal('show');
     }
 
@@ -124,20 +183,66 @@ $(document).ready(function() {
 
     // Evento para confirmar la solicitud
     $('#confirmar-solicitud').click(function() {
-        if (selectedDates.length === 0) {
-            alert('No hay días seleccionados para guardar.');
+        if (selectedPeriods.length === 0) {
+            notify('warning', 'Atención', 'No hay períodos de vacaciones para guardar.', 3000);
             return;
         }
 
         // Mostrar indicador de carga
-        var $btn = $(this).button('loading');
+        const $btn = $(this).button('loading');
 
-        var formData = new FormData();
+        // Preparar las fechas para enviar al servidor
+        const allDates = [];
+        
+        // Obtener todos los días laborables de los períodos seleccionados
+        selectedPeriods.forEach(periodo => {
+            // Crear fechas sin hora para evitar problemas de zona horaria
+            const startDate = new Date(periodo.start);
+            const endDate = new Date(periodo.end);
+            
+            // Asegurarse de que estamos trabajando con la fecha correcta
+            startDate.setHours(12, 0, 0, 0); // Establecer al mediodía para evitar cambios de fecha
+            endDate.setHours(12, 0, 0, 0);
+            
+            const currentDate = new Date(startDate);
+            
+            while (currentDate <= endDate) {
+                // No incluir fines de semana
+                if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+                    // Formatear como YYYY-MM-DD
+                    const year = currentDate.getFullYear();
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+                    allDates.push(`${year}-${month}-${day}`);
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        });
+        
+        if (allDates.length === 0) {
+            notify('warning', 'Atención', 'No hay días laborables en los períodos seleccionados.', 3000);
+            $btn.button('reset');
+            return;
+        }
+
+        const formData = new FormData();
+        
         formData.append('module', 'planificacion-vacaciones');
         formData.append('method', 'save');
         formData.append('trabajador_id', trabajadorId);
-        formData.append('fechas', selectedDates);
-
+        formData.append('fechas', allDates);
+        // Formatear fechas como YYYY-MM-DD
+        const formatDate = (date) => {
+            const d = new Date(date);
+            d.setHours(12, 0, 0, 0); // Establecer al mediodía para evitar cambios de fecha
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        
+        formData.append('fecha_inicio', formatDate(selectedPeriods[0].start));
+        formData.append('fecha_fin', formatDate(selectedPeriods[selectedPeriods.length - 1].end));
         // Enviar solicitud al servidor
         $.ajax({
             url: 'api-app.php',
@@ -148,19 +253,21 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.status === 1) {
-                    alert('Solicitud de vacaciones guardada correctamente.');
+                    notify('success', 'Éxito', 'Solicitud de vacaciones guardada correctamente.', 5000);
                     $('#modalConfirmacion').modal('hide');
-                    selectedDates = [];
+                    selectedPeriods = [];
                     updateCalendarEvents();
+                    
+                    // Recargar las vacaciones planificadas
+                    cargarVacacionesPlanificadas();
                 } else {
-                    alert('Error al guardar la solicitud: ' + (response.message || 'Error desconocido'));
+                    const errorMsg = response.message || 'Error desconocido al guardar la solicitud';
+                    notify('danger', 'Error', errorMsg, 5000);
                 }
             },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                //$('#img-loading').addClass('hidden');
-               // $('#btn-save').attr('disabled', false);
-                var response = XMLHttpRequest && XMLHttpRequest.responseText ? XMLHttpRequest.responseText : (errorThrown || textStatus || 'Error desconocido');
-                notify('danger', 'Error al guardar', response, 5000);
+            error: function(xhr, status, error) {
+                const response = xhr.responseText || error || 'Error en la conexión';
+                notify('danger', 'Error', response, 5000);
             },
             complete: function() {
                 $btn.button('reset');
@@ -197,7 +304,10 @@ $(document).ready(function() {
                                 borderColor: '#46b8da',
                                 editable: false,
                                 startEditable: false,
-                                durationEditable: false
+                                durationEditable: false,
+                                extendedProps: {
+                                    tipo: 'planificadas'
+                                }
                             });
                         });
                     });

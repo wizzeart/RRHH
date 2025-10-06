@@ -85,24 +85,47 @@ $page['subtitle'] = 'Seleccione los días de vacaciones';
 
 </head>
 
-<div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Calendario de Vacaciones</h3>
             </div>
             <div class="panel-body">
-                <div class="alert alert-info">
-                    <i class="fa fa-info-circle"></i> Seleccione los días de vacaciones en el calendario.
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> Seleccione el rango de fechas para sus vacaciones.
+                        </div>
+                        <form id="vacation-form" class="form-inline mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group ml-2">
+                                        <label for="fecha_inicio" class="mr-2">Fecha Inicio:</label>
+                                        <input type="date" class="form-control" id="fecha_inicio" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mr-2 ml-2">
+                                        <label for="fecha_fin" class="mr-2">Fecha Fin:</label>
+                                        <input type="date" class="form-control" id="fecha_fin" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary ml-2">
+                                        <i class="fa fa-plus"></i> Agregar Vacaciones
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 
-                <div id="calendar"></div>
+                <div id="calendar" style="margin-top: 20px;"></div>
                 
                 <div class="text-right" style="margin-top: 20px;">
                     <button id="btn-guardar" class="btn btn-success">
                         <i class="fa fa-save"></i> Guardar Vacaciones
                     </button>
-                </div>
             </div>
         </div>
     </div>

@@ -58,10 +58,10 @@ class Vacaciones {
 
         try {
             if(isset($param['fecha_aprobacion'])) {
-                $result = $this->db->insert('plan_vacaciones', array('trabajador_id' => $param['trabajador_id'], 'fecha_aprobacion' => $param['fecha_aprobacion'], 'dias' => json_encode($param['fechas'])));
+                $result = $this->db->insert('plan_vacaciones', array('trabajador_id' => $param['trabajador_id'], 'fecha_aprobacion' => $param['fecha_aprobacion'], 'dias' => json_encode($param['fechas']), 'fecha_inicio' => $param['fecha_inicio'], 'fecha_fin' => $param['fecha_fin']));
             }
             else {
-                $result = $this->db->insert('plan_vacaciones', array('trabajador_id' => $param['trabajador_id'], 'dias' => json_encode($param['fechas'])));
+                $result = $this->db->insert('plan_vacaciones', array('trabajador_id' => $param['trabajador_id'], 'dias' => json_encode($param['fechas']), 'fecha_inicio' => $param['fecha_inicio'], 'fecha_fin' => $param['fecha_fin']));
             }
             if ($result) {
                 $data['msg'] = 'Vacaciones guardadas correctamente.';
