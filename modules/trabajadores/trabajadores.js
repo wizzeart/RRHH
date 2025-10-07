@@ -288,7 +288,11 @@ $(document).ready(function () {
                 'carnet_identidad': $('#f-ci').val(),
                 'edad': $('#f-edad').val(),
                 'direccion': $('#f-direccion').val(),
+                'provincia_id': $('#f-provincia').val(),
+                'municipio_id': $('#f-municipio').val(),
                 'telefono': $('#f-telefono').val(),
+                'tarjeta_salario': $('#f-tarjeta_salario').val(),
+                'cuenta_estandar': $('#f-cuenta_estandar').val(),
                 'email': $('#f-email').val(),
                 'nivel_educacional': $('#f-nivel').val(),
                 'departamento_id': $('#f-departamento').val(),
@@ -487,3 +491,88 @@ function formatoNivel(value, row) {
     //return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
     return s;
 }
+
+// Filtrado dinámico de municipios basado en provincia seleccionada
+$(document).ready(function() {
+    // Función para filtrar municipios
+    function filterMunicipios(provinciaId) {
+        var $municipioSelect = $('#f-municipio');
+        var $municipioOptions = $municipioSelect.find('option');
+        
+        // Mostrar solo la opción por defecto
+        $municipioOptions.hide();
+        $municipioSelect.find('option[value=""]').show();
+        
+        if (provinciaId && provinciaId !== '') {
+            // Mostrar municipios de la provincia seleccionada
+            $municipioOptions.each(function() {
+                var $option = $(this);
+                if ($option.data('provincia') == provinciaId || $option.val() === '') {
+                    $option.show();
+                }
+            });
+        } else {
+            // Si no hay provincia seleccionada, mostrar todos los municipios
+            $municipioOptions.show();
+        }
+        
+        // Resetear selección de municipio
+        $municipioSelect.val('');
+    }
+    
+    // Función para cargar municipios vía AJAX (alternativa más eficiente)
+    function loadMunicipiosAjax(provinciaId) {
+        var $municipioSelect = $('#f-municipio');
+        
+        if (!provinciaId || provinciaId === '') {
+            // Limpiar select de municipios
+            $municipioSelect.html('<option value="">Seleccionar Municipio</option>');
+            return;
+        }
+        
+        // Mostrar loading
+        $municipioSelect.html('<option value="">Cargando...</option>');
+        
+        // Hacer petición AJAX
+        $.ajax({
+            url: 'api-app.php',
+            type: 'GET',
+            data: {
+                module: 'trabajadores',
+                method: 'get-municipios',
+                provincia_id: provinciaId
+            },
+            dataType: 'json',
+            success: function(data) {
+                var options = '<option value="">Seleccionar Municipio</option>';
+                
+                if (data && Array.isArray(data)) {
+                    data.forEach(function(municipio) {
+                        options += '<option value="' + municipio.id + '">' + municipio.nombre + '</option>';
+                    });
+                }
+                
+                $municipioSelect.html(options);
+            },
+            error: function() {
+                $municipioSelect.html('<option value="">Error cargando municipios</option>');
+                console.error('Error cargando municipios para provincia:', provinciaId);
+            }
+        });
+    }
+    
+    // Event listener para cambio de provincia
+    $('#f-provincia').on('change', function() {
+        var provinciaId = $(this).val();
+        
+        // Usar filtrado por atributos data (más rápido) o AJAX (más eficiente en memoria)
+        // Puedes cambiar entre filterMunicipios() y loadMunicipiosAjax()
+        loadMunicipiosAjax(provinciaId);
+    });
+    
+    // Inicializar filtrado al cargar la página si hay una provincia preseleccionada
+    var initialProvincia = $('#f-provincia').val();
+    if (initialProvincia && initialProvincia !== '') {
+        loadMunicipiosAjax(initialProvincia);
+    }
+});

@@ -58,6 +58,7 @@
                         <th data-field="bonif" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">Bonif</th>
                         <th data-field="sal_dev" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="120">Sal. Dev</th>
                         <th data-field="ausencias" data-align="right" data-sortable="true" data-formatter="number2Formatter" data-width="110">Ausencias</th>
+                        <th data-field="ausenciasCosto" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="110">Descuento Ausencias</th>
                         <th data-field="vacaciones" data-align="right" data-sortable="true" data-formatter="number2Formatter" data-width="120">Vacaciones</th>
                         <th data-field="pago_vac" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="140">pago x vacaciones</th>
                         <th data-field="salario_neto" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="130">Salario Neto</th>

@@ -4,7 +4,11 @@
     </div>
 
     <div class="panel-body">
-       
+    <div class="panel">
+                    <div class="form-control">
+                        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo contrato" title="Añadir Nuevo contrato">Añadir Nuevo Contrato</button>
+                    </div>
+                </div>
         
         <table 
             id="table-panel"
