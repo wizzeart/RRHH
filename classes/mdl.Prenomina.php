@@ -107,12 +107,13 @@ class Prenomina {
                     NULL AS bonif,                                                                                                                                                                      -- Bonificaciones (no calculadas automáticamente)
                     (192.00 * COALESCE(c.salario, 0)) AS sal_dev,                                                                                                                                      -- Salario devengado (igual al salario base)
                     (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,                                                                  -- Conteo de ausencias desde registro_asistencia
+                    ROUND(((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') * 8 * COALESCE(c.salario, 0)), 2) AS ausenciasCosto,                -- Costo por ausencias: ausencias × 8 × tarifa
                     (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,                               -- Suma de días de vacaciones disfrutadas
                     ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,  -- Pago por vacaciones: (tarifa × 8) × días_vacaciones
                     ((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,  -- Salario neto: salario_base + pago_vacaciones
                     ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) AS seg_social,                                                                                                               -- Descuento seguridad social: 5% del salario base
                     ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) AS ing_pers,                                                                                                              -- Descuento ingresos personales: 3.75% del salario base
-                    ROUND(((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) + ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2)), 2) AS salario_pagar,                -- Salario a pagar: salario_neto - (seg_social + ing_pers)
+                    ROUND(((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) + ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) + ROUND(((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') * 8 * COALESCE(c.salario, 0)), 2)), 2) AS salario_pagar,  -- Salario a pagar: salario_neto - (seg_social + ing_pers + ausenciasCosto)
                     COALESCE(d.nombre, '') AS departamento                                                                                                                                             -- Nombre del departamento
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
@@ -127,10 +128,43 @@ class Prenomina {
     }
 
     private function _save_horas() {
-        header('Content-Type: application/json; charset=utf-8');
-        $raw = file_get_contents('php://input');
-        $payload = json_decode($raw, true);
-        $resp = ['status' => 1, 'msg' => 'Guardado', 'errors' => [], 'affected' => 0];
+        try {
+            // Limpiar cualquier output previo
+            if (ob_get_level()) {
+                ob_clean();
+            }
+            
+            header('Content-Type: application/json; charset=utf-8');
+            $raw = file_get_contents('php://input');
+            $payload = json_decode($raw, true);
+            $resp = ['status' => 1, 'msg' => 'Guardado', 'errors' => [], 'affected' => 0];
+            
+            // Debug: verificar que la tabla prenomina existe
+            try {
+                $testQuery = "SHOW TABLES LIKE 'prenomina'";
+                $tableExists = $this->db->fetchAll($testQuery);
+                if (empty($tableExists)) {
+                    echo json_encode(['status' => 0, 'msg' => 'Error: La tabla prenomina no existe']);
+                    exit;
+                }
+                
+                // Verificar que el campo ausencias_costo existe
+                $columnQuery = "SHOW COLUMNS FROM prenomina LIKE 'ausencias_costo'";
+                $columnExists = $this->db->fetchAll($columnQuery);
+                if (empty($columnExists)) {
+                    echo json_encode(['status' => 0, 'msg' => 'Error: El campo ausencias_costo no existe en la tabla prenomina']);
+                    exit;
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => 0, 'msg' => 'Error verificando tabla: ' . $e->getMessage()]);
+                exit;
+            }
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 0, 'msg' => 'Error inicial: ' . $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            exit;
+        }
     
         if (!is_array($payload)) {
             $resp['status'] = 0;
@@ -139,119 +173,130 @@ class Prenomina {
             exit;
         }
     
-        $year = isset($payload['year']) ? intval($payload['year']) : intval(date('Y'));
-        $month = isset($payload['month']) ? intval($payload['month']) : intval(date('n'));
-        $rows = isset($payload['rows']) && is_array($payload['rows']) ? $payload['rows'] : [];
-        if (empty($rows)) {
-            $resp['status'] = 0;
-            $resp['msg'] = 'Sin filas a guardar';
-            echo json_encode($resp);
-            exit;
-        }
-    
-        foreach ($rows as $r) {
-            $trabajador_id = isset($r['trabajador_id']) ? intval($r['trabajador_id']) : 0;
-            $horas = isset($r['horas']) ? floatval($r['horas']) : 0.0;
-    
-            if ($trabajador_id <= 0) {
-                $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'trabajador_id inválido'];
-                continue;
+        try {
+            $year = isset($payload['year']) ? intval($payload['year']) : intval(date('Y'));
+            $month = isset($payload['month']) ? intval($payload['month']) : intval(date('n'));
+            $rows = isset($payload['rows']) && is_array($payload['rows']) ? $payload['rows'] : [];
+            if (empty($rows)) {
+                $resp['status'] = 0;
+                $resp['msg'] = 'Sin filas a guardar';
+                echo json_encode($resp);
+                exit;
             }
-    
-            // Verificar si ya existe registro del periodo
-            $sqlSel = "SELECT id, tarifa FROM prenomina WHERE trabajador_id=:tid AND `year`=:y AND `month`=:m";
-            $row = $this->db->fetchRow($sqlSel, ['tid' => $trabajador_id, 'y' => $year, 'm' => $month]);
-    
-            // Obtener tarifa
-            if ($row) {
-                $tarifa = floatval($row['tarifa']);
-            } else {
-                $sqlTar = "SELECT COALESCE(c.salario,0) AS tarifa 
-                           FROM trabajadores t 
-                           LEFT JOIN cargos c ON t.cargos_id=c.id 
-                           WHERE t.id=:tid";
-                $trow = $this->db->fetchRow($sqlTar, ['tid' => $trabajador_id]);
-                $tarifa = $trow ? floatval($trow['tarifa']) : 0.0;
-            }
-    
-            // Calcular salario base
-            $a_cobrar = $horas * $tarifa;
-    
-            // Obtener ausencias
-            $sqlAusencias = "SELECT COUNT(*) as total_ausencias 
-                             FROM registro_asistencia 
-                             WHERE trabajador_id = :tid AND ausencia = '1'";
-            $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
-            $ausencias = $ausenciasRow ? intval($ausenciasRow['total_ausencias']) : 0;
-    
-            // Obtener vacaciones
-            $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones 
-                              FROM registro_vacaciones 
-                              WHERE trabajador_id = :tid AND dias_disfrutados > 0";
-            $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
-            $vacaciones = $vacacionesRow ? intval($vacacionesRow['total_dias_vacaciones']) : 0;
-    
-            // Calcular pago por vacaciones
-            $pago_vac = round(($tarifa * 8) * $vacaciones, 2);
-    
-            // Salario neto incluye pago por vacaciones
-            $salario_neto = $a_cobrar + $pago_vac;
-    
-            // Descuentos
-            $seg_social = round($a_cobrar * 0.05, 2);
-            $ing_pers   = round($a_cobrar * 0.0375, 2);
-    
-            // Salario final a pagar
-            $salario_pagar = round($salario_neto - ($seg_social + $ing_pers), 2);
-    
-            if ($row) {
-                // Update
-                $upd = [
-                    'horas' => $horas,
-                    'a_cobrar' => $a_cobrar,
-                    'sal_dev' => $a_cobrar,
-                    'salario_neto' => $salario_neto,
-                    'seg_social' => $seg_social,
-                    'ing_pers' => $ing_pers,
-                    'salario_pagar' => $salario_pagar,
-                    'ausencias' => $ausencias,
-                    'vacaciones' => $vacaciones,
-                    'pago_vac' => $pago_vac,
-                ];
-                $where = ['trabajador_id' => $trabajador_id, 'year' => $year, 'month' => $month];
-                $this->db->update('prenomina', $upd, $where);
-            } else {
-                // Insert
-                $ins = [
-                    'trabajador_id' => $trabajador_id,
-                    'year' => $year,
-                    'month' => $month,
-                    'horas' => $horas,
-                    'tarifa' => $tarifa,
-                    'a_cobrar' => $a_cobrar,
-                    'bonif' => null,
-                    'sal_dev' => $a_cobrar,
-                    'ausencias' => $ausencias,
-                    'vacaciones' => $vacaciones,
-                    'pago_vac' => $pago_vac,
-                    'salario_neto' => $salario_neto,
-                    'seg_social' => $seg_social,
-                    'ing_pers' => $ing_pers,
-                    'salario_pagar' => $salario_pagar,
-                ];
+        
+            foreach ($rows as $r) {
+                $trabajador_id = isset($r['trabajador_id']) ? intval($r['trabajador_id']) : 0;
+                $horas = isset($r['horas']) ? floatval($r['horas']) : 0.0;
+        
+                if ($trabajador_id <= 0) {
+                    $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'trabajador_id inválido'];
+                    continue;
+                }
+        
                 try {
-                    $this->db->insert('prenomina', $ins);
+                    // Verificar si ya existe registro del periodo
+                    $sqlSel = "SELECT id, tarifa FROM prenomina WHERE trabajador_id=:tid AND `year`=:y AND `month`=:m";
+                    $row = $this->db->fetchRow($sqlSel, ['tid' => $trabajador_id, 'y' => $year, 'm' => $month]);
+        
+                    // Obtener tarifa
+                    if ($row) {
+                        $tarifa = floatval($row['tarifa']);
+                    } else {
+                        $sqlTar = "SELECT COALESCE(c.salario,0) AS tarifa 
+                                   FROM trabajadores t 
+                                   LEFT JOIN cargos c ON t.cargos_id=c.id 
+                                   WHERE t.id=:tid";
+                        $trow = $this->db->fetchRow($sqlTar, ['tid' => $trabajador_id]);
+                        $tarifa = $trow ? floatval($trow['tarifa']) : 0.0;
+                    }
+        
+                    // Calcular salario base
+                    $a_cobrar = $horas * $tarifa;
+        
+                    // Obtener ausencias
+                    $sqlAusencias = "SELECT COUNT(*) as total_ausencias 
+                                     FROM registro_asistencia 
+                                     WHERE trabajador_id = :tid AND ausencia = '1'";
+                    $ausenciasRow = $this->db->fetchRow($sqlAusencias, ['tid' => $trabajador_id]);
+                    $ausencias = $ausenciasRow ? intval($ausenciasRow['total_ausencias']) : 0;
+                    $ausenciasCosto = round($ausencias * 8 * $tarifa, 2);
+                    
+                    // Obtener vacaciones
+                    $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones 
+                                      FROM registro_vacaciones 
+                                      WHERE trabajador_id = :tid AND dias_disfrutados > 0";
+                    $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
+                    $vacaciones = $vacacionesRow ? intval($vacacionesRow['total_dias_vacaciones']) : 0;
+        
+                    // Calcular pago por vacaciones
+                    $pago_vac = round(($tarifa * 8) * $vacaciones, 2);
+        
+                    // Salario neto incluye pago por vacaciones
+                    $salario_neto = $a_cobrar + $pago_vac;
+        
+                    // Descuentos
+                    $seg_social = round($a_cobrar * 0.05, 2);
+                    $ing_pers   = round($a_cobrar * 0.0375, 2);
+        
+                    // Salario final a pagar
+                    $salario_pagar = round($salario_neto - ($seg_social + $ing_pers + $ausenciasCosto), 2);
+        
+                    if ($row) {
+                        // Update
+                        $upd = [
+                            'horas' => $horas,
+                            'a_cobrar' => $a_cobrar,
+                            'sal_dev' => $a_cobrar,
+                            'salario_neto' => $salario_neto,
+                            'seg_social' => $seg_social,
+                            'ing_pers' => $ing_pers,
+                            'salario_pagar' => $salario_pagar,
+                            'ausencias' => $ausencias,
+                            'ausencias_costo' => $ausenciasCosto,
+                            'vacaciones' => $vacaciones,
+                            'pago_vac' => $pago_vac,
+                        ];
+                        $where = ['trabajador_id' => $trabajador_id, 'year' => $year, 'month' => $month];
+                        $this->db->update('prenomina', $upd, $where);
+                    } else {
+                        // Insert
+                        $ins = [
+                            'trabajador_id' => $trabajador_id,
+                            'year' => $year,
+                            'month' => $month,
+                            'horas' => $horas,
+                            'tarifa' => $tarifa,
+                            'a_cobrar' => $a_cobrar,
+                            'bonif' => null,
+                            'sal_dev' => $a_cobrar,
+                            'ausencias' => $ausencias,
+                            'ausencias_costo' => $ausenciasCosto,
+                            'vacaciones' => $vacaciones,
+                            'pago_vac' => $pago_vac,
+                            'salario_neto' => $salario_neto,
+                            'seg_social' => $seg_social,
+                            'ing_pers' => $ing_pers,
+                            'salario_pagar' => $salario_pagar,
+                        ];
+                        $this->db->insert('prenomina', $ins);
+                    }
+        
+                    $resp['affected']++;
+                    
                 } catch (Exception $e) {
                     $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => $e->getMessage()];
                     continue;
                 }
             }
-    
-            $resp['affected']++;
+        
+            echo json_encode($resp);
+            exit;
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 0, 'msg' => 'Error general: ' . $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            exit;
         }
-    
-        echo json_encode($resp);
-        exit;
     }
     
 
@@ -279,13 +324,8 @@ class Prenomina {
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS a_cobrar,
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
-                    (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,
-                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,
-                    ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,
-                    ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) + ROUND(((COALESCE(c.salario,0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,
-                    ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05, 2) AS seg_social,
-                    ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375, 2) AS ing_pers,
-                    ROUND((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) - (((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.05) + ((COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) * 0.0375)), 2) AS salario_pagar
+                    COALESCE((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1'), 0) AS ausencias,
+                    COALESCE((SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0), 0) AS vacaciones
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id
@@ -293,16 +333,55 @@ class Prenomina {
                 " . $cond .
                 " ORDER BY t.id ASC";
 
-        $data = $this->db->fetchAll($sql, $vals);
+        try {
+            $data = $this->db->fetchAll($sql, $vals);
+            
+            // Calcular campos derivados en PHP para evitar consultas SQL complejas
+            foreach ($data as &$row) {
+                $horas = floatval($row['horas']);
+                $tarifa = floatval($row['tarifa']);
+                $ausencias = intval($row['ausencias']);
+                $vacaciones = intval($row['vacaciones']);
+                
+                $a_cobrar = $horas * $tarifa;
+                $ausenciasCosto = round($ausencias * 8 * $tarifa, 2);
+                $pago_vac = round($tarifa * 8 * $vacaciones, 2);
+                $salario_neto = $a_cobrar + $pago_vac;
+                $seg_social = round($a_cobrar * 0.05, 2);
+                $ing_pers = round($a_cobrar * 0.0375, 2);
+                $salario_pagar = round($salario_neto - ($seg_social + $ing_pers + $ausenciasCosto), 2);
+                
+                $row['a_cobrar'] = $a_cobrar;
+                $row['sal_dev'] = $a_cobrar;
+                $row['ausenciasCosto'] = $ausenciasCosto;
+                $row['pago_vac'] = $pago_vac;
+                $row['salario_neto'] = $salario_neto;
+                $row['seg_social'] = $seg_social;
+                $row['ing_pers'] = $ing_pers;
+                $row['salario_pagar'] = $salario_pagar;
+            }
+        } catch (Exception $e) {
+            error_log("Error en consulta Excel prenómina: " . $e->getMessage());
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error en consulta de datos: ' . $e->getMessage()]);
+            exit;
+        }
 
         // Cargar PHPExcel
-        require_once(BASE_CLASS . '/PHPExcel.php');
-        $obj = new PHPExcel();
-        $obj->getProperties()
-            ->setCreator('Sistema')
-            ->setTitle('Prenomina');
-        $sheet = $obj->setActiveSheetIndex(0);
-        $sheet->setTitle('Prenomina');
+        try {
+            require_once(BASE_CLASS . '/PHPExcel.php');
+            $obj = new PHPExcel();
+            $obj->getProperties()
+                ->setCreator('Sistema')
+                ->setTitle('Prenomina');
+            $sheet = $obj->setActiveSheetIndex(0);
+            $sheet->setTitle('Prenomina');
+        } catch (Exception $e) {
+            error_log("Error cargando PHPExcel: " . $e->getMessage());
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error cargando PHPExcel: ' . $e->getMessage()]);
+            exit;
+        }
 
         // Obtener nombre del mes
         $meses = [
@@ -321,16 +400,16 @@ class Prenomina {
         // Encabezado principal
         $sheet->setCellValue('A1', 'Prenómina Correspondiente al Mes de ' . $nombreMes . ' de ' . $year);
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->mergeCells('A1:O1');
+        $sheet->mergeCells('A1:P1');
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
         $sheet->setCellValue('A2', 'Elaborado Por: ' . $nombreUsuario);
         $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->mergeCells('A2:G2');
+        $sheet->mergeCells('A2:H2');
 
-        $sheet->setCellValue('H2', 'Área: ' . $departamento);
-        $sheet->getStyle('H2')->getFont()->setBold(true);
-        $sheet->mergeCells('H2:O2');
+        $sheet->setCellValue('I2', 'Área: ' . $departamento);
+        $sheet->getStyle('I2')->getFont()->setBold(true);
+        $sheet->mergeCells('I2:P2');
 
         // Línea en blanco
         $sheet->setCellValue('A3', '');
@@ -346,12 +425,13 @@ class Prenomina {
             'G' => 'Bonif',
             'H' => 'Sal. Dev',
             'I' => 'Ausencias',
-            'J' => 'Vacaciones',
-            'K' => 'pago x vacaciones',
-            'L' => 'Salario Neto',
-            'M' => 'importe Seg Social',
-            'N' => 'importe Ing Pers',
-            'O' => 'Salario a pagar',
+            'J' => 'Descuento Ausencias',
+            'K' => 'Vacaciones',
+            'L' => 'pago x vacaciones',
+            'M' => 'Salario Neto',
+            'N' => 'importe Seg Social',
+            'O' => 'importe Ing Pers',
+            'P' => 'Salario a pagar',
         ];
         foreach ($headers as $col => $title) {
             $sheet->setCellValue($col . '4', $title);
@@ -370,30 +450,38 @@ class Prenomina {
             $sheet->setCellValue('G' . $rowNum, isset($r['bonif']) ? $r['bonif'] : '');
             $sheet->setCellValue('H' . $rowNum, $r['sal_dev']);
             $sheet->setCellValue('I' . $rowNum, isset($r['ausencias']) ? $r['ausencias'] : '');
-            $sheet->setCellValue('J' . $rowNum, isset($r['vacaciones']) ? $r['vacaciones'] : '');
-            $sheet->setCellValue('K' . $rowNum, isset($r['pago_vac']) ? $r['pago_vac'] : '');
-            $sheet->setCellValue('L' . $rowNum, $r['salario_neto']);
-            $sheet->setCellValue('M' . $rowNum, $r['seg_social']);
-            $sheet->setCellValue('N' . $rowNum, $r['ing_pers']);
-            $sheet->setCellValue('O' . $rowNum, $r['salario_pagar']);
+            $sheet->setCellValue('J' . $rowNum, isset($r['ausenciasCosto']) ? $r['ausenciasCosto'] : '');
+            $sheet->setCellValue('K' . $rowNum, isset($r['vacaciones']) ? $r['vacaciones'] : '');
+            $sheet->setCellValue('L' . $rowNum, isset($r['pago_vac']) ? $r['pago_vac'] : '');
+            $sheet->setCellValue('M' . $rowNum, $r['salario_neto']);
+            $sheet->setCellValue('N' . $rowNum, $r['seg_social']);
+            $sheet->setCellValue('O' . $rowNum, $r['ing_pers']);
+            $sheet->setCellValue('P' . $rowNum, $r['salario_pagar']);
             $rowNum++;
         }
 
         // Formatos numéricos
         $sheet->getStyle('D5:D' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
-        $sheet->getStyle('E5:O' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('E5:P' . ($rowNum-1))->getNumberFormat()->setFormatCode('#,##0.00');
         foreach (array_keys($headers) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         // Descarga
-        $filename = 'prenomina_' . $year . '_' . str_pad((string)$month, 2, '0', STR_PAD_LEFT) . '_' . date('Ymd_His') . '.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        $writer = PHPExcel_IOFactory::createWriter($obj, 'Excel2007');
-        $writer->save('php://output');
-        exit;
+        try {
+            $filename = 'prenomina_' . $year . '_' . str_pad((string)$month, 2, '0', STR_PAD_LEFT) . '_' . date('Ymd_His') . '.xlsx';
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            header('Cache-Control: max-age=0');
+            $writer = PHPExcel_IOFactory::createWriter($obj, 'Excel2007');
+            $writer->save('php://output');
+            exit;
+        } catch (Exception $e) {
+            error_log("Error generando archivo Excel: " . $e->getMessage());
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error generando archivo Excel: ' . $e->getMessage()]);
+            exit;
+        }
     }
 
 
