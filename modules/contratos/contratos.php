@@ -51,22 +51,7 @@
                         <input type="date" id="f-fecha-inicio" name="fecha_inicio" class="form-control" value="<?php if (isset($data['fecha_inicio'])) print($data['fecha_inicio']); ?>">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="control-label" for="f-fecha-fin">Fecha Fin</label>
-                        <div class="input-group">
-                            <input type="date" id="f-fecha-fin" name="fecha_fin" class="form-control" value="<?php if (isset($data['fecha_fin'])) print($data['fecha_fin']); ?>">
-                            <div class="input-group-append" style="display:flex; align-items:center; padding-left:8px;">
-                                <div class="checkbox" style="margin:0;">
-                                    <label style="margin:0;">
-                                        <input type="checkbox" id="chk-sin-fecha-fin" <?php if (!isset($data['fecha_fin']) || empty($data['fecha_fin'])) print('checked'); ?>>
-                                        Sin fecha fin
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+             
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="control-label">Archivo del Contrato</label>
@@ -90,20 +75,13 @@
 
         <div class="panel-footer text-center">
             <img id="img-loading" class="hidden" src="img/spinners/282.gif"/>
-            <button id="btn-save" class="btn btn-info icon-lg" type="button">
-                <i class="fa fa-check"></i>
-                Guardar
-            </button>
+           
             <button id="btn-open-template" class="btn btn-primary icon-lg" type="button">
                 <i class="fa fa-file-pdf-o"></i>
                 Generar Contrato
             </button>
-            <button type="button" id="btn-save-and-generate" class="btn btn-primary">
-                <i class="fa fa-file-pdf-o"></i> Guardar y Generar
-            </button>
-            <button type="button" id="btn-download-pdf" class="btn btn-success">
-                <i class="fa fa-download"></i> Descargar PDF
-            </button>
+            
+            
             <button id="btn-generate-fpdf" class="btn btn-info icon-lg" type="button">
                 <i class="fa fa-file-pdf-o"></i>
                 Generar PDF (FPDF)
@@ -112,10 +90,7 @@
                 <i class="fa fa-undo"></i>
                 Volver
             </button>
-            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                <i class="fa fa-plus"></i>
-                Nuevo
-            </button>
+          
         </div>
     </div>
 </div>

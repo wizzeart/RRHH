@@ -13,6 +13,7 @@ include(INCLUDES . DS . 'functions.php');
 init_app();
 $app = new App();
 
+
 if ($app->user_id == '' && !in_array($_REQUEST['module'], array('login', 'reset'))) {
     $data = array(
         'status' => 0,
@@ -73,6 +74,11 @@ switch ($_REQUEST['module']) {
     case 'config':
         include_once(BASE_CLASS . '/mdl.Config.php');
         $mdl = new Config($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'cuentas':
+        include_once(BASE_CLASS . '/mdl.Cuentas.php');
+        $mdl = new Cuentas($app);
         $mdl->api($_REQUEST);
         break;
     case 'historial':

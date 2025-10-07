@@ -8,6 +8,7 @@
                 <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Trabajadores</a></li>
                 <li><a href="#" onclick="location.href='?module=delete-trabajadores'">Dar de baja</a></li>
                 <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
+                <li><a href="#" onclick="location.href='?module=list-cuentas'"></i> Listado de Cuentas</a></li>
             </ul>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>

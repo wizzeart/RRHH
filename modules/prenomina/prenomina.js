@@ -1,4 +1,4 @@
-(function(){
+$(document).ready(function(){
   function setActiveTab(tabEl){
     tabEl.closest('ul').querySelectorAll('li').forEach(function(li){ li.classList.remove('active'); });
     tabEl.parentElement.classList.add('active');
@@ -40,6 +40,7 @@
         $table.bootstrapTable('refreshOptions', { url: 'api-app.php?module=prenomina&method=list-prenomina' });
       });
   }
+  
   $(document).on('click', '#tabs-prenomina a', function(e){
     e.preventDefault();
     var tabName = $(this).data('tab');
@@ -48,9 +49,7 @@
   });
 
   // init dynamic tabs
-  $(function(){
-    buildTabs();
-  });
+  buildTabs();
 
   // formatters used in the table
   window.currencyFormatter = function(value){
@@ -72,12 +71,15 @@
   function recalcForRow(row){
     var horas = Number(row.horas || 0);
     var tarifa = Number(row.tarifa || 0);
+    var ausencias = Number(row.ausencias || 0);
     var a_cobrar = horas * tarifa;
     var sal_dev = a_cobrar;
     var salario_neto = a_cobrar;
     var seg_social = +(a_cobrar * 0.05).toFixed(2);
     var ing_pers = +(a_cobrar * 0.0375).toFixed(2);
-    var salario_pagar = +(a_cobrar - (seg_social + ing_pers)).toFixed(2);
+    var ausenciasCosto = +(ausencias * 8 * tarifa).toFixed(2);
+    var salario_pagar = +(a_cobrar - (seg_social + ing_pers + ausenciasCosto)).toFixed(2);
+    
     return {
       horas: horas,
       a_cobrar: a_cobrar,
@@ -85,7 +87,8 @@
       salario_neto: salario_neto,
       seg_social: seg_social,
       ing_pers: ing_pers,
-      salario_pagar: salario_pagar
+      salario_pagar: salario_pagar,
+      ausenciasCosto: ausenciasCosto
     };
   }
 
@@ -127,20 +130,45 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ year: year, month: month, rows: rows })
-    }).then(function(r){ return r.json(); })
-      .then(function(resp){
-        if (resp && resp.status === 1) {
-          alert('Guardado correcto. Filas afectadas: ' + (resp.affected || 0));
-          // Exportar a Excel del tab actual
-          var $active = $('#tabs-prenomina li.active a');
-          var tabName = $active.length ? $active.data('tab') : '';
-          var url = 'api-app.php?module=prenomina&method=export-excel&year=' + year + '&month=' + month + (tabName ? ('&tab=' + encodeURIComponent(tabName)) : '');
-          window.open(url, '_blank');
-        } else {
-          alert('Error al guardar: ' + (resp && resp.msg ? resp.msg : 'Desconocido'));
-        }
-      }).catch(function(err){
-        alert('Error de red al guardar: ' + err);
-      });
+    }).then(function(r){ 
+      return r.text(); // Cambiar a text() primero para manejar errores HTML
+    }).then(function(responseText){
+      var resp;
+      try {
+        resp = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Respuesta no es JSON válido:', responseText);
+        console.error('Error de parsing:', e);
+        // Mostrar los primeros 500 caracteres de la respuesta para debug
+        var preview = responseText.length > 500 ? responseText.substring(0, 500) + '...' : responseText;
+        alert('Error del servidor: Respuesta inválida\n\nRespuesta recibida:\n' + preview);
+        return;
+      }
+      
+      if (resp && resp.status === 1) {
+        alert('Guardado correcto. Filas afectadas: ' + (resp.affected || 0));
+        // Exportar a Excel del tab actual
+        var $active = $('#tabs-prenomina li.active a');
+        var tabName = $active.length ? $active.data('tab') : '';
+        var url = 'api-app.php?module=prenomina&method=export-excel&year=' + year + '&month=' + month + (tabName ? ('&tab=' + encodeURIComponent(tabName)) : '');
+        
+        // Crear un iframe oculto para la descarga para evitar errores de parsing
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        
+        // Remover el iframe después de un tiempo
+        setTimeout(function() {
+          document.body.removeChild(iframe);
+        }, 5000);
+      } else if (resp && resp.error) {
+        alert('Error: ' + resp.error);
+      } else {
+        alert('Error al guardar: ' + (resp && resp.msg ? resp.msg : 'Desconocido'));
+      }
+    }).catch(function(err){
+      alert('Error de red al guardar: ' + err);
+    });
   });
-})();
+});
