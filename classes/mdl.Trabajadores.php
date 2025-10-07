@@ -40,6 +40,10 @@ class Trabajador {
             case 'save':
                 $this->_save($param);
                 break;
+            case 'get-municipios':
+                $data = $this->_get_municipios_by_provincia($param);
+                print(json_encode($data));
+                break;
         }
     }
 
@@ -71,27 +75,16 @@ class Trabajador {
                 break;
             case 'ficha-trabajador':
                 $data = array();
-                $page['title'] = 'Ficha de Trabajador';
-                //$page['subtitle'] = 'Ficha de Trabajador';
-                
-                if (isset($param['id'])) {
-                    $val = array(
-                        'id' => $param['id']
-                    );
-                    $sql = "select *"
-                            . " from " . 'trabajadores'
-                            . " where id=:id";
-                    $row = $this->db->fetchRow($sql, $val);
-                }
-                else {
-                    $val = array(
-                        'usuario_id' => $param['usuario_id']
-                    );
-                    $sql = "select *"
-                            . " from " . 'trabajadores'
-                            . " where usuario_id=:usuario_id";
-                    $row = $this->db->fetchRow($sql, $val);
-                }
+                $page['title'] = 'Registro de Trabajador';
+                $page['subtitle'] = 'Registro de Trabajador';
+
+                $val = array(
+                    'id' => $param['id']
+                );
+                $sql = "select *"
+                        . " from " . 'trabajadores'
+                        . " where id=:id";
+                $row = $this->db->fetchRow($sql, $val);
                 if ($row) {
 
                     //$row['almacenes'] = $this->app->get_list_usuarios_almacenes($row['xusuario_id']);
@@ -125,7 +118,11 @@ class Trabajador {
                     $data_form['departamentos'] = array();
                 }
                 
-
+                // Lista de Provincias para el select en el formulario
+                $data_form['provincias'] = $this->_get_list_provincias();
+                
+                // Lista de Municipios para el select en el formulario
+                $data_form['municipios'] = $this->_get_list_municipios();
                 
                 $data_form['bolsas'] = $this->app->get_list_bolsa_empleo();
 
@@ -142,11 +139,14 @@ class Trabajador {
                             . " where id=:id";
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
-
-                        //$row['almacenes'] = $this->app->get_list_usuarios_almacenes($row['xusuario_id']);
-                        //$row['puntos-ventas'] = $this->app->get_list_usuarios_revendedores($row['xusuario_id']);
-                        //print_r($row['almacenes']);
-                        //die();
+                        // Cargar datos bancarios del trabajador
+                        $sqlBanco = "SELECT numero_tarjeta_salario, numero_cuenta_estandar FROM bancos WHERE trabajador_id = :trabajador_id";
+                        $bancoDatos = $this->db->fetchRow($sqlBanco, ['trabajador_id' => $row['id']]);
+                        
+                        if ($bancoDatos) {
+                            $row['tarjeta_salario'] = $bancoDatos['numero_tarjeta_salario'];
+                            $row['cuenta_estandar'] = $bancoDatos['numero_cuenta_estandar'];
+                        }
 
                         $data = $row;
                         $page['subtitle'] = 'Trabajador: ' . $row['id'] . ' - ' . $row['nombre'];
@@ -166,7 +166,8 @@ class Trabajador {
         );
 
         $update = array(
-            'fecha_baja' => date('Y-m-d')
+            'fecha_baja' => date('Y-m-d'),
+            'trabajador_eliminado' => 1
         );
         $where = array(
             'id' => $param['id']
@@ -267,13 +268,17 @@ class Trabajador {
                 'carnet_identidad' => 'Carnet de Identidad',
                 'edad' => 'Edad',
                 'direccion' => 'Dirección',
+                'provincia_id' => 'Provincia',
+                'municipio_id' => 'Municipio',
                 'telefono' => 'Teléfono',
                 // 'email' => 'Email',
                 'nivel_educacional' => 'Nivel Educacional',
                 'departamento_id' => 'Departamento',
                 'cargos_id' => 'Cargo',
                 'estatus' => 'Estatus'
-            );        foreach ($required_fields as $field => $label) {
+            );        
+            
+            foreach ($required_fields as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
                 $data['status'] = 0;
                 $data['msg'] = "El campo {$label} es obligatorio";
@@ -282,9 +287,11 @@ class Trabajador {
             }
         }
 
+        // Los campos provincia_id y municipio_id ya están incluidos en allowed_fields
+
         // Crear array de datos sin incluir campos de control
         $insert = array();
-        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'telefono', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'provincia_id', 'municipio_id', 'telefono', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
         
         foreach ($allowed_fields as $field) {
             if (isset($param[$field])) {
@@ -292,6 +299,8 @@ class Trabajador {
                     case 'edad':
                     case 'departamento_id':
                     case 'cargos_id':
+                    case 'provincia_id':
+                    case 'municipio_id':
                         $insert[$field] = intval($param[$field]);
                         break;
                     case 'bolsa_empleo_id':
@@ -387,6 +396,8 @@ class Trabajador {
                     'sexo',
                     'edad',
                     'direccion',
+                    'provincia_id',
+                    'municipio_id',
                     'telefono',
                     'usuario_id',
                     'nivel_educacional',
@@ -435,6 +446,8 @@ class Trabajador {
                         }
                     }
                 }
+                
+                // Insertar trabajador con datos validados
                 
                 // Insertar el trabajador
                 $result = $this->db->insert('trabajadores', $insert_filtered);
@@ -586,6 +599,8 @@ class Trabajador {
                     'sexo',
                     'edad',
                     'direccion',
+                    'provincia_id',
+                    'municipio_id',
                     'telefono',
                     'email',
                     'nivel_educacional',
@@ -701,7 +716,29 @@ class Trabajador {
         $data = array();
         
         // Primero probamos sin JOIN para confirmar que funciona
-        $sqlWithJoin = "SELECT 
+        $sql = "SELECT 
+                t.id,
+                t.nombre,
+                t.apellidos,
+                t.carnet_identidad,
+                t.sexo,
+                t.edad,
+                t.estatus,
+                t.cargos_id,
+                t.provincia_id,
+                t.municipio_id,
+                CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
+                FROM trabajadores t 
+                WHERE t.trabajador_eliminado = '0'
+                ORDER BY t.apellidos, t.nombre";
+                
+        error_log("Consulta sin JOIN: " . $sql);
+        $data = $this->db->fetchAll($sql);
+        error_log("Registros sin JOIN: " . count($data));
+        
+        // Si funciona sin JOIN, probamos con JOIN
+        if (!empty($data)) {
+            $sqlWithJoin = "SELECT 
                     t.id,
                     t.nombre,
                     t.apellidos,
@@ -709,12 +746,17 @@ class Trabajador {
                     t.sexo,
                     t.edad,
                     t.estatus,
-                    c.nombre as cargo_nombre,
-                    d.nombre as departamento_nombre,
+                    t.cargos_id,
+                    t.provincia_id,
+                    t.municipio_id,
+                    COALESCE(c.nombre, 'Sin cargo') as cargo_nombre,
+                    COALESCE(p.nombre, 'Sin provincia') as provincia_nombre,
+                    COALESCE(m.nombre, 'Sin municipio') as municipio_nombre,
                     CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
                     FROM trabajadores t 
                     LEFT JOIN cargos c ON t.cargos_id = c.id
-                    LEFT JOIN departamentos d ON t.departamento_id = d.id
+                    LEFT JOIN provincia p ON t.provincia_id = p.id
+                    LEFT JOIN municipio m ON t.municipio_id = m.id
                     WHERE t.trabajador_eliminado = '0'
                     ORDER BY t.apellidos, t.nombre";
                     
@@ -777,6 +819,31 @@ class Trabajador {
 
     private function _list_bajas($param) {
         $data = array();
+        
+        // Consulta que incluye trabajadores marcados como eliminados (baja)
+        // Consulta básica con campos esenciales
+        // Consulta con solo los campos esenciales que funcionan
+        $sql = "SELECT 
+                t.id,
+                t.nombre,
+                t.apellidos,
+                t.carnet_identidad,
+                t.fecha_baja,
+                t.estatus,
+                t.sexo,
+                t.edad,
+                t.telefono,
+                t.direccion,
+                t.fecha_contratacion,
+                t.cargos_id,
+                CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo,
+                COALESCE(c.nombre, 'Sin cargo') as cargo_nombre
+                FROM trabajadores t 
+                LEFT JOIN cargos c ON t.cargos_id = c.id
+                WHERE t.trabajador_eliminado = 1
+                ORDER BY t.fecha_baja DESC, t.apellidos, t.nombre";
+                
+        /* Versión completa comentada para referencia
         $sql = "SELECT 
                 t.id,
                 t.cargos_id,
@@ -794,16 +861,120 @@ class Trabajador {
                 t.estatus,
                 t.bolsa_empleo_id,
                 t.foto,
-                c.nombre as cargo_nombre
+                CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo,
+                COALESCE(c.nombre, 'Sin cargo') as cargo_nombre
                 FROM trabajadores t 
-                LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
-                WHERE t.fecha_baja IS NOT NULL 
-                AND t.fecha_baja != ''
-                ORDER BY t.fecha_baja DESC";
-        
+                LEFT JOIN cargos c ON t.cargos_id = c.id
+                WHERE t.trabajador_eliminado = 1
+                ORDER BY t.fecha_baja DESC, t.apellidos, t.nombre";
+        */
+                
+        error_log("Consulta de bajas: " . $sql);
         $data = $this->db->fetchAll($sql);
+        error_log("Registros de bajas encontrados: " . count($data));
+        
+        // Si no hay datos, devolvemos array vacío
+        if (empty($data)) {
+            error_log("No se encontraron registros de bajas (trabajador_eliminado = 1)");
+            return array();
+        }
+        
+        // Si hay datos, intentamos obtener la información de los cargos
+        if (!empty($data)) {
+            // Obtenemos los IDs de cargos únicos
+            $cargosIds = array_unique(array_column($data, 'cargos_id'));
+            $cargosIds = array_filter($cargosIds, function($value) {
+                return !empty($value); // Filtramos valores vacíos o nulos
+            });
+            
+            if (!empty($cargosIds)) {
+                // Obtenemos los cargos en una sola consulta
+                $cargosList = $this->db->fetchAll("SELECT id, nombre FROM cargos WHERE id IN (" . implode(',', $cargosIds) . ")");
+                $cargosMap = [];
+                
+                // Creamos un mapa de cargos para búsqueda rápida
+                foreach ($cargosList as $cargo) {
+                    $cargosMap[$cargo['id']] = $cargo['nombre'];
+                }
+                
+                // Actualizamos los datos con los nombres de los cargos
+                foreach ($data as &$trabajador) {
+                    if (!empty($trabajador['cargos_id']) && isset($cargosMap[$trabajador['cargos_id']])) {
+                        $trabajador['cargo_nombre'] = $cargosMap[$trabajador['cargos_id']];
+                    }
+                }
+                unset($trabajador); // Rompe la referencia
+            }
+            
+            // Aseguramos que todos los trabajadores tengan el campo cargo_nombre
+            foreach ($data as &$trabajador) {
+                if (empty($trabajador['cargo_nombre'])) {
+                    $trabajador['cargo_nombre'] = 'Sin cargo';
+                }
+                
+                // Aseguramos que la fecha de baja tenga formato
+                if (!empty($trabajador['fecha_baja'])) {
+                    $fecha = new DateTime($trabajador['fecha_baja']);
+                    $trabajador['fecha_baja'] = $fecha->format('d/m/Y');
+                }
+                
+                // Formateamos la fecha de contratación
+                if (!empty($trabajador['fecha_contratacion'])) {
+                    $fecha = new DateTime($trabajador['fecha_contratacion']);
+                    $trabajador['fecha_contratacion'] = $fecha->format('d/m/Y');
+                }
+            }
+        }
+        
         return $data;
     }
 
+    /**
+     * Obtener lista de provincias
+     */
+    private function _get_list_provincias() {
+        $sql = "SELECT id, nombre FROM provincia ORDER BY nombre ASC";
+        try {
+            $data = $this->db->fetchAll($sql);
+            return $data;
+        } catch (Exception $e) {
+            error_log("Error obteniendo provincias: " . $e->getMessage());
+            return array();
+        }
+    }
+
+    /**
+     * Obtener lista de municipios
+     */
+    private function _get_list_municipios() {
+        $sql = "SELECT id, nombre, provincia_id FROM municipio ORDER BY nombre ASC";
+        try {
+            $data = $this->db->fetchAll($sql);
+            return $data;
+        } catch (Exception $e) {
+            error_log("Error obteniendo municipios: " . $e->getMessage());
+            return array();
+        }
+    }
+
+    /**
+     * Obtener municipios filtrados por provincia
+     */
+    private function _get_municipios_by_provincia($param) {
+        $provincia_id = isset($param['provincia_id']) ? intval($param['provincia_id']) : 0;
+        
+        if ($provincia_id <= 0) {
+            return array();
+        }
+        
+        $sql = "SELECT id, nombre, provincia_id FROM municipio WHERE provincia_id = :provincia_id ORDER BY nombre ASC";
+        try {
+            $data = $this->db->fetchAll($sql, array('provincia_id' => $provincia_id));
+            return $data;
+        } catch (Exception $e) {
+            error_log("Error obteniendo municipios por provincia: " . $e->getMessage());
+            return array();
+        }
+    }
    
 }

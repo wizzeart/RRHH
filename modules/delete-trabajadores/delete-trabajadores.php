@@ -14,6 +14,7 @@
                 <li><a href="#" onclick="location.href='?module=list-trabajadores'">Listado de Trabajadores</a></li>
                 <li class="active"><a href="#tab-dar-baja" data-toggle="tab" aria-expanded="true">Dar de baja</a></li>
                 <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
+                <li><a href="#" onclick="location.href='?module=list-cuentas'">Listado de Cuentas</a></li>
             </ul>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>

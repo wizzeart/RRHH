@@ -12,22 +12,40 @@
         <h3 class="panel-title"><?php print ($page['subtitle']); ?></h3>
     </div>
 
-    <!-- BASIC FORM ELEMENTS -->
+    <!-- TABS NAVIGATION -->
     <!--===================================================-->
     <div class="panel-body">
-        <div class="panel">
-            <div class="panel-body orm-padding"><!-- form-horizontal -->
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#datos-personales" aria-controls="datos-personales" role="tab" data-toggle="tab">
+                    <i class="fa fa-user"></i> Datos Personales
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#cuentas-bancarias" aria-controls="cuentas-bancarias" role="tab" data-toggle="tab">
+                    <i class="fa fa-credit-card"></i> Cuentas Bancarias
+                </a>
+            </li>
+         
+        </ul>
 
-                <!-- Primera fila -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-id">Código del trabajador</label>
-                            <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id']))
-                                print ($data['id']); ?>" disabled>
-                            <small class="help-block">Identificador único</small>
-                        </div>
-                    </div>
+        <!-- Tab panes -->
+        <div class="tab-content" style="margin-top: 20px;">
+            <!-- TAB: DATOS PERSONALES -->
+            <div role="tabpanel" class="tab-pane active" id="datos-personales">
+                <div class="panel">
+                    <div class="panel-body orm-padding">
+                        <!-- Primera fila -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-id">Código del trabajador</label>
+                                    <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id']))
+                                        print ($data['id']); ?>" disabled>
+                                    <small class="help-block">Identificador único</small>
+                                </div>
+                            </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label" for="f-nombre">Nombre <span class="text-danger">*</span></label>
@@ -96,7 +114,45 @@
 
                 </div>
 
-
+                <!-- Nueva fila - Provincia y Municipio -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-provincia">Provincia <span class="text-danger">*</span></label>
+                            <select id="f-provincia" name="provincia_id" class="form-control">
+                                <option value="">Seleccionar Provincia</option>
+                                <?php if (isset($data_form['provincias']) && is_array($data_form['provincias'])): ?>
+                                    <?php foreach ($data_form['provincias'] as $provincia): ?>
+                                        <option value="<?php echo $provincia['id']; ?>" 
+                                                <?php echo (isset($data['provincia_id']) && $data['provincia_id'] == $provincia['id']) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($provincia['nombre']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label" for="f-municipio">Municipio <span class="text-danger">*</span></label>
+                            <select id="f-municipio" name="municipio_id" class="form-control">
+                                <option value="">Seleccionar Municipio</option>
+                                <?php if (isset($data_form['municipios']) && is_array($data_form['municipios'])): ?>
+                                    <?php foreach ($data_form['municipios'] as $municipio): ?>
+                                        <option value="<?php echo $municipio['id']; ?>" 
+                                                data-provincia="<?php echo $municipio['provincia_id']; ?>"
+                                                <?php echo (isset($data['municipio_id']) && $data['municipio_id'] == $municipio['id']) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($municipio['nombre']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Espacio vacío para mantener el layout -->
+                    </div>
+                </div>
 
                 <!-- Tercera fila -->
                 <div class="row">
@@ -217,26 +273,6 @@
                             <!-- <small class="help-block">Cargo asignado</small> -->
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-telefono">Tarjeta de Salario</label>
-                            <input type="text" id="f-tarjeta_salario" name="tarjeta_salario" class="form-control"
-                                placeholder="Numero de Tarjeta de Salario"
-                                value="<?php if (isset($data['tarjeta_salario']))
-                                    print ($data['tarjeta_salario']); ?>">
-                            <!-- <small class="help-block">Teléfono de contacto</small> -->
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-cuenta_estandar">Cuenta Estándar</label>
-                            <input type="number" id="f-cuenta_estandar" name="cuenta_estandar" class="form-control"
-                                placeholder="Numero de Cuenta Estándar"
-                                value="<?php if (isset($data['cuenta_estandar']))
-                                    print ($data['cuenta_estandar']); ?>">
-                            <!-- <small class="help-block">Teléfono de contacto</small> -->
-                        </div>
-                    </div>
                 </div>
                 <!-- Sección de foto -->
                 <div class="row">
@@ -254,29 +290,134 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel-footer text-center">
-                    <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
-                    <button id="btn-save" class="btn btn-info icon-lg" type="button">
-                        <i class="fa fa-check"></i>
-                        Guardar
-                    </button>
-                    <button id="btn-back" class="btn btn-default icon-lg" type="button">
-                        <i class="fa fa-undo"></i>
-                        Volver
-                    </button>
-                    <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                        <i class="fa fa-plus"></i>
-                        Nuevo
-                    </button>
-
-                    <!-- Sección de Foto del Trabajador -->
-                    <hr>
-
+                    </div>
                 </div>
             </div>
+            <!-- END TAB: DATOS PERSONALES -->
+
+            <!-- TAB: CUENTAS BANCARIAS -->
+            <div role="tabpanel" class="tab-pane" id="cuentas-bancarias">
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4><i class="fa fa-credit-card"></i> Información Bancaria del Trabajador</h4>
+                                <hr>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos bancarios -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-tarjeta_salario">Tarjeta de Salario</label>
+                                    <input type="text" id="f-tarjeta_salario" name="tarjeta_salario" class="form-control"
+                                        placeholder="Número de Tarjeta de Salario"
+                                        value="<?php if (isset($data['tarjeta_salario']))
+                                            print ($data['tarjeta_salario']); ?>">
+                                    <small class="help-block">Número de la tarjeta de salario del trabajador</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-cuenta_estandar">Cuenta Estándar</label>
+                                    <input type="text" id="f-cuenta_estandar" name="cuenta_estandar" class="form-control"
+                                        placeholder="Número de Cuenta Estándar"
+                                        value="<?php if (isset($data['cuenta_estandar']))
+                                            print ($data['cuenta_estandar']); ?>">
+                                    <small class="help-block">Número de la cuenta estándar del trabajador</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle"></i>
+                                    <strong>Información:</strong> Los datos bancarios son opcionales pero recomendados para el procesamiento de nóminas y pagos.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mostrar datos existentes si está editando -->
+                        <?php if (isset($data['id']) && !empty($data['id'])): ?>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5><i class="fa fa-database"></i> Datos Actuales en Base de Datos</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Campo</th>
+                                                <th>Valor Actual</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Tarjeta de Salario</strong></td>
+                                                <td>
+                                                    <?php 
+                                                    echo !empty($data['tarjeta_salario']) 
+                                                        ? htmlspecialchars($data['tarjeta_salario']) 
+                                                        : '<em class="text-muted">No registrada</em>'; 
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php if (!empty($data['tarjeta_salario'])): ?>
+                                                        <span class="label label-success">Registrada</span>
+                                                    <?php else: ?>
+                                                        <span class="label label-warning">Pendiente</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Cuenta Estándar</strong></td>
+                                                <td>
+                                                    <?php 
+                                                    echo !empty($data['cuenta_estandar']) 
+                                                        ? htmlspecialchars($data['cuenta_estandar']) 
+                                                        : '<em class="text-muted">No registrada</em>'; 
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php if (!empty($data['cuenta_estandar'])): ?>
+                                                        <span class="label label-success">Registrada</span>
+                                                    <?php else: ?>
+                                                        <span class="label label-warning">Pendiente</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <!-- END TAB: CUENTAS BANCARIAS -->
         </div>
-        <!-- =================================================== -->
-        <!-- END BASIC FORM ELEMENTS -->
+        <!-- END TAB CONTENT -->
+
+        <!-- Botones de acción (fuera de los tabs) -->
+        <div class="panel-footer text-center">
+            <img id="img-loading" class="hidden" src="img/spinners/282.gif" />
+            <button id="btn-save" class="btn btn-info icon-lg" type="button">
+                <i class="fa fa-check"></i>
+                Guardar
+            </button>
+            <button id="btn-back" class="btn btn-default icon-lg" type="button">
+                <i class="fa fa-undo"></i>
+                Volver
+            </button>
+            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
+                <i class="fa fa-plus"></i>
+                Nuevo
+            </button>
+        </div>
     </div>
 
 </div>
