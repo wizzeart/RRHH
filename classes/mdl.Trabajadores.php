@@ -746,10 +746,10 @@ class Trabajador {
                     t.sexo,
                     t.edad,
                     t.estatus,
-                    t.cargos_id,
+                    c.nombre as cargo_nombre,
                     t.provincia_id,
                     t.municipio_id,
-                    COALESCE(c.nombre, 'Sin cargo') as cargo_nombre,
+                    d.nombre as departamento_nombre,
                     COALESCE(p.nombre, 'Sin provincia') as provincia_nombre,
                     COALESCE(m.nombre, 'Sin municipio') as municipio_nombre,
                     CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
@@ -757,6 +757,7 @@ class Trabajador {
                     LEFT JOIN cargos c ON t.cargos_id = c.id
                     LEFT JOIN provincia p ON t.provincia_id = p.id
                     LEFT JOIN municipio m ON t.municipio_id = m.id
+                    LEFT JOIN departamentos d ON t.departamento_id = d.id
                     WHERE t.trabajador_eliminado = '0'
                     ORDER BY t.apellidos, t.nombre";
                     
@@ -765,7 +766,7 @@ class Trabajador {
             // Si el JOIN funciona, usar esos datos
             if (!empty($dataWithJoin)) {    
                 $data = $dataWithJoin;
-            }
+            }}
         
         return $data;
     }
@@ -929,6 +930,7 @@ class Trabajador {
         return $data;
     }
 
+    
     /**
      * Obtener lista de provincias
      */
