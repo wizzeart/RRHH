@@ -766,7 +766,7 @@ class Trabajador {
             // Si el JOIN funciona, usar esos datos
             if (!empty($dataWithJoin)) {    
                 $data = $dataWithJoin;
-            }
+            }}
         
         return $data;
     }
@@ -930,6 +930,7 @@ class Trabajador {
         return $data;
     }
 
+    
     /**
      * Obtener lista de provincias
      */
