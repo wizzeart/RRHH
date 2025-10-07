@@ -485,22 +485,12 @@ function pdfFormatter(value, row, index) {
            '<a href="' + url + '" target="_blank" class="btn btn-info btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
            '</div>';
 }
-  
 
-function firmadoFormatter(value, row, index) {
-    var firmado = (value && String(value).trim() !== '' && value !== 'null' && value !== null);
-    if (firmado) {
-      return '<span class="label label-success">Firmado</span>';
-    }
-    return '<span class="label label-warning">No firmado</span>';
-}
-
-// Formateador para la columna de aprobación
 function formatoAprobacion(value, row, index) {
-    if (value && value.trim() !== '' && value !== 'null' && value !== null) {
-        return '<span class="label label-success">Aceptado</span>';
+    if (value) {
+        return '<span class="label label-success">Aprobado</span>';
     }
-    return '<span class="text-muted">Pendiente</span>';
+    return '<span class="label label-warning">Pendiente</span>';
 }
 
 function imageFormatter(value, row) {

@@ -29,6 +29,8 @@ switch ($_REQUEST['module']) {
         $mdl = new Document($app);
         $mdl->api($_REQUEST);
         break;
+    case 'planificacion-vacaciones':
+        
     case 'vacaciones':
         include_once(BASE_CLASS . '/mdl.Vacaciones.php');
         $mdl = new Vacaciones($app);
@@ -122,6 +124,11 @@ switch ($_REQUEST['module']) {
     case 'contratos':
         include_once(BASE_CLASS . '/mdl.Contratos.php');
         $mdl = new Contrato($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'asistencias':
+        include_once(BASE_CLASS . '/mdl.Asistencias.php');
+        $mdl = new Asistencia($app);
         $mdl->api($_REQUEST);
         break;
     case 'login':

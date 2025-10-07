@@ -23,6 +23,10 @@ class Trabajador {
                 $data = $this->_list($param);
                 print(json_encode($data));
                 break;
+            case 'list-filter':
+                $data = $this->_list_filter($param);
+                print(json_encode($data));
+                break;
             case 'list-bajas':
                 $data = $this->_list_bajas($param);
                 print(json_encode($data));
@@ -89,7 +93,7 @@ class Trabajador {
                     //die();
 
                     $data = $row;
-                    $page['subtitle'] = 'Trabajador: ' . $row['nombre'];
+                    $page['title'] = 'Ficha de Trabajador: ' . $row['nombre'] . ' ' . $row['apellidos'] . ' ' . $row['apellidos_segundos'];
                 }
                 $data_form = array();
                 break;
@@ -756,18 +760,62 @@ class Trabajador {
                     WHERE t.trabajador_eliminado = '0'
                     ORDER BY t.apellidos, t.nombre";
                     
-            error_log("Consulta con JOIN: " . $sqlWithJoin);
             $dataWithJoin = $this->db->fetchAll($sqlWithJoin);
-            error_log("Registros con JOIN: " . count($dataWithJoin));
             
             // Si el JOIN funciona, usar esos datos
-            if (!empty($dataWithJoin)) {
+            if (!empty($dataWithJoin)) {    
                 $data = $dataWithJoin;
             }
-        }
         
         return $data;
     }
+
+    private function _list_filter($param){
+        try {
+            $data = array();
+            $where = ["t.trabajador_eliminado = '0'"];
+            $params = [];
+
+            // Filtro por cargo
+            if (!empty($param['cargo_id'])) {
+                $where[] = "t.cargos_id = :cargo_id";
+                $params[':cargo_id'] = $param['cargo_id'];
+            }
+
+            // Filtro por departamento
+            if (!empty($param['departamento_id'])) {
+                $where[] = "t.departamento_id = :departamento_id";
+                $params[':departamento_id'] = $param['departamento_id'];
+            }
+
+            $sql = "SELECT 
+                    t.id,
+                    t.nombre,
+                    t.apellidos,
+                    t.carnet_identidad,
+                    t.sexo,
+                    t.edad,
+                    t.estatus,
+                    c.nombre as cargo_nombre,
+                    d.nombre as departamento_nombre,
+                    CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
+                    FROM trabajadores t 
+                    LEFT JOIN cargos c ON t.cargos_id = c.id
+                    LEFT JOIN departamentos d ON t.departamento_id = d.id
+                    WHERE " . implode(' AND ', $where) . "
+                    ORDER BY t.apellidos, t.nombre";
+
+            $data = $this->db->fetchAll($sql,$params);
+            return $data;
+        } catch (Exception $e) {
+            // Registrar el error en el log
+            error_log('Error en Trabajador->_list_filter: ' . $e->getMessage());
+
+            // Devolver un array vacío en caso de error
+            return array();
+        }
+    }
+
 
     private function _list_bajas($param) {
         $data = array();

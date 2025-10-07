@@ -55,46 +55,28 @@
 
 <!--NEW MENU TRABAJADORES-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-        <i class="fa fa-users"></i>
+<li class="<?php if (in_array($_GET['module'], array('ficha-trabajador'))) print('active-link') ?>">
+    <a href="?module=ficha-trabajador&usuario_id=<?php print($app->user_id); ?>">
+        <i class="fa fa-user"></i>
         <span class="menu-title">
-            <strong>Trabajadores</strong>
+            <strong>Ficha de Trabajador</strong>
         </span>
-        <i class="arrow"></i>
+        <!--<i class="arrow"></i>-->
     </a>
 
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
-            <a href="?module=list-trabajadores">Lista de Trabajadores</a>
-        </li>
-        <li e>
-        <li class="<?php if (in_array($_GET['module'], array('list-trabajadores', 'trabajadores'))) print('active-link') ?>">
-            <a href="?module=trabajadores">Registrar Trabajador</a>
-        </li>
-    </ul>
+    
 </li>
 
 <!--NEW MENU BOLSAS EMPLEO-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-        <i class="fa fa-database"></i>
+<li class="<?php if (in_array($_GET['module'], array('planificacion-vacaciones'))) print('active-link') ?>">
+    <a href="?module=planificacion-vacaciones&usuario_id=<?php print($app->user_id); ?>">
+        <i class="fa fa-umbrella"></i>
         <span class="menu-title">
-            <strong>Bolsa de Empleo</strong>
+            <strong>Planificar Vacaciones</strong>
         </span>
-        <i class="arrow"></i>
+        <!--<i class="arrow"></i>-->
     </a>
 
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
-            <a href="?module=list-bolsas_empleos">Lista de Bolsas de Empleos</a>
-        </li>
-        <li e>
-        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
-            <a href="?module=bolsas_empleos">Registrar Bolsa de Empleo</a>
-        </li>
-    </ul>
+    
 </li>

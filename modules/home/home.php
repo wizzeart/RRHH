@@ -2,6 +2,7 @@
 // Asegurarse de que tenemos acceso a la base de datos
 global $data, $page;
 ?>
+
 <!-- Dashboard Header -->
 <div class="row">
     <div class="col-md-12">
@@ -13,10 +14,19 @@ global $data, $page;
     </div>
 
     <style>
-    /* Hover sutil para paneles clicables */
-    a .panel.panel-colorful { transition: transform .12s ease-in-out, box-shadow .12s ease-in-out; }
-    a .panel.panel-colorful:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
-    .mar-btm { margin-bottom: 8px; }
+        /* Hover sutil para paneles clicables */
+        a .panel.panel-colorful {
+            transition: transform .12s ease-in-out, box-shadow .12s ease-in-out;
+        }
+
+        a .panel.panel-colorful:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .mar-btm {
+            margin-bottom: 8px;
+        }
     </style>
 
     <!-- Contadores fila 1: existentes (4 elementos) -->
@@ -26,49 +36,49 @@ global $data, $page;
                 <!-- Total Trabajadores -->
                 <div class="col-sm-6 col-lg-3">
                     <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver lista de trabajadores">
-                    <div class="panel panel-primary panel-colorful">
-                        <div class="pad-all text-center">
-                            <div class="mar-btm"><i class="fa fa-users fa-2x"></i></div>
-                            <span class="text-3x text-thin" id="total-trabajadores">0</span>
-                            <p>Total Trabajadores</p>
+                        <div class="panel panel-primary panel-colorful">
+                            <div class="pad-all text-center">
+                                <div class="mar-btm"><i class="fa fa-users fa-2x"></i></div>
+                                <span class="text-3x text-thin" id="total-trabajadores">0</span>
+                                <p>Total Trabajadores</p>
+                            </div>
                         </div>
-                    </div>
                     </a>
                 </div>
                 <!-- Trabajadores Activos -->
                 <div class="col-sm-6 col-lg-3">
                     <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver trabajadores activos">
-                    <div class="panel panel-info panel-colorful">
-                        <div class="pad-all text-center">
-                            <div class="mar-btm"><i class="fa fa-user fa-2x"></i></div>
-                            <span class="text-3x text-thin" id="trabajadores-activos">0</span>
-                            <p>Trabajadores Activos</p>
+                        <div class="panel panel-info panel-colorful">
+                            <div class="pad-all text-center">
+                                <div class="mar-btm"><i class="fa fa-user fa-2x"></i></div>
+                                <span class="text-3x text-thin" id="trabajadores-activos">0</span>
+                                <p>Trabajadores Activos</p>
+                            </div>
                         </div>
-                    </div>
                     </a>
                 </div>
                 <!-- Promedio de Edad -->
                 <div class="col-sm-6 col-lg-3">
                     <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver detalle de trabajadores">
-                    <div class="panel panel-success panel-colorful">
-                        <div class="pad-all text-center">
-                            <div class="mar-btm"><i class="fa fa-bar-chart fa-2x"></i></div>
-                            <span class="text-3x text-thin" id="promedio-edad">0</span>
-                            <p>Promedio de Edad</p>
+                        <div class="panel panel-success panel-colorful">
+                            <div class="pad-all text-center">
+                                <div class="mar-btm"><i class="fa fa-bar-chart fa-2x"></i></div>
+                                <span class="text-3x text-thin" id="promedio-edad">0</span>
+                                <p>Promedio de Edad</p>
+                            </div>
                         </div>
-                    </div>
                     </a>
                 </div>
                 <!-- Cargos Diferentes -->
                 <div class="col-sm-6 col-lg-3">
                     <a href="?module=list-cargos" style="text-decoration:none;" data-toggle="tooltip" title="Ver cargos en trabajadores">
-                    <div class="panel panel-warning panel-colorful">
-                        <div class="pad-all text-center">
-                            <div class="mar-btm"><i class="fa fa-briefcase fa-2x"></i></div>
-                            <span class="text-3x text-thin" id="total-cargos">0</span>
-                            <p>Cantidad de Cargos</p>
+                        <div class="panel panel-warning panel-colorful">
+                            <div class="pad-all text-center">
+                                <div class="mar-btm"><i class="fa fa-briefcase fa-2x"></i></div>
+                                <span class="text-3x text-thin" id="total-cargos">0</span>
+                                <p>Cantidad de Cargos</p>
+                            </div>
                         </div>
-                    </div>
                     </a>
                 </div>
             </div>
@@ -166,11 +176,11 @@ global $data, $page;
     </div>
 </div>
 
-
-
 <!-- Scripts: load jQuery from CDN with local fallback, then the dashboard script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/jquery-3.2.1.min.js"><\/script>');</script>
+<script>
+    window.jQuery || document.write('<script src="js/jquery-3.2.1.min.js"><\/script>');
+</script>
 <script type="text/javascript" src="modules/home/home.js"></script>
 
 <!-- Lista de Trabajadores -->
@@ -201,55 +211,76 @@ global $data, $page;
     </div>
 </div>
 
-                <!-- Listas adicionales: Cargos, Departamentos, Pases de Acceso -->
-                <div class="row" style="margin-top:20px;">
-                    <div class="col-md-6">
-                        <div class="panel">
-                            <div class="panel-heading"><h3 class="panel-title">Cargos</h3></div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped" id="cargos-list">
-                                        <thead>
-                                            <tr><th>ID</th><th>Departamento</th><th>Nombre</th><th>Salario</th></tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="panel">
-                            <div class="panel-heading"><h3 class="panel-title">Departamentos</h3></div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped" id="departamentos-list">
-                                        <thead>
-                                            <tr><th>ID</th><th>Nombre</th></tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!-- Listas adicionales: Cargos, Departamentos, Pases de Acceso -->
+<div class="row" style="margin-top:20px;">
+    <div class="col-md-6">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cargos</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="cargos-list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Departamento</th>
+                                <th>Nombre</th>
+                                <th>Salario</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="row" style="margin-top:20px;">
-                    <div class="col-md-12">
-                        <div class="panel">
-                            <div class="panel-heading"><h3 class="panel-title">Pases de Acceso (recientes)</h3></div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped" id="pases-list">
-                                        <thead>
-                                            <tr><th>ID</th><th>Trabajador ID</th><th>Subcontrato ID</th><th>Áreas</th><th>Fecha</th><th>Vigente</th></tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="col-md-6">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Departamentos</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="departamentos-list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top:20px;">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Pases de Acceso (recientes)</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="pases-list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Trabajador ID</th>
+                                <th>Subcontrato ID</th>
+                                <th>Áreas</th>
+                                <th>Fecha</th>
+                                <th>Vigente</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

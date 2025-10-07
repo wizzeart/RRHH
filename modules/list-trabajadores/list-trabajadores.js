@@ -1,4 +1,167 @@
 $(document).ready(function () {
+    // Initialize table reference
+    var $table = $('#table-panel');
+    var searchTimeout;
+    
+    // Function to search workers
+    function buscarTrabajadores(termino) {
+        if (termino.length < 2) {
+            $('#resultados-busqueda').hide().empty();
+            return;
+        }
+
+        // Cancel previous search if exists
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        // Set new timeout for search
+        searchTimeout = setTimeout(function() {
+            $.ajax({
+                url: 'api-app.php',
+                type: 'GET',
+                data: {
+                    module: 'trabajadores',
+                    method: 'list',
+                    termino: termino
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response) {
+                        const resultados = response.map(trabajador => {
+                            // Create a search string with all relevant fields
+                            const searchStr = (
+                                (trabajador.nombre || '') + ' ' +
+                                (trabajador.apellidos || '') + ' ' +
+                                (trabajador.carnet_identidad || '')
+                            ).toLowerCase();
+                            
+                            // Calculate match score
+                            const index = searchStr.indexOf(termino.toLowerCase());
+                            if (index === -1) return { ...trabajador, _score: 0 };
+                            
+                            const positionScore = 1 / (index + 1);
+                            const lengthScore = termino.length / searchStr.length;
+                            const score = positionScore * 0.7 + lengthScore * 0.3;
+                            
+                            return { ...trabajador, _score: score };
+                        })
+                        .filter(t => t._score > 0)
+                        .sort((a, b) => b._score - a._score)
+                        .map(({ _score, ...trabajador }) => trabajador);
+
+                        mostrarResultadosBusqueda(resultados);
+                    } else {
+                        mostrarResultadosBusqueda([]);
+                    }
+                },
+                error: function() {
+                    console.error('Error al buscar trabajadores');
+                    $('#resultados-busqueda').hide().empty();
+                }
+            });
+        }, 300); // Wait 300ms after last keystroke
+    }
+
+    // Show search results
+    function mostrarResultadosBusqueda(resultados) {
+        var $resultados = $('#resultados-busqueda');
+        $resultados.empty();
+        
+        if (resultados.length === 0) {
+            $resultados.append('<div class="list-group-item">No se encontraron resultados</div>');
+        } else {
+            resultados.forEach(function(trabajador) {
+                $resultados.append(
+                    '<div class="list-group-item list-group-item-action" data-id="' + trabajador.id + '" style="cursor: pointer;">' +
+                    '   <strong>' + (trabajador.nombre || '') + ' ' + (trabajador.apellidos || '') + '</strong><br>' +
+                    '   <small class="text-muted">CI: ' + (trabajador.carnet_identidad || '') + '</small>' +
+                    '</div>'
+                );
+            });
+            
+            // Add click handler for search results
+            $resultados.off('click', '.list-group-item').on('click', '.list-group-item', function() {
+                var id = $(this).data('id');
+                var nombreCompleto = $(this).find('strong').text().trim();
+                
+                // Set the search box value to the selected worker's name
+                $('#buscar-trabajador').val(nombreCompleto);
+                
+                // Filter the table to show only the selected worker
+                $table.bootstrapTable('filterBy', {
+                    id: id
+                });
+                $resultados.hide();
+            });
+        }
+        
+        $resultados.show();
+    }
+
+    // Handle search input
+    $('#buscar-trabajador').on('input', function() {
+        var termino = $(this).val().trim();
+        if (termino === '') {
+            // If search box is cleared, reset the table filter
+            $table.bootstrapTable('filterBy', {});
+            $('#resultados-busqueda').hide().empty();
+        } else {
+            buscarTrabajadores(termino);
+        }
+    });
+
+    // Hide search results when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#buscar-trabajador, #resultados-busqueda').length) {
+            $('#resultados-busqueda').hide();
+        }
+    });
+    
+    // Function to apply filters
+    function applyFilters() {
+        var cargoId = $('#filterCargo').val();
+        var deptoId = $('#filterDepartamento').val();
+        
+        // Build the URL with filters
+        var url = 'api-app.php?module=trabajadores&method=list-filter';
+        if (cargoId) url += '&cargo_id=' + cargoId;
+        if (deptoId) url += '&departamento_id=' + deptoId;
+        
+        // Reload table with new URL
+        $table.bootstrapTable('refresh', {
+            url: url,
+            silent: true
+        });
+    }
+    
+    // Filter button click handler
+    $('#btn-filter').on('click', function() {
+        applyFilters();
+    });
+    
+    // Reset button click handler
+    $('#btn-reset').on('click', function() {
+        // Clear all filters
+        $('#filterCargo, #filterDepartamento').val('');
+        $('#buscar-trabajador').val('');
+        $('#resultados-busqueda').hide().empty();
+        
+        // Reset the table to show all records
+        $table.bootstrapTable('filterBy', {});
+        $table.bootstrapTable('refresh', {
+            url: 'api-app.php?module=trabajadores&method=list',
+            silent: true
+        });
+    });
+    
+    // Handle Enter key in filter inputs
+    $('#filterCargo, #filterDepartamento').keypress(function(e) {
+        if (e.which == 13) {
+            applyFilters();
+            return false;
+        }
+    });
     // Helper to escape HTML for safe insertion into hidden inputs
     function escapeHtml(str) {
         if (typeof str !== 'string') return str || '';
@@ -8,6 +171,7 @@ $(document).ready(function () {
                   .replace(/"/g, '&quot;')
                   .replace(/'/g, '&#039;');
     }
+    // Move the add new button handler after the filter code
     $('#btn-add-new').click(function () {
         location.href = 'index.php?module=trabajadores';
     });
