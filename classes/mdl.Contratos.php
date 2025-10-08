@@ -10,6 +10,29 @@ class Contrato {
         $action = 'insert';
     }
 
+    // Lista de trabajadores para poblar el select del formulario
+    private function _list_trabajadores() {
+        try {
+            $sql = "SELECT id, nombre, apellidos, apellidos_segundos
+                    FROM trabajadores
+                    WHERE trabajador_eliminado = '0'
+                    ORDER BY apellidos ASC, nombre ASC";
+            return $this->db->fetchAll($sql);
+        } catch (Exception $e) {
+            return array();
+        }
+    }
+
+    // Lista de departamentos para poblar el select
+    private function _list_departamentos() {
+        try {
+            $sql = "SELECT id, nombre FROM departamentos ORDER BY nombre";
+            return $this->db->fetchAll($sql);
+        } catch (Exception $e) {
+            return array();
+        }
+    }
+
     public function api($param) {
         switch ($param['method']) {
             case 'list':
@@ -18,6 +41,18 @@ class Contrato {
                 break;
             case 'list-id':
                 $data = $this->_list_id($param);
+                print(json_encode($data));
+                break;
+            case 'list-trabajadores':
+                $data = $this->_list_trabajadores();
+                print(json_encode($data));
+                break;
+            case 'list-departamentos':
+                $data = $this->_list_departamentos();
+                print(json_encode($data));
+                break;
+            case 'get-trabajador-data':
+                $data = $this->_get_trabajador_data($param);
                 print(json_encode($data));
                 break;
             case 'getTemplate':
@@ -49,12 +84,27 @@ class Contrato {
                 $page['subtitle'] = 'Registro de Contrato';
                 $action = 'insert';
 
-                // Cargar trabajadores activos para el select
+                // Cargar trabajadores para el select (sin filtros restrictivos)
                 try {
-                    $data_form['trabajadores'] = $this->db->fetchAll("SELECT id, nombre, apellidos FROM trabajadores WHERE trabajador_eliminado = '0' ORDER BY nombre ASC, apellidos ASC");
+                    $sql = "SELECT id, nombre, apellidos, apellidos_segundos FROM trabajadores ORDER BY apellidos ASC, nombre ASC";
+                    $data_form['trabajadores'] = $this->db->fetchAll($sql);
                 } catch (Exception $e) {
                     $data_form['trabajadores'] = array();
                 }
+                
+                // Cargar departamentos para el select de ubicación laboral
+                try {
+                    $data_form['departamentos'] = $this->app->get_list_departamentos();
+                    if (!isset($data_form['departamentos']) || !is_array($data_form['departamentos']) || count($data_form['departamentos']) === 0) {
+                        // Fallback directo a la tabla 'departamentos'
+                        $data_form['departamentos'] = $this->db->fetchAll("SELECT id, nombre FROM departamentos ORDER BY nombre");
+                    }
+                } catch (Exception $e) {
+                    // Fallback en caso de error usando App
+                    try { $data_form['departamentos'] = $this->db->fetchAll("SELECT id, nombre FROM departamentos ORDER BY nombre"); }
+                    catch(Exception $e2) { $data_form['departamentos'] = array(); }
+                }
+                
                 if (isset($param['id'])) {
                     $page['title'] = 'Editar Contrato';
                     $action = 'update';
@@ -89,12 +139,12 @@ class Contrato {
 
     // Genera PDF a partir del HTML enviado (ya con valores reemplazados)
     private function _generatePdfFromHtml($param) {
-        $response = array('status'=>0,'msg'=>'');
+        $response = array('status'=>0,'msg'=>'', 'file_url'=>'');
         $html = isset($param['html']) ? $param['html'] : '';
         $tipo = isset($param['tipo']) ? $param['tipo'] : 'contrato';
         $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
 
-        if (empty($html)) { $response['msg'] = 'HTML vacío'; print(json_encode($response)); return; }
+        if (empty($html)) { $response['msg'] = 'HTML no proporcionado'; print(json_encode($response)); return; }
 
         // Cargar mPDF
         $autoloads = array(
@@ -117,7 +167,7 @@ class Contrato {
             $fullPath = rtrim($upload_dir, '/\\') . '/' . $fileName;
             $mpdf->Output($fullPath, 'F');
 
-            $response['status']=1; $response['file_url'] = $fullPath; $response['msg']='OK';
+            $response['status']=1; $response['file_url'] = $fullPath; $response['msg']='PDF generado correctamente';
             // Si contrato_id fue proporcionado actualizamos la columna archivo_contrato
             if ($contrato_id) {
                 try { $this->db->update('contratos', array('archivo_contrato'=>$fullPath), array('id'=>$contrato_id)); } catch(Exception $e) { /* silencio */ }
@@ -127,6 +177,7 @@ class Contrato {
         }
         print(json_encode($response));
     }
+
 
     // Genera PDF usando la librería FPDF (texto plano a partir de plantilla PHP)
     private function _generatePdfWithFpdf($param) {
@@ -261,20 +312,91 @@ class Contrato {
         }
         return $data;
     }
+    
+    // Nuevo método para obtener datos completos del trabajador
+    private function _get_trabajador_data($param) {
+        $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
+        $data = array('status' => 0, 'data' => array());
+        if ($trabajador_id <= 0) { $data['msg'] = 'ID de trabajador inválido'; return $data; }
+
+        // Primer intento: tablas en singular (provincia, municipio)
+        $sqlSingular = "SELECT 
+                            t.id, t.nombre, t.apellidos, t.apellidos_segundos, t.direccion,
+                            t.cargos_id, t.provincia_id, t.municipio_id,
+                            c.nombre as cargo_nombre,
+                            p.nombre as provincia_nombre,
+                            m.nombre as municipio_nombre
+                        FROM trabajadores t
+                        LEFT JOIN cargos c ON t.cargos_id = c.id
+                        LEFT JOIN provincia p ON t.provincia_id = p.id
+                        LEFT JOIN municipio m ON t.municipio_id = m.id
+                        WHERE t.id = :id AND t.trabajador_eliminado = '0'";
+        // Segundo intento: tablas en plural (provincias, municipios)
+        $sqlPlural = "SELECT 
+                            t.id, t.nombre, t.apellidos, t.apellidos_segundos, t.direccion,
+                            t.cargos_id, t.provincia_id, t.municipio_id,
+                            c.nombre as cargo_nombre,
+                            p.nombre as provincia_nombre,
+                            m.nombre as municipio_nombre
+                        FROM trabajadores t
+                        LEFT JOIN cargos c ON t.cargos_id = c.id
+                        LEFT JOIN provincias p ON t.provincia_id = p.id
+                        LEFT JOIN municipios m ON t.municipio_id = m.id
+                        WHERE t.id = :id AND t.trabajador_eliminado = '0'";
+
+        $trabajador = null;
+        try {
+            $trabajador = $this->db->fetchRow($sqlSingular, array('id' => $trabajador_id));
+        } catch (Exception $e1) {
+            try {
+                $trabajador = $this->db->fetchRow($sqlPlural, array('id' => $trabajador_id));
+            } catch (Exception $e2) {
+                $data['msg'] = 'Error al consultar trabajador';
+                return $data;
+            }
+        }
+
+        if ($trabajador) {
+            $data['status'] = 1;
+            $data['data'] = array(
+                'id' => $trabajador['id'],
+                'nombre' => $trabajador['nombre'] ?? '',
+                'apellidos' => $trabajador['apellidos'] ?? '',
+                'apellidos_segundos' => $trabajador['apellidos_segundos'] ?? '',
+                'direccion' => $trabajador['direccion'] ?? '',
+                'cargos_id' => $trabajador['cargos_id'] ?? '',
+                'cargo_nombre' => $trabajador['cargo_nombre'] ?? 'Sin cargo',
+                'provincia_id' => $trabajador['provincia_id'] ?? '',
+                'provincia_nombre' => $trabajador['provincia_nombre'] ?? 'Sin provincia',
+                'municipio_id' => $trabajador['municipio_id'] ?? '',
+                'municipio_nombre' => $trabajador['municipio_nombre'] ?? 'Sin municipio'
+            );
+        } else {
+            $data['msg'] = 'Trabajador no encontrado';
+        }
+        return $data;
+    }
 
     private function _save($param) {
         $data = array('status'=>1, 'msg_title'=>'Éxito', 'msg'=>'Contrato guardado correctamente');
 
-        // Validaciones básicas
+        // Validaciones básicas - nuevos campos
         $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
-        $tipo = isset($param['tipo']) ? trim($param['tipo']) : '';
-        $fecha_inicio = isset($param['fecha_inicio']) ? $param['fecha_inicio'] : null;
-        $fecha_fin = isset($param['fecha_fin']) ? $param['fecha_fin'] : null;
+        $tipo_contrato = isset($param['tipo_contrato']) ? trim($param['tipo_contrato']) : '';
+        $departamento_id = isset($param['departamento_id']) ? intval($param['departamento_id']) : 0;
+        $regimen_descanso = isset($param['regimen_descanso']) ? trim($param['regimen_descanso']) : '';
+        $salario_base = isset($param['salario_base']) ? floatval($param['salario_base']) : 0;
+        $modalidad_trabajo = isset($param['modalidad_trabajo']) ? trim($param['modalidad_trabajo']) : '';
+        
+        // La fecha de inicio se toma automáticamente como la fecha actual
+        $fecha_inicio = date('Y-m-d');
 
         if ($trabajador_id <= 0) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El trabajador es obligatorio'; print(json_encode($data)); return; }
-        if ($tipo === '') { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El tipo de contrato es obligatorio'; print(json_encode($data)); return; }
-        if (empty($fecha_inicio)) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La fecha de inicio es obligatoria'; print(json_encode($data)); return; }
-        if (!empty($fecha_fin) && $fecha_fin < $fecha_inicio) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La fecha fin no puede ser anterior a la fecha inicio'; print(json_encode($data)); return; }
+        if ($tipo_contrato === '') { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El tipo de contrato es obligatorio'; print(json_encode($data)); return; }
+        if ($departamento_id <= 0) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La ubicación laboral es obligatoria'; print(json_encode($data)); return; }
+        if ($regimen_descanso === '') { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El régimen de descanso es obligatorio'; print(json_encode($data)); return; }
+        if ($salario_base <= 0) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El salario base debe ser mayor a 0'; print(json_encode($data)); return; }
+        if ($modalidad_trabajo === '') { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='La modalidad de trabajo es obligatoria'; print(json_encode($data)); return; }
 
         // Manejo de uploads (solo firma, el contrato se genera como PDF automáticamente)
         $upload_dir = 'uploads/contratos/';
@@ -294,12 +416,15 @@ class Contrato {
         }
 
         $insert = array(
-            'trabajador_id'   => $trabajador_id,
-            'tipo'            => $tipo,
-            'fecha_inicio'    => $fecha_inicio,
-            'fecha_fin'       => !empty($fecha_fin) ? $fecha_fin : null,
-            'archivo_contrato'=> $archivo_contrato_path,
-            'firma_digital'   => $firma_digital_path
+            'trabajador_id'     => $trabajador_id,
+            'tipo_contrato'     => $tipo_contrato,
+            'departamento_id'   => $departamento_id,
+            'regimen_descanso'  => $regimen_descanso,
+            'salario_base'      => $salario_base,
+            'modalidad_trabajo' => $modalidad_trabajo,
+            'fecha_inicio'      => $fecha_inicio,
+            'archivo_contrato'  => $archivo_contrato_path,
+            'firma_digital'     => $firma_digital_path
         );
 
         try {
@@ -311,7 +436,7 @@ class Contrato {
                     if ($lastId) {
                         $data['id'] = $lastId;
                         // 2) Generar PDF con mPDF
-                        $pdfPath = $this->generar_pdf_contrato($upload_dir, $lastId, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, $firma_digital_path);
+                        $pdfPath = $this->generar_pdf_contrato($upload_dir, $lastId, $trabajador_id, $tipo_contrato, $fecha_inicio, null, $firma_digital_path);
                         if ($pdfPath) {
                             // 3) Actualizar ruta del archivo en BD
                             $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $lastId));
@@ -330,7 +455,7 @@ class Contrato {
                 else {
                     $data['id'] = $id;
                     // Regenerar PDF con datos actualizados
-                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, isset($insert['firma_digital']) ? $insert['firma_digital'] : $firma_digital_path);
+                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, isset($insert['firma_digital']) ? $insert['firma_digital'] : $firma_digital_path);
                     if ($pdfPath) {
                         $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $id));
                         $data['file_url'] = $pdfPath;
