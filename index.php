@@ -173,24 +173,29 @@ $load_grid = true;
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <li class="tgl-menu-btn">
                             <a class="mainnav-toggle" href="javascript:void(0);">
-                                <i class="fa fa-navicon fa-lg"></i>
                             </a>
                         </li>
-                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-                        <!--End Navigation toogle button-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->                        <!--End Navigation toogle button-->
                     </ul>
                     <ul class="nav navbar-top-links pull-right">
 
                         <!--City selector-->
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-                        <?php //require_once(INCLUDES . DS . 'city-selector.php');  
-                        ?>
+                        <?php //require_once(INCLUDES . DS . 'city-selector.php');  ?>
+                        <!-- Botón de notificaciones/Chat -->
+                        <li>
+                            <a id="btn-navbar-chat" href="index.php?module=chat" title="Chat / Notificaciones">
+                                <i class="fa fa-comments fa-lg"></i>
+                                <span id="notif-count" class="badge badge-danger" style="display:none; margin-left:6px;">0</span>
+                            </a>
+                        </li>
+
+                        <!--City selector-->
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <!--End city selector-->
 
-
-
                         <!--User dropdown-->
+
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <?php require_once(INCLUDES . DS . 'dropdown-user.php'); ?>
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->

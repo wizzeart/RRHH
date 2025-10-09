@@ -71,6 +71,37 @@ $(document).ready(function () {
     actualizarVistaPrevia();
   });
 
+  // UX: abrir selector de hora al clickear cualquier parte del input
+  function bindTimePicker(selector) {
+    var $el = $(selector);
+    if (!$el.length) return;
+    function openPicker(input) {
+      try {
+        if (input && typeof input.showPicker === 'function') {
+          input.showPicker();
+          return true;
+        }
+      } catch (e) { /* ignore */ }
+      try { input.focus(); input.click(); } catch(e) { /* ignore */ }
+      return false;
+    }
+    // Abrir en click y en focus vía teclado
+    $el.on('click', function(e){ openPicker(this); });
+    $el.on('focus', function(e){
+      // abrir automáticamente al enfocar con teclado/tab
+      setTimeout(() => openPicker(this), 0);
+    });
+    // También permitir abrir con Enter o Space
+    $el.on('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openPicker(this);
+      }
+    });
+  }
+  bindTimePicker('#f-desde-hora');
+  bindTimePicker('#f-hasta-hora');
+
   // Función para actualizar la vista previa del contrato
   function actualizarVistaPrevia() {
     var tipoContrato = $('#f-tipo-contrato').val();

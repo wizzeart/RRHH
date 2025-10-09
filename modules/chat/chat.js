@@ -12,6 +12,7 @@ $(function() {
 
     var Chat = {
         updateTimer: null,
+        isAdmin: false,
 
         // simple enterprise color palette
         palette: [
@@ -36,15 +37,18 @@ $(function() {
                 e.preventDefault();
                 var message = $('#mensaje-texto').val().trim();
                 if (message === '') return;
+                var receiver = $('#mensaje-texto').attr('data-receiver') || '';
                 $('#mensaje-texto').prop('disabled', true);
                 $.ajax({
                     url: 'api-app.php',
                     type: 'POST',
-                    data: { module: 'chat', method: 'sendMessage', content: message },
+                    data: { module: 'chat', method: 'sendMessage', content: message, receiver_user: receiver },
                     dataType: 'json',
                     success: function(res) {
                         if (res && res.status === 1) {
                             $('#mensaje-texto').val('');
+                            // Reset reply target and placeholder
+                            $('#mensaje-texto').removeAttr('data-receiver').attr('placeholder', 'Escribe tu mensaje...');
                             self.loadMessages();
                         } else {
                             alert(res && res.msg ? res.msg : 'Error al enviar mensaje');
@@ -56,6 +60,16 @@ $(function() {
                     },
                     complete: function() { $('#mensaje-texto').prop('disabled', false).focus(); }
                 });
+            });
+
+            // Delegated: click on reply buttons (admin only)
+            $(document).on('click', '.reply-btn', function() {
+                var user = $(this).data('user');
+                if (!user) return;
+                $('#mensaje-texto')
+                  .attr('data-receiver', user)
+                  .attr('placeholder', 'Responder a ' + user + '...')
+                  .focus();
             });
 
             document.addEventListener('visibilitychange', function() {
@@ -75,6 +89,7 @@ $(function() {
                 dataType: 'json',
                 success: function(res) {
                     if (res && res.status === 1 && Array.isArray(res.messages)) {
+                        Chat.isAdmin = !!res.is_admin;
                         var html = '';
                         if (res.messages.length === 0) {
                             html = '<tr><td colspan="3" class="text-center">No hay mensajes</td></tr>';
@@ -97,9 +112,14 @@ $(function() {
                                 var badge = '<span class="chat-user-badge" style="background:' + color + '"></span>';
                                 var isCurrent = m.is_current || (typeof window.CHAT_CURRENT_USER !== 'undefined' && window.CHAT_CURRENT_USER === m.user);
                                 var rowClass = (isCurrent ? 'table-primary' : '');
+                                var role = (m.sender_role === 'admin') ? '<span class="label label-info" style="margin-right:6px;">Admin</span>' : '<span class="label label-default" style="margin-right:6px;">Trabajador</span>';
+                                var replyBtn = '';
+                                if (Chat.isAdmin && m.sender_role === 'worker' && m.user) {
+                                    replyBtn = ' <button type="button" class="btn btn-xs btn-primary reply-btn" data-user="' + escapeHtml(m.user) + '">Responder</button>';
+                                }
                                 html += '<tr class="' + rowClass + '">' +
                                         '<td>' + badge + '<strong>' + escapeHtml(m.user) + '</strong></td>' +
-                                        '<td>' + escapeHtml(m.content) + '</td>' +
+                                        '<td>' + role + escapeHtml(m.content) + replyBtn + '</td>' +
                                         '<td class="text-center">' + escapeHtml(m.date) + '</td>' +
                                         '</tr>';
                             });
