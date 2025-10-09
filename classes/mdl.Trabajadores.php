@@ -95,12 +95,14 @@ class Trabajador {
                     $sql = "SELECT numero_tarjeta_salario, numero_cuenta_estandar FROM bancos WHERE trabajador_id = :id";
                         
                     $result = $this->app->db->fetchAll($sql, array('id' => $param['id']));
-                    $numero_tarjeta_salario = array_column($result, 'numero_tarjeta_salario')[0];
-                    $numero_cuenta_estandar = array_column($result, 'numero_cuenta_estandar')[0];
-                    
                     $data = $row;
-                    $data['cuenta_estandar'] = $numero_cuenta_estandar;
-                    $data['tarjeta_salario'] = $numero_tarjeta_salario;
+                    if (isset($result) && count($result) > 0) {
+                        $numero_tarjeta_salario = array_column($result, 'numero_tarjeta_salario')[0];
+                        $numero_cuenta_estandar = array_column($result, 'numero_cuenta_estandar')[0];
+                        $data['cuenta_estandar'] = $numero_cuenta_estandar;
+                        $data['tarjeta_salario'] = $numero_tarjeta_salario;
+                    }
+                    
                     $page['title'] = 'Ficha de Trabajador: ' . $row['nombre'] . ' ' . $row['apellidos'] . ' ' . $row['apellidos_segundos'];
                 }
                 $data_form = array();

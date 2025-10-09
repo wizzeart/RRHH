@@ -290,6 +290,16 @@
                         </div>
 
 
+                        <div class="row panel-footer" style="margin-top: 20px;">
+                            <div class="col-md-12">
+                                <button id="btn-pase-acceso" class="btn btn-warning icon-lg" type="button">
+                                    <i class="fa fa-plus"></i>
+                                    Descargar Pase de Acceso
+                                </button>
+                            </div>
+                        </div>
+
+                    
                     </div>
                 </div><!-- TAB GENERAL -->
             </div>
@@ -521,10 +531,11 @@
                             data-pagination="true">
                             <thead>
                                 <tr>
-                                    <th data-field="dias" data-sortable="true">Días</th>
-                                    <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
+                                    <th data-field="fecha_inicio" data-sortable="true">Fecha Inicio</th>
+                                    <th data-field="fecha_fin" data-sortable="true">Fecha Fin</th>
                                     <th data-field="fecha_aprobacion" data-formatter="formatoAprobacion" data-sortable="true">Estado</th>
-
+                                    <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
+                                            
                                 </tr>
                             </thead>
                         </table>
@@ -574,19 +585,27 @@
                     <i class="fa fa-undo"></i>
                     Volver
                 </button>
-                <!-- <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                                <i class="fa fa-plus"></i>
-                                Nuevo
-                            </button> -->
-
-                <!-- Sección de Foto del Trabajador -->
-                <hr>
 
             </div>
         </div><!-- TAB RECURSOS ASIGNADOS -->
-        <!-- TAB CONTRATACIÓN -->
 
     </div>
     <!-- =================================================== -->
     <!-- END BASIC FORM ELEMENTS -->
+</div>
+
+<div class="modal fade" id="trabajadorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- <h5 class="modal-title" id="modalLabel">Detalles del Trabajador</h5> -->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Aquí se insertan los datos -->
+            </div>
+        </div>
+    </div>
 </div>

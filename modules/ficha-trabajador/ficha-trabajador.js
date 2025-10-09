@@ -15,7 +15,93 @@ function formatoEstado(value, row) {
 }
 
 $(document).ready(function () {
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return str || '';
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#039;');
+    }
     // Helper de notificaciones: usa Nifty Noty si está disponible, si no, fallback a alert
+    $('#btn-pase-acceso').on('click', function () {
+        // Obtener los datos del trabajador del formulario
+        var t = {
+            id: $('#f-id').val(),
+            nombre: $('#f-nombre').val(),
+            apellidos: $('#f-apellidos').val(),
+            carnet_identidad: $('#f-ci').val(),
+            cargo_nombre: $('#f-cargo option:selected').text(),
+            cargos_id: $('#f-cargo').val(),
+            areas_acceso: $('#f-areas-acceso').val() || 'Todas las áreas',
+            fecha_generacion: new Date().toLocaleDateString(),
+            vigente: '1',
+            foto: $('#foto-preview').attr('src') || 'img/avatar.png'
+        };
+        
+        // Debug: ver los datos que recibimos
+        console.log('Datos del trabajador para pase de acceso:', t);
+        var fotoHtml = '';
+        if (t.foto) {
+            fotoHtml = '<img src="' + t.foto + '" alt="Foto del trabajador" style="max-width:200px; margin-bottom:10px;" class="img-thumbnail">';
+        }
+
+        // Construir el HTML del modal como tarjeta de identificación
+        // Usamos un formulario oculto para enviar los datos al generador de PDF.
+        var formId = 'pdfForm_' + (Math.floor(Math.random() * 100000));
+        var html = '<div class="id-card-container" style="max-width:700px; margin:0 auto;">'
+            + '<form id="' + formId + '" method="POST" action="generate_id_pdf.php" target="_blank">'
+            // Hidden inputs to send to the PDF generator
+            + '<input type="hidden" name="nombre" value="' + (escapeHtml(t.nombre || '')) + '">'
+            + '<input type="hidden" name="apellidos" value="' + (escapeHtml(t.apellidos || '')) + '">'
+            + '<input type="hidden" name="carnet_identidad" value="' + (escapeHtml(t.carnet_identidad || '')) + '">'
+            + '<input type="hidden" name="cargo_nombre" value="' + (escapeHtml(t.cargo_nombre || '')) + '">'
+            + '<input type="hidden" name="areas_acceso" value="' + (escapeHtml(t.areas_acceso || '')) + '">'
+            + '<input type="hidden" name="fecha_generacion" value="' + (escapeHtml(t.fecha_generacion || '')) + '">'
+            + '<input type="hidden" name="vigente" value="' + (t.vigente || '') + '">'
+            + '<input type="hidden" name="foto" value="' + (escapeHtml(t.foto || '')) + '">'
+            + '<div class="row">'
+            + '<div class="col-md-12 text-center mb-3">'
+            + '<h4 style="margin:0;">Tarjeta de Identificación</h4>'
+            + '<small class="text-muted">Pase de Control de Acceso</small>'
+            + '</div>'
+            + '</div>'
+            + '<div class="row align-items-center">'
+            + '<div class="col-md-4 text-center">'
+            + '<div class="photo-box" style="width:200px; height:260px; margin:0 auto; border:2px solid #e9ecef; border-radius:6px; display:flex; align-items:center; justify-content:center; background:#fff;">'
+            + (fotoHtml || '<div style="padding:10px;">No hay foto</div>')
+            + '</div>'
+            + '<div style="margin-top:10px;">'
+            + '<span class="badge badge-info">ID: ' + (t.cargos_id || 'N/A') + '</span>'
+            + '</div>'
+            + '</div>'
+            + '<div class="col-md-8">'
+            + '<div class="card" style="border:1px solid #e9ecef; box-shadow: none;">'
+            + '<div class="card-body p-3">'
+            + '<h5 style="font-weight:700; margin-bottom:6px;">' + (t.nombre || '') + ' ' + (t.apellidos || '') + '</h5>'
+            + '<p style="margin:0 0 8px 0; color:#6c757d;">' + (t.cargo_nombre || 'Cargo no especificado') + '</p>'
+            + '<table class="table table-sm" style="margin-bottom:0; font-size:0.95em;">'
+            + '<tr><td><strong>CI</strong></td><td>' + (t.carnet_identidad || 'N/A') + '</td></tr>'
+            + '<tr><td><strong>Áreas</strong></td><td>' + (t.areas_acceso || 'No definidas') + '</td></tr>'
+            + '<tr><td><strong>Fecha Gen.</strong></td><td>' + (t.fecha_generacion || 'N/A') + '</td></tr>'
+            + '<tr><td><strong>Estado Pase</strong></td><td>' + (t.vigente === '1' ? 'Vigente' : 'No Vigente') + '</td></tr>'
+            + '</table>'
+            + '</div>'
+            + '</div>'
+            + '<div class="mt-2">'
+            + '<button type="submit" class="btn btn-primary btn-sm" style="margin-right:8px;" onclick="document.getElementById(\'' + formId + '\').submit();">Generar PDF</button>'
+            + '<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Cerrar</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</form>'
+            + '</div>';
+
+        $('#modalBody').html(html);
+        //$('#trabajadorModal').modal('show');
+        // hacerle submit al formulario
+        document.getElementById(formId).submit();
+    });
     function notify(type, title, message, timer) {
         if ($.niftyNoty && typeof $.niftyNoty === 'function') {
             $.niftyNoty({
