@@ -299,7 +299,7 @@
                             </div>
                         </div>
 
-                    
+
                     </div>
                 </div><!-- TAB GENERAL -->
             </div>
@@ -351,7 +351,7 @@
                     </div>
                     <div class="panel-body">
                         <table
-                            id="table-todos"
+                            id="table-recursos"
                             data-toggle="table"
                             data-url="api-app.php?module=gestion-recursos&method=list-id&trabajador_id=<?php print($data['id']) ?>"
                             data-search="true"
@@ -370,7 +370,7 @@
                                     <th data-field="estado" data-sortable="true" data-formatter="formatoEstado">Estado</th>
                                     <th data-field="fecha_entrega_a_t" data-sortable="true" data-formatter="formatoFecha">Fecha Entrega</th>
                                     <th data-field="fecha_entrega_a_rh" data-sortable="true" data-formatter="formatoFecha">Fecha Devolución</th>
-                                    <!--<th data-field="toolbar" data-align="center" data-formatter="formatoToolbar" data-sortable="false">Opciones</th>-->
+                                    <th data-field="toolbar" data-align="center" data-formatter="formatoToolbar2" data-sortable="false">Opciones</th>
                                 </tr>
                             </thead>
                         </table>
@@ -460,7 +460,7 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Salario</h3>
-                                            
+
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -489,14 +489,15 @@
                                 <tr>
                                     <th data-field="year" data-sortable="true">Período</th>
                                     <th data-field="month" data-sortable="true">Mes</th>
-                                    <th data-field="horas" data-sortable="true">Horas</th>
+                                    <th data-field="horas" data-sortable="true">Horas trabajadas</th>
                                     <th data-field="tarifa" data-sortable="true">Tarifa/hora (CUP)</th>
                                     <th data-field="a_cobrar" data-sortable="true">Total Bruto (CUP)</th>
                                     <!-- <th data-field="bonif" data-sortable="true">Bonif.</th> -->
                                     <!-- <th data-field="sal_dev" data-sortable="true">Sal. Dev.</th> -->
-                                    <!-- <th data-field="ausencias" data-sortable="true">Ausencias</th> -->
-                                    <!-- <th data-field="vacaciones" data-sortable="true">Vacaciones</th> -->
-                                    <!-- <th data-field="pago_vac" data-sortable="true">Pago Vac.</th> -->
+                                    <th data-field="ausencias" data-sortable="true">Ausencias</th>
+                                    <th data-field="ausencias_costo" data-sortable="true">Costo Ausencias</th>
+                                    <th data-field="vacaciones" data-sortable="true">Vacaciones</th>
+                                    <th data-field="pago_vac" data-sortable="true">Pago Vac.</th>
                                     <th data-field="salario_neto" data-sortable="true">Sal. Neto (CUP)</th>
                                     <th data-field="seg_social" data-sortable="true">Seg. Social (CUP)</th>
                                     <th data-field="ing_pers" data-sortable="true">Ing. Pers. (CUP)</th>
@@ -535,7 +536,7 @@
                                     <th data-field="fecha_fin" data-sortable="true">Fecha Fin</th>
                                     <th data-field="fecha_aprobacion" data-formatter="formatoAprobacion" data-sortable="true">Estado</th>
                                     <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
-                                            
+
                                 </tr>
                             </thead>
                         </table>
@@ -604,6 +605,23 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
+                <!-- Aquí se insertan los datos -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles del recurso -->
+<div class="modal fade" id="recursoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Detalles del Recurso</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody2">
                 <!-- Aquí se insertan los datos -->
             </div>
         </div>

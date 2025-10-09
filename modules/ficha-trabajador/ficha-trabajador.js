@@ -14,6 +14,15 @@ function formatoEstado(value, row) {
     }
 }
 
+
+function firmadoFormatter(value, row, index) {
+    var firmado = (value && String(value).trim() !== '' && value !== 'null' && value !== null);
+    if (firmado) {
+      return '<span class="label label-success">Firmado</span>';
+    }
+    return '<span class="label label-warning">No firmado</span>';
+  }
+
 $(document).ready(function () {
     function escapeHtml(str) {
         if (typeof str !== 'string') return str || '';
@@ -495,6 +504,45 @@ $(document).ready(function () {
 
     // Inicializar estado del checkbox de fecha baja al cargar la página
     $('#check-fecha-baja').trigger('change');
+
+    // Manejador para el botón de ver detalles
+    $('#table-recursos').on('click', '.view-recurso', function () {
+        var $tr = $(this).closest('tr');
+        var $table = $tr.closest('table');
+
+        var index = $tr.data('index'); // O $tr.index()
+        var allData = $table.bootstrapTable('getData');
+        var rowData = allData[index];
+        
+        // Construir el HTML del modal con los detalles
+        var html = '<div class="row">';
+        html += '<div class="col-md-12">';
+        html += '<table class="table table-bordered">';
+        
+        // Función para agregar una fila a la tabla
+        function addRow(label, value) {
+            return '<tr><td class="active" style="width:30%;"><strong>' + label + '</strong></td><td>' + (value || 'N/A') + '</td></tr>';
+        }
+        
+        // Agregar detalles del recurso
+        html += addRow('Recurso', rowData.nombre);
+        html += addRow('Trabajador', rowData.nombre_trabajador || 'No asignado');
+        html += addRow('Estado', formatoEstado(rowData.estado, rowData));
+        html += addRow('Fecha de Entrega', formatoFecha(rowData.fecha_entrega_a_t));
+        html += addRow('Fecha de Devolución', formatoFecha(rowData.fecha_entrega_a_rh) || 'Pendiente');
+        html += addRow('Marca', rowData.marca);
+        html += addRow('Modelo', rowData.modelo);
+        html += addRow('Color', rowData.color);
+        html += addRow('Otros Recursos', rowData.otros_recursos);
+        
+        html += '</table>';
+        html += '</div>';
+        html += '</div>';
+
+        // Mostrar el modal
+        $('#modalBody2').html(html);
+        $('#recursoModal').modal('show');
+    });
 });
 
 function formatoPedido(value, row) {
@@ -505,6 +553,19 @@ function formatoPedido(value, row) {
     s += '<div><small>' + row.xhash + '</small></div>';
     s += '<div>' + row.xrevendedor + '</div>';
     return s;
+}
+function formatoToolbar2(value, row) {
+    var html = '<div class="btn-group">';
+    
+    
+ 
+    
+    // Botón de ver detalles
+    html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
+    html += 'data-id="' + row.id + '" title="Ver detalles"></button> ';
+    
+    html += '</div>';
+    return html;
 }
 function formatoToolbar(value, row) {
     var btn_edit = '<button title="Editar" data-id="' + row.xpedido_id + '" data-ref="' + row.xhash + '" class="btn btn-info btn-xs btn-icon icon-sm fa fa-edit"></button>';
