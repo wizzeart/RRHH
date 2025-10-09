@@ -127,7 +127,7 @@
 </li>
 
 <li class="list-divider"></li>
-<li>
+<li class="<?php if (in_array($_GET['module'], array('list-asistencias', 'asistencias'))) print('active-link') ?>">
     <a href="?module=list-asistencias">
         <i class="fa fa-calendar"></i>
         <span class="menu-title">
@@ -239,19 +239,11 @@
 
 <!--NEW MENU ENTREGA DE RECURSOS-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
+<li class="<?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('active-link') ?>">
+    <a href="?module=list-recursos">
         <i class="fa fa-cube"></i>
         <span class="menu-title">
             <strong>Entrega de Recursos</strong>
         </span>
-        <i class="arrow"></i>
     </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-recursos'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-recursos'))) print('active-link') ?>">
-            <a href="?module=list-recursos">Lista de Recursos</a>
-        </li>
-    </ul>
 </li>

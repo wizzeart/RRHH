@@ -43,14 +43,12 @@ $(document).ready(function () {
 
     // Manejador para el botón de ver detalles
     $('#table-todos, #table-asignados, #table-retornados').on('click', '.view-recurso', function () {
-        var id = $(this).data('id');
-        var $tables = $('#table-todos');
-        var rowData = $tables.bootstrapTable('getRowByUniqueId', id);
-        
-        if (!rowData) {
-            alert('No se encontró la información del recurso.');
-            return;
-        }
+        var $tr = $(this).closest('tr');
+        var $table = $tr.closest('table');
+
+        var index = $tr.data('index'); // O $tr.index()
+        var allData = $table.bootstrapTable('getData');
+        var rowData = allData[index];
         
         // Construir el HTML del modal con los detalles
         var html = '<div class="row">';
@@ -68,6 +66,10 @@ $(document).ready(function () {
         html += addRow('Estado', formatoEstado(rowData.estado, rowData));
         html += addRow('Fecha de Entrega', formatoFecha(rowData.fecha_entrega_a_t));
         html += addRow('Fecha de Devolución', formatoFecha(rowData.fecha_entrega_a_rh) || 'Pendiente');
+        html += addRow('Marca', rowData.marca);
+        html += addRow('Modelo', rowData.modelo);
+        html += addRow('Color', rowData.color);
+        html += addRow('Otros Recursos', rowData.otros_recursos);
         
         html += '</table>';
         html += '</div>';

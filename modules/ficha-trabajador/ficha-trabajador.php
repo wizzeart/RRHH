@@ -290,6 +290,16 @@
                         </div>
 
 
+                        <div class="row panel-footer" style="margin-top: 20px;">
+                            <div class="col-md-12">
+                                <button id="btn-pase-acceso" class="btn btn-warning icon-lg" type="button">
+                                    <i class="fa fa-plus"></i>
+                                    Descargar Pase de Acceso
+                                </button>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div><!-- TAB GENERAL -->
             </div>
@@ -303,26 +313,28 @@
                     <div class="panel-body orm-padding">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="control-label" for="f-email">Correo Electrónico</label>
-                                    <input type="email" id="f-email" name="email" class="form-control" placeholder="correo@ejemplo.com" value="<?php if (isset($data['email'])) print(htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8')); ?>" readonly>
-                                </div>
+
 
                                 <div class="form-group">
                                     <label class="control-label" for="f-telefono">Teléfono Móvil</label>
                                     <input type="text" id="f-telefono" name="telefono" class="form-control" placeholder="Teléfono de contacto" value="<?php if (isset($data['telefono'])) print($data['telefono']); ?>" readonly>
                                 </div>
 
+
                                 <div class="form-group">
-                                    <label class="control-label" for="f-telefono-fijo">Teléfono Fijo</label>
-                                    <input type="text" id="f-telefono-fijo" name="telefono_fijo" class="form-control" placeholder="+56 X XXXX XXXX" value="<?php if (isset($data['telefono_fijo'])) print(htmlspecialchars($data['telefono_fijo'], ENT_QUOTES, 'UTF-8')); ?>" readonly>
+                                    <label class="control-label" for="f-direccion">Dirección</label>
+                                    <textarea id="f-direccion" name="direccion" class="form-control" rows="2" placeholder="Dirección completa" readonly><?php if (isset($data['direccion'])) print(htmlspecialchars($data['direccion'], ENT_QUOTES, 'UTF-8')); ?></textarea>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="control-label" for="f-direccion">Dirección</label>
-                                    <textarea id="f-direccion" name="direccion" class="form-control" rows="3" placeholder="Dirección completa" readonly><?php if (isset($data['direccion'])) print(htmlspecialchars($data['direccion'], ENT_QUOTES, 'UTF-8')); ?></textarea>
+                                    <label class="control-label" for="f-provincia">Provincia</label>
+                                    <input type="text" id="f-provincia" name="provincia" class="form-control" placeholder="Provincia" readonly value="<?php if (isset($data['provincia_nombre'])) print(htmlspecialchars($data['provincia_nombre'], ENT_QUOTES, 'UTF-8')); ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="f-municipio">Municipio</label>
+                                    <input type="text" id="f-municipio" name="municipio" class="form-control" placeholder="Municipio" readonly value="<?php if (isset($data['municipio_nombre'])) print(htmlspecialchars($data['municipio_nombre'], ENT_QUOTES, 'UTF-8')); ?>">
                                 </div>
 
                             </div>
@@ -339,7 +351,7 @@
                     </div>
                     <div class="panel-body">
                         <table
-                            id="table-todos"
+                            id="table-recursos"
                             data-toggle="table"
                             data-url="api-app.php?module=gestion-recursos&method=list-id&trabajador_id=<?php print($data['id']) ?>"
                             data-search="true"
@@ -358,7 +370,7 @@
                                     <th data-field="estado" data-sortable="true" data-formatter="formatoEstado">Estado</th>
                                     <th data-field="fecha_entrega_a_t" data-sortable="true" data-formatter="formatoFecha">Fecha Entrega</th>
                                     <th data-field="fecha_entrega_a_rh" data-sortable="true" data-formatter="formatoFecha">Fecha Devolución</th>
-                                    <!--<th data-field="toolbar" data-align="center" data-formatter="formatoToolbar" data-sortable="false">Opciones</th>-->
+                                    <th data-field="toolbar" data-align="center" data-formatter="formatoToolbar2" data-sortable="false">Opciones</th>
                                 </tr>
                             </thead>
                         </table>
@@ -448,8 +460,19 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Salario</h3>
+
                     </div>
                     <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label" for="f-num-tarjeta">Número de Tarjeta</label>
+                                <input type="text" id="f-num-tarjeta" name="num-tarjeta" class="form-control" placeholder="Tarjeta Salario" readonly value="<?php if (isset($data['tarjeta_salario'])) print(htmlspecialchars($data['tarjeta_salario'], ENT_QUOTES, 'UTF-8')); ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label" for="f-num-cuenta">Número de Cuenta Estándar</label>
+                                <input type="text" id="f-num-cuenta" name="num-cuenta" class="form-control" placeholder="Cuenta Estándar" readonly value="<?php if (isset($data['cuenta_estandar'])) print(htmlspecialchars($data['cuenta_estandar'], ENT_QUOTES, 'UTF-8')); ?>">
+                            </div>
+                        </div>
                         <table id="table-salarios"
                             data-toggle="table"
                             data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
@@ -466,14 +489,15 @@
                                 <tr>
                                     <th data-field="year" data-sortable="true">Período</th>
                                     <th data-field="month" data-sortable="true">Mes</th>
-                                    <th data-field="horas" data-sortable="true">Horas</th>
+                                    <th data-field="horas" data-sortable="true">Horas trabajadas</th>
                                     <th data-field="tarifa" data-sortable="true">Tarifa/hora (CUP)</th>
                                     <th data-field="a_cobrar" data-sortable="true">Total Bruto (CUP)</th>
                                     <!-- <th data-field="bonif" data-sortable="true">Bonif.</th> -->
                                     <!-- <th data-field="sal_dev" data-sortable="true">Sal. Dev.</th> -->
-                                    <!-- <th data-field="ausencias" data-sortable="true">Ausencias</th> -->
-                                    <!-- <th data-field="vacaciones" data-sortable="true">Vacaciones</th> -->
-                                    <!-- <th data-field="pago_vac" data-sortable="true">Pago Vac.</th> -->
+                                    <th data-field="ausencias" data-sortable="true">Ausencias</th>
+                                    <th data-field="ausencias_costo" data-sortable="true">Costo Ausencias</th>
+                                    <th data-field="vacaciones" data-sortable="true">Vacaciones</th>
+                                    <th data-field="pago_vac" data-sortable="true">Pago Vac.</th>
                                     <th data-field="salario_neto" data-sortable="true">Sal. Neto (CUP)</th>
                                     <th data-field="seg_social" data-sortable="true">Seg. Social (CUP)</th>
                                     <th data-field="ing_pers" data-sortable="true">Ing. Pers. (CUP)</th>
@@ -487,7 +511,7 @@
                 </div>
 
             </div>
-            
+
             <div class="tab-pane fade" id="tab-vacaciones">
                 <div class="panel">
                     <div class="panel-heading">
@@ -508,9 +532,10 @@
                             data-pagination="true">
                             <thead>
                                 <tr>
-                                    <th data-field="dias" data-sortable="true">Días</th>
-                                    <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
+                                    <th data-field="fecha_inicio" data-sortable="true">Fecha Inicio</th>
+                                    <th data-field="fecha_fin" data-sortable="true">Fecha Fin</th>
                                     <th data-field="fecha_aprobacion" data-formatter="formatoAprobacion" data-sortable="true">Estado</th>
+                                    <th data-field="fecha_aprobacion" data-sortable="true">Fecha Aprobación</th>
 
                                 </tr>
                             </thead>
@@ -561,19 +586,44 @@
                     <i class="fa fa-undo"></i>
                     Volver
                 </button>
-                <!-- <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                                <i class="fa fa-plus"></i>
-                                Nuevo
-                            </button> -->
-
-                <!-- Sección de Foto del Trabajador -->
-                <hr>
 
             </div>
         </div><!-- TAB RECURSOS ASIGNADOS -->
-        <!-- TAB CONTRATACIÓN -->
 
     </div>
     <!-- =================================================== -->
     <!-- END BASIC FORM ELEMENTS -->
+</div>
+
+<div class="modal fade" id="trabajadorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- <h5 class="modal-title" id="modalLabel">Detalles del Trabajador</h5> -->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Aquí se insertan los datos -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles del recurso -->
+<div class="modal fade" id="recursoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Detalles del Recurso</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody2">
+                <!-- Aquí se insertan los datos -->
+            </div>
+        </div>
+    </div>
 </div>

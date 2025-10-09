@@ -1,10 +1,11 @@
 <?php
-class List_recursos
-{
+// Incluir TCPDF
+
+
+class List_recursos {
     var $app;
     var $db;
     var $action;
-
     public function __construct($app)
     {
         $this->app = $app;
@@ -96,6 +97,110 @@ class List_recursos
         print(json_encode($data));
     }
 
+    private function generar_acta_entrega($param)
+    {
+
+        // Verificar que se reciba el ID del recurso
+        if (!isset($param['id']) || !is_numeric($param['id'])) {
+            die('ID de recurso no válido');
+        }
+
+        $id_recurso = intval($param['id']);
+        // Obtener datos del recurso y del trabajador
+        $sql = "SELECT r.*, t.nombre as nombre_trabajador, t.apellidos, t.cargos_id, c.nombre as cargo_nombre 
+        FROM recursos r 
+        LEFT JOIN trabajadores t ON r.trabajador_id = t.id 
+        LEFT JOIN cargos c ON t.cargos_id = c.id 
+        WHERE r.id = :id";
+        $recurso = $this->app->db->fetchAll($sql, array(
+            'id'=>$id_recurso
+        ));
+
+        if (!$recurso) {
+            die('Recurso no encontrado');
+        }
+
+        // Obtener el contenido del HTML del acta usando ruta absoluta
+        $ruta_absoluta = $_SERVER['DOCUMENT_ROOT'] . '/docs/acta_de_entrega/Acta_de_Entrega.html';
+        $html = file_get_contents($ruta_absoluta);
+        
+        if ($html === false) {
+            die('No se pudo leer el archivo del acta. Ruta intentada: ' . $ruta_absoluta);
+        }
+
+        // Reemplazar los marcadores de posición con los datos reales
+        $fecha_actual = new DateTime();
+        $meses = [
+            1 => 'enero',
+            2 => 'febrero',
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre'
+        ];
+
+        $reemplazos = [
+            'id="dias"></span>' => 'id="dias"><b><u>' . $fecha_actual->format('d') . '</u></b></span>',
+            'id="mes"></span>' => 'id="mes"><b><u>' . $meses[intval($fecha_actual->format('m'))] . '</u></b></span>',
+            'id="ano"></span>' => 'id="ano"><b><u>' . $fecha_actual->format('Y') . '</u></b></span>',
+            'id="trabajador_nombre"></span>' => 'id="trabajador_nombre"><b><u>' . htmlspecialchars($recurso[0]['nombre_trabajador'] . ' ' . $recurso[0]['apellidos']) . '</u></b></span>',
+            'id="recurso"></span>' => 'id="recurso"><b><u>' . htmlspecialchars($recurso[0]['nombre'] ?? '') . '</u></b></span>',
+            'id="marca"></span>' => 'id="marca"><b><u>' . htmlspecialchars($recurso[0]['marca'] ?? '') . '</u></b></span>',
+            'id="modelo"></span>' => 'id="modelo"><b><u>' . htmlspecialchars($recurso[0]['modelo'] ?? '') . '</u></b></span>',
+            'id="color"></span>' => 'id="color"><b><u>' . htmlspecialchars($recurso[0]['color'] ?? '') . '</u></b></span>',
+            'id="otros_recursos"></span>' => 'id="otros_recursos"><b><u>' . htmlspecialchars($recurso[0]['otros_recursos'] ?? '') . '</u></b></span>',
+            'id="cargo_nombre"></span>' => 'id="cargo_nombre"><b><u>' . htmlspecialchars($recurso[0]['cargo_nombre'] ?? '') . '</u></b></span>'
+        ];
+
+        foreach ($reemplazos as $buscar => $reemplazo) {
+            $html = str_replace($buscar, $reemplazo, $html);
+        }
+
+
+        $ruta_absoluta = $_SERVER['DOCUMENT_ROOT'] . '/plugins/tcpdf/tcpdf.php';
+        
+        require_once($ruta_absoluta);
+        // Crear nuevo documento PDF
+        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+        // Configuración del documento
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor('IML Servicios');
+        $pdf->SetTitle('Acta de Entrega - ' . $recurso[0]['nombre']);
+        $pdf->SetSubject('Acta de Entrega');
+        $pdf->SetKeywords('acta, entrega, recurso, IML');
+
+        // Eliminar cabecera y pie de página por defecto
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+
+        // Añadir una página
+        $pdf->AddPage();
+
+        // Escribir el contenido HTML
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Crear directorio si no existe
+        $directorio = $_SERVER['DOCUMENT_ROOT'] . '/docs/actas_guardadas/';
+        if (!file_exists($directorio)) {
+            mkdir($directorio, 0777, true);
+        }
+        
+        // Generar nombre de archivo único
+        $nombre_archivo = 'acta_entrega_' . $recurso[0]['id'] . '.pdf';
+        $ruta_completa = $directorio . $nombre_archivo;
+        
+        // Guardar en el servidor
+        $pdf->Output($ruta_completa, 'F');
+        
+    }
+
     private function _save($param)
     {
         // Debug: Guardar los parámetros recibidos en un archivo de log
@@ -118,6 +223,10 @@ class List_recursos
             'trabajador_id' => 'Trabajador',
             'fecha_entrega_a_t' => 'Fecha de Entrega',
             'nombre' => 'Recurso',
+            'marca' => 'Marca',
+            'modelo' => 'Modelo',
+            'color' => 'Color',
+            'otros_recursos' => 'Otros recursos'
         );
 
         foreach ($required_fields as $field => $label) {
@@ -133,6 +242,10 @@ class List_recursos
             'trabajador_id' => $param['trabajador_id'],
             'fecha_entrega_a_t' => isset($param['fecha_entrega_a_t']) && !empty($param['fecha_entrega_a_t']) ? $param['fecha_entrega_a_t'] : date('Y-m-d'),
             'nombre' => $param['nombre'],
+            'marca' => $param['marca'],
+            'modelo' => $param['modelo'],
+            'color' => $param['color'],
+            'otros_recursos' => $param['otros_recursos'],
             //'fecha_entrega_a_rh' => $param['fecha_entrega_a_rh']
         );
 
@@ -148,7 +261,11 @@ class List_recursos
             $campos_validos = [
                 'trabajador_id',
                 'fecha_entrega_a_t',
-                'nombre'
+                'nombre',
+                'marca',
+                'modelo',
+                'color',
+                'otros_recursos'
             ];
 
             // Filtrar solo los campos válidos
@@ -166,6 +283,8 @@ class List_recursos
                 if ($result) {
                     // Obtener el último ID insertado
                     $lastId = $this->db->last_id();
+                    $param['id'] = $lastId;
+                    $this->generar_acta_entrega($param);
 
                     if ($lastId) {
                         // Preparar respuesta exitosa
@@ -175,7 +294,7 @@ class List_recursos
                         $data['date'] = date('Y-m-d H:i:s');
 
                         // Registrar en historial
-                        $history = array(   
+                        $history = array(
                             'xentity' => 'RECURSOS',
                             'xaction' => 'INSERT-RECURSO',
                             //'id' => $lastId,
@@ -214,18 +333,23 @@ class List_recursos
 
             try {
                 $id = $param['id'];
+                
 
                 // Filtrar campos válidos para actualización
                 $campos_validos = [
                     'trabajador_id',
                     'fecha_entrega_a_t',
                     'nombre',
-                    'fecha_entrega_a_rh'
+                    'fecha_entrega_a_rh',
+                    'marca',
+                    'modelo',
+                    'color',
+                    'otros_recursos'
                 ];
 
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
-                
+
                 $update_filtered['fecha_entrega_a_rh'] = $param['fecha_entrega_a_rh'];
                 if (isset($param['fecha_entrega_a_rh'])) {
                     $update_filtered['estado'] = 0;
@@ -241,6 +365,7 @@ class List_recursos
                 $result = $this->app->db->update('recursos', $update_filtered, $where);
 
                 if ($result) {
+                    $this->generar_acta_entrega($param);
                     // Preparar respuesta exitosa
                     $data['msg_title'] = 'Operación exitosa';
                     $data['msg'] = 'Registro actualizado correctamente';
@@ -274,6 +399,8 @@ class List_recursos
 
         print(json_encode($data));
     }
+
+    
 
     private function _list($param)
     {
@@ -340,7 +467,7 @@ class List_recursos
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
                         $data = $row;
-                        $page['subtitle'] = 'Recurso: ' . $row['id'] . ' - ' . $row['nombre'] ;
+                        $page['subtitle'] = 'Recurso: ' . $row['id'] . ' - ' . $row['nombre'];
                     }
                 } else {
                     $data['estado'] = 1;

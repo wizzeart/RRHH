@@ -151,14 +151,6 @@ $('#btn-guardar-asistencia').click(function() {
     });
 });
 
-// Inicializar select2 para el buscador de trabajadores
-if ($.fn.select2) {
-    $('.select2').select2({
-        placeholder: 'Seleccione un trabajador',
-        allowClear: true
-    });
-}
-
 // Mostrar/ocultar el filtro de tipo de ausencia según el estado
 $('#filtro-estado').change(function() {
     if ($(this).val() === '2') { // Si es 'Ausente'
