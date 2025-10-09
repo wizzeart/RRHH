@@ -117,6 +117,158 @@ class Contrato {
         }
     }
 
+    // Igual que _render_contrato_unico pero devuelve HTML en lugar de imprimir JSON
+    private function _render_contrato_unico_html($param) {
+        $html = '';
+        try {
+            $tplPath = __DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php';
+            if (!file_exists($tplPath)) { $tplPath = realpath(__DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php'); }
+            if (!file_exists($tplPath)) { return ''; }
+
+            // Reutilizar el mismo mapeo de variables
+            $nombre = isset($param['trabajador_nombre']) ? $param['trabajador_nombre'] : '';
+            $apellidos = isset($param['trabajador_apellidos']) ? $param['trabajador_apellidos'] : '';
+            $apellidos2 = isset($param['trabajador_apellidos_segundos']) ? $param['trabajador_apellidos_segundos'] : '';
+            $direccion = isset($param['trabajador_direccion']) ? $param['trabajador_direccion'] : '';
+            $municipio_nombre = isset($param['trabajador_municipio']) ? $param['trabajador_municipio'] : '';
+            $provincia_nombre = isset($param['trabajador_provincia']) ? $param['trabajador_provincia'] : '';
+            $tipo_contrato_texto = isset($param['tipo_contrato_texto']) ? $param['tipo_contrato_texto'] : '';
+            $modalidad_trabajo_texto = isset($param['modalidad_trabajo_texto']) ? $param['modalidad_trabajo_texto'] : '';
+            $ubicacion_laboral_texto = isset($param['ubicacion_laboral_texto']) ? $param['ubicacion_laboral_texto'] : '';
+            $regimen_descanso = isset($param['regimen_descanso']) ? $param['regimen_descanso'] : '';
+            $salario_base = isset($param['salario_base']) ? $param['salario_base'] : '';
+            $hora_desde_h = isset($param['hora_desde_h']) ? $param['hora_desde_h'] : '';
+            $hora_hasta_h = isset($param['hora_hasta_h']) ? $param['hora_hasta_h'] : '';
+
+            $var1 = trim($nombre . ' ' . $apellidos . ' ' . $apellidos2);
+            $var2 = isset($param['trabajador_ci']) ? $param['trabajador_ci'] : '';
+            $var3 = $direccion;
+            $var4 = '';
+            $var5 = $municipio_nombre;
+            $var6 = $provincia_nombre;
+            if (strcasecmp($tipo_contrato_texto, 'Tiempo Determinado') === 0) { $var23 = '_X_'; $var7  = '___'; }
+            elseif (strcasecmp($tipo_contrato_texto, 'Tiempo Indeterminado') === 0) { $var23 = '___'; $var7  = '_X_'; }
+            else { $var23 = '___'; $var7  = '___'; }
+            $var24 = '___'; $var25 = '___'; $var26 = '___';
+            if ($modalidad_trabajo_texto !== '') {
+                if (stripos($modalidad_trabajo_texto, 'presencial') !== false) { $var24 = '_X_'; }
+                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var25 = '_X_'; }
+                if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
+            }
+            $var27 = '(_)'; $var28 = '(_)'; $var29 = '(_)';
+            if (!empty($param['frecuencia_trabajo'])) {
+                $freq = strtolower(trim($param['frecuencia_trabajo']));
+                if ($freq === 'semanal') { $var27 = '(X)'; }
+                else if ($freq === 'quincenal') { $var28 = '(X)'; }
+                else if ($freq === 'mensual') { $var29 = '(X)'; }
+            }
+            $var8 = $modalidad_trabajo_texto;
+            $var9 = $modalidad_trabajo_texto;
+            $var10 = isset($param['cargo_nombre']) ? $param['cargo_nombre'] : '';
+            $var11 = $ubicacion_laboral_texto;
+            $var12 = isset($param['regimen_trabajo_desde']) ? $param['regimen_trabajo_desde'] : '';
+            $var13 = isset($param['regimen_trabajo_hasta']) ? $param['regimen_trabajo_hasta'] : '';
+            $var14 = isset($param['hora_rango_label']) ? $param['hora_rango_label'] : 'De';
+            $var15 = isset($param['hora_desde_h']) ? $param['hora_desde_h'] : '';
+            $var16 = isset($param['hora_hasta_h']) ? $param['hora_hasta_h'] : '';
+            $var17 = isset($param['hora_hasta_m']) ? $param['hora_hasta_m'] : '';
+            if (isset($param['descanso_dias']) && $param['descanso_dias'] !== '') { $var18 = $param['descanso_dias']; }
+            else { $var18 = ''; if (!empty($regimen_descanso)) { if (preg_match('/\d+/', $regimen_descanso, $m)) { $var18 = $m[0]; } } }
+            $var19 = $salario_base;
+            $var20 = isset($param['extra1']) ? $param['extra1'] : '';
+            $var21 = isset($param['extra2']) ? $param['extra2'] : '';
+            $var22 = isset($param['extra3']) ? $param['extra3'] : '';
+            $var25 = date('Y');
+
+            ob_start();
+            include $tplPath;
+            $html = ob_get_clean();
+        } catch (Exception $e) { $html = ''; }
+        return $html;
+    }
+
+    // Genera PDF únicamente con contrato_id: carga datos desde BD y usa la misma plantilla de vista previa
+    private function _generatePdfById($param) {
+        $response = array('status'=>0,'msg'=>'','file_url'=>'');
+        $cid = isset($param['contrato_id']) ? intval($param['contrato_id']) : 0;
+        if ($cid <= 0) { $response['msg']='contrato_id inválido'; print(json_encode($response)); return; }
+        try {
+            // Intento 1: con columna departamento_id en contratos
+            try {
+                $row = $this->db->fetchRow(
+                    "SELECT c.*, t.nombre, t.apellidos, t.apellidos_segundos, t.direccion, t.carnet_identidad,
+                            t.provincia_id, t.municipio_id, t.cargos_id,
+                            COALESCE(cg.nombre,'') AS cargo_nombre,
+                            COALESCE(p.nombre,'') AS provincia_nombre,
+                            COALESCE(m.nombre,'') AS municipio_nombre,
+                            COALESCE(d.nombre,'') AS departamento_nombre
+                     FROM contratos c
+                     LEFT JOIN trabajadores t ON t.id=c.trabajador_id
+                     LEFT JOIN cargos cg ON cg.id=t.cargos_id
+                     LEFT JOIN provincia p ON p.id=t.provincia_id
+                     LEFT JOIN municipio m ON m.id=t.municipio_id
+                     LEFT JOIN departamentos d ON d.id=c.departamento_id
+                     WHERE c.id = :id",
+                    array('id'=>$cid)
+                );
+            } catch (Exception $eJoin) {
+                // Intento 2: sin columna departamento_id
+                $row = $this->db->fetchRow(
+                    "SELECT c.*, t.nombre, t.apellidos, t.apellidos_segundos, t.direccion, t.carnet_identidad,
+                            t.provincia_id, t.municipio_id, t.cargos_id,
+                            COALESCE(cg.nombre,'') AS cargo_nombre,
+                            COALESCE(p.nombre,'') AS provincia_nombre,
+                            COALESCE(m.nombre,'') AS municipio_nombre
+                     FROM contratos c
+                     LEFT JOIN trabajadores t ON t.id=c.trabajador_id
+                     LEFT JOIN cargos cg ON cg.id=t.cargos_id
+                     LEFT JOIN provincia p ON p.id=t.provincia_id
+                     LEFT JOIN municipio m ON m.id=t.municipio_id
+                     WHERE c.id = :id",
+                    array('id'=>$cid)
+                );
+                // agregar alias vacío para compatibilidad
+                if ($row) { $row['departamento_nombre'] = ''; }
+            }
+            if (!$row) { $response['msg']='Contrato no encontrado'; print(json_encode($response)); return; }
+
+            // Mapear a los mismos parámetros de plantilla usados en la vista previa
+            $tipoTexto = ($row['tipo'] == '1' ? 'Tiempo Determinado' : ($row['tipo'] == '2' ? 'Tiempo Indeterminado' : ''));
+            $mt = isset($row['modalidad_trabajo']) ? (string)$row['modalidad_trabajo'] : '';
+            $payload = array(
+                'trabajador_nombre' => $row['nombre'] ?? '',
+                'trabajador_apellidos' => $row['apellidos'] ?? '',
+                'trabajador_apellidos_segundos' => $row['apellidos_segundos'] ?? '',
+                'trabajador_direccion' => $row['direccion'] ?? '',
+                'trabajador_municipio' => $row['municipio_nombre'] ?? '',
+                'trabajador_provincia' => $row['provincia_nombre'] ?? '',
+                'trabajador_ci' => $row['carnet_identidad'] ?? '',
+                'cargo_nombre' => $row['cargo_nombre'] ?? '',
+                'tipo_contrato_texto' => $tipoTexto,
+                'modalidad_trabajo_texto' => ($mt==='1' ? 'Presencial' : ($mt==='2' ? 'A distancia' : ($mt==='3' ? 'Teletrabajo' : ''))),
+                'ubicacion_laboral_texto' => $row['departamento_nombre'] ?? '',
+                'regimen_descanso' => $row['regimen_descanso'] ?? '',
+                'salario_base' => $row['salario_base'] ?? '',
+                'regimen_trabajo_desde' => $row['regimen_trabajo_desde'] ?? '',
+                'regimen_trabajo_hasta' => $row['regimen_trabajo_hasta'] ?? '',
+                'hora_desde_h' => $row['hora_desde_h'] ?? '',
+                'hora_hasta_h' => $row['hora_hasta_h'] ?? '',
+                'frecuencia_trabajo' => $row['frecuencia_trabajo'] ?? ''
+            );
+
+            // Render a HTML con la misma plantilla
+            $html = $this->_render_contrato_unico_html($payload);
+            if (!$html) { $response['msg']='No se pudo renderizar la plantilla'; print(json_encode($response)); return; }
+
+            // Generar PDF con el núcleo reutilizable
+            $resp = $this->_generatePdfCore(array('html'=>$html, 'tipo'=>'contrato', 'contrato_id'=>$cid));
+            print(json_encode($resp));
+        } catch (Exception $e) {
+            $response['msg']='Error: '.$e->getMessage();
+            print(json_encode($response));
+        }
+    }
+
     // Lista de trabajadores para poblar el select del formulario
     private function _list_trabajadores() {
         try {
@@ -173,6 +325,12 @@ class Contrato {
                 break;
             case 'generatePdfFromHtml':
                 $this->_generatePdfFromHtml($param);
+                break;
+            case 'generatePdfById':
+                $this->_generatePdfById($param);
+                break;
+            case 'savePdfContrato':
+                $this->_savePdfContrato($param);
                 break;
             case 'generatePdfWithFpdf':
                 $this->_generatePdfWithFpdf($param);
@@ -247,14 +405,14 @@ class Contrato {
         print('Plantilla no encontrada');
     }
 
-    // Genera PDF a partir del HTML enviado (ya con valores reemplazados)
-    private function _generatePdfFromHtml($param) {
+    // Núcleo de generación de PDF: retorna array (no imprime)
+    private function _generatePdfCore($param) {
         $response = array('status'=>0,'msg'=>'', 'file_url'=>'');
         $html = isset($param['html']) ? $param['html'] : '';
         $tipo = isset($param['tipo']) ? $param['tipo'] : 'contrato';
         $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
 
-        if (empty($html)) { $response['msg'] = 'HTML no proporcionado'; print(json_encode($response)); return; }
+        if (empty($html)) { $response['msg'] = 'HTML no proporcionado'; return $response; }
 
         // Cargar mPDF (si está disponible) o hacer fallback a TCPDF
         $loadedPdfEngine = null;
@@ -270,19 +428,16 @@ class Contrato {
 
         // 2) Si no hay mPDF, intentar TCPDF
         if ($loadedPdfEngine === null) {
-            // Intentar include recomendado de TCPDF
             $tcpdfIncludes = array(
                 BASE . '/plugins/tcpdf/tcpdf_include.php',
                 __DIR__ . '/../plugins/tcpdf/tcpdf_include.php',
                 BASE . '/tcpdf/tcpdf_include.php',
                 __DIR__ . '/../tcpdf/tcpdf_include.php',
-                // Variantes basadas en DOCUMENT_ROOT provistas por el usuario
                 (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/plugins/tcpdf/tcpdf_include.php' : null)
             );
             $loaded = false;
             foreach ($tcpdfIncludes as $inc) { if ($inc && file_exists($inc)) { @require_once($inc); $loaded = true; break; } }
             if (!$loaded) {
-                // Fallback directo a tcpdf.php
                 $tcpdfPaths = array(
                     BASE . '/plugins/tcpdf/tcpdf.php',
                     __DIR__ . '/../plugins/tcpdf/tcpdf.php',
@@ -295,14 +450,12 @@ class Contrato {
             if (class_exists('TCPDF')) { $loadedPdfEngine = 'tcpdf'; }
         }
 
-        if ($loadedPdfEngine === null) { $response['msg']='mPDF/TCPDF no disponible'; print(json_encode($response)); return; }
+        if ($loadedPdfEngine === null) { $response['msg']='mPDF/TCPDF no disponible'; return $response; }
 
-        // Preparar HTML: inline de CSS externo para que el PDF respete estilos
+        // Preparar HTML y CSS embebido
         $html2 = $html;
         $inlinedCss = '';
-        // Helper para obtener contenido de CSS con resolución de rutas locales
         $fetchContent = function($href) {
-            // 1) Href absoluto con esquema http/https
             if (preg_match('#^https?://#i', $href)) {
                 $ctx = @file_get_contents($href);
                 if ($ctx !== false) return $ctx;
@@ -318,21 +471,13 @@ class Contrato {
                     if ($out !== false) return $out;
                 }
             } else {
-                // 2) Ruta absoluta del sitio /... -> DOCUMENT_ROOT
                 if (substr($href, 0, 1) === '/' && isset($_SERVER['DOCUMENT_ROOT'])) {
                     $fs = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $href;
-                    if (is_file($fs) && is_readable($fs)) {
-                        $ctx = @file_get_contents($fs);
-                        if ($ctx !== false) return $ctx;
-                    }
+                    if (is_file($fs) && is_readable($fs)) { $ctx = @file_get_contents($fs); if ($ctx !== false) return $ctx; }
                 }
-                // 3) Ruta relativa -> intentar BASE
                 if (defined('BASE')) {
                     $fs2 = rtrim(BASE, '/\\') . '/' . ltrim($href, '/');
-                    if (is_file($fs2) && is_readable($fs2)) {
-                        $ctx = @file_get_contents($fs2);
-                        if ($ctx !== false) return $ctx;
-                    }
+                    if (is_file($fs2) && is_readable($fs2)) { $ctx = @file_get_contents($fs2); if ($ctx !== false) return $ctx; }
                 }
             }
             return false;
@@ -344,18 +489,29 @@ class Contrato {
                 if ($cssContent && is_string($cssContent)) { $inlinedCss .= "\n/* inlined: $href */\n" . $cssContent . "\n"; }
             }
             if ($inlinedCss !== '') {
-                // Quitar los <link> y agregar <style> con los CSS recopilados
                 $html2 = preg_replace('/<link[^>]+rel=["\']stylesheet["\'][^>]*href=["\']([^"\']+\.css)["\'][^>]*>/i', '', $html2);
-                if (stripos($html2, '</head>') !== false) {
-                    $html2 = str_ireplace('</head>', "<style>" . $inlinedCss . "</style></head>", $html2);
+                if (stripos($html2, '</head>') !== false) { $html2 = str_ireplace('</head>', "<style>" . $inlinedCss . "</style></head>", $html2); }
+                else { $html2 = "<style>" . $inlinedCss . "</style>" . $html2; }
+            }
+        }
+
+        // Inyectar <base href> para que imágenes (logo) y rutas relativas funcionen igual que en la vista previa
+        $scheme = (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http'));
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        $baseHref = '';
+        if ($host) { $baseHref = $scheme . '://' . $host . '/'; }
+        if ($baseHref !== '') {
+            if (stripos($html2, '<base ') === false) {
+                if (stripos($html2, '<head') !== false && stripos($html2, '</head>') !== false) {
+                    $html2 = preg_replace('/<head[^>]*>/i', '$0<base href="' . htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8') . '">', $html2, 1);
                 } else {
-                    $html2 = "<style>" . $inlinedCss . "</style>" . $html2;
+                    // Si no hay head explícito, agregarlo para que el base tenga efecto
+                    $html2 = '<head><base href="' . htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8') . '"></head>' . $html2;
                 }
             }
         }
 
         try {
-            // Construir ruta absoluta en FS y URL pública
             $baseRoot = defined('BASE') ? rtrim(BASE, '/\\') : rtrim($_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/..', '/\\');
             $upload_rel = 'uploads/contratos/';
             $upload_dir_fs = $baseRoot . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $upload_rel);
@@ -370,71 +526,95 @@ class Contrato {
                 $mpdf->WriteHTML($html2);
                 $mpdf->Output($fullPath, 'F');
             } else {
-                // TCPDF flujo conforme al ejemplo del usuario
                 if (!defined('PDF_PAGE_ORIENTATION')) define('PDF_PAGE_ORIENTATION','P');
                 if (!defined('PDF_UNIT')) define('PDF_UNIT','mm');
                 if (!defined('PDF_PAGE_FORMAT')) define('PDF_PAGE_FORMAT','A4');
                 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-                // Metadatos estándar
                 if (defined('PDF_CREATOR')) { $pdf->SetCreator(PDF_CREATOR); } else { $pdf->SetCreator('Sistema'); }
                 $pdf->SetAuthor('Sistema');
                 $pdf->SetTitle('Contrato - ' . $tipo);
                 $pdf->SetSubject('Contrato de Trabajo');
                 $pdf->SetKeywords('contrato, trabajo');
-                // Sin cabecera/rodapié y con márgenes consistentes
                 $pdf->setPrintHeader(false);
                 $pdf->setPrintFooter(false);
                 $pdf->SetMargins(10, 10, 10);
-                // Página e impresión de HTML
                 $pdf->AddPage();
                 if (method_exists($pdf, 'SetFont')) { $pdf->SetFont('dejavusans','',10); }
                 if (method_exists($pdf, 'SetAutoPageBreak')) { $pdf->SetAutoPageBreak(true, 10); }
                 if (method_exists($pdf, 'setImageScale')) { $pdf->setImageScale(1.25); }
-                // Si no hay soporte para imágenes con alpha (GD/Imagick), sanitizar HTML de forma agresiva antes de writeHTML
-                $hasImageAlphaSupport = (extension_loaded('gd') || class_exists('Imagick'));
-                $html_for_tcpdf = $html2;
-                if (!$hasImageAlphaSupport) {
-                    // Eliminar cualquier etiqueta <img>
-                    $html_for_tcpdf = preg_replace('/<img[^>]*>/i', '', $html_for_tcpdf);
-                    // Eliminar cualquier url(...) en estilos inline o bloques <style>
-                    $html_for_tcpdf = preg_replace('/url\(.*?\)/i', '/* img removed */', $html_for_tcpdf);
-                    // Eliminar etiquetas <image ...> de SVG
-                    $html_for_tcpdf = preg_replace('/<image[^>]*>/i', '', $html_for_tcpdf);
-                    // Eliminar bloques SVG completos por si referencian rasterizados internos
-                    $html_for_tcpdf = preg_replace('/<svg[\s\S]*?<\/svg>/i', '', $html_for_tcpdf);
-                }
-                // Escribir el HTML (o HTML saneado) con soporte a UTF-8, con reintento agresivo si falla por imágenes
-                try {
-                    $pdf->writeHTML($html_for_tcpdf, true, false, true, false, '');
-                } catch (\Throwable $e) {
-                    // Fallback agresivo: eliminar todas las imágenes y fondos sin discriminar extensión
-                    $html_retry = $html_for_tcpdf;
-                    // Quitar cualquier <img>
-                    $html_retry = preg_replace('/<img[^>]*>/i', '', $html_retry);
-                    // Quitar url(...) en estilos inline y en bloques style
-                    $html_retry = preg_replace('/url\(.*?\)/i', '/* img removed */', $html_retry);
-                    // Quitar <image ...> de SVG
-                    $html_retry = preg_replace('/<image[^>]*>/i', '', $html_retry);
-                    // Quitar bloques <svg> completos si aún quedan referencias a raster
-                    if (stripos($html_retry, '<image') !== false) {
-                        $html_retry = preg_replace('/<svg[\s\S]*?<\/svg>/i', '', $html_retry);
+                // Si no hay soporte de GD/Imagick, evitar PNG con alpha: usar JPG local de fallback para el logo si existe
+                if (!extension_loaded('gd') && !class_exists('Imagick')) {
+                    $fallbackRel = '/img/logo-pdf.jpg'; // coloca aquí un JPG sin transparencia
+                    $fsCheck = null;
+                    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                        $fsCheck = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $fallbackRel;
+                    } elseif (defined('BASE')) {
+                        $fsCheck = rtrim(BASE, '/\\') . $fallbackRel;
                     }
+                    if ($fsCheck && is_file($fsCheck)) {
+                        // Reemplazar src que apunten a logo*.png por el JPG local para evitar alpha channel
+                        $html2 = preg_replace('#(<img[^>]+src=["\"])((?:[^"\"]*/)?[^"\"]*logo[^"\"]*\.png)(["\"][^>]*>)#i', '$1' . $fallbackRel . '$3', $html2);
+                    }
+                }
+                // Intentar respetar imágenes y estilos tal cual (solo eliminar imágenes si falla el render)
+                $html_for_tcpdf = $html2;
+                try { $pdf->writeHTML($html_for_tcpdf, true, false, true, false, ''); }
+                catch (\Throwable $e) {
+                    $html_retry = preg_replace('/<img[^>]*>/i', '', $html_for_tcpdf);
+                    $html_retry = preg_replace('/url\(.*?\)/i', '/* img removed */', $html_retry);
+                    $html_retry = preg_replace('/<image[^>]*>/i', '', $html_retry);
+                    if (stripos($html_retry, '<image') !== false) { $html_retry = preg_replace('/<svg[\s\S]*?<\/svg>/i', '', $html_retry); }
                     $pdf->writeHTML($html_retry, true, false, true, false, '');
                 }
-                // Guardar en disco
                 $pdf->Output($fullPath, 'F');
             }
 
-            // Construir URL pública (relativa al documento web)
             $fileUrl = rtrim('/', '/') . '/' . $upload_rel . $fileName;
             $response['status']=1; $response['file_url'] = $fileUrl; $response['msg']='PDF generado correctamente';
-            if ($contrato_id) {
-                try { $this->db->update('contratos', array('archivo_contrato'=>$fileUrl), array('id'=>$contrato_id)); } catch(Exception $e) { /* silencio */ }
-            }
+            if ($contrato_id) { try { $this->db->update('contratos', array('archivo_contrato'=>$fileUrl), array('id'=>$contrato_id)); } catch(Exception $e) { } }
         } catch (Exception $e) {
             $response['msg'] = 'Error al generar PDF: ' . $e->getMessage();
         }
-        print(json_encode($response));
+        return $response;
+    }
+
+    // Genera PDF a partir del HTML enviado (ya con valores reemplazados) y imprime JSON (API existente)
+    private function _generatePdfFromHtml($param) {
+        $resp = $this->_generatePdfCore($param);
+        print(json_encode($resp));
+    }
+
+    // Nuevo método API: misma estructura de respuesta que _save() de List_recursos
+    private function _savePdfContrato($param) {
+        // Log opcional similar a List_recursos::_save
+        $log = date('Y-m-d H:i:s') . " - savePdfContrato params:\n";
+        $log .= "POST: " . print_r($param, true) . "\n";
+        file_put_contents('debug_contratos.log', $log, FILE_APPEND);
+
+        $data = array(
+            'status' => 1,
+            'msg_title' => 'Operación exitosa',
+            'msg' => 'PDF generado correctamente',
+            'date' => date('Y-m-d H:i:s'),
+        );
+
+        // Validación mínima
+        if (!isset($param['html']) || trim((string)$param['html']) === '') {
+            $data['status'] = 0; $data['msg_title'] = 'Validación'; $data['msg'] = 'HTML no proporcionado'; print(json_encode($data)); return;
+        }
+
+        // Generar PDF usando el núcleo reutilizable
+        $resp = $this->_generatePdfCore($param);
+        if (!$resp['status']) {
+            $data['status'] = 0; $data['msg_title'] = 'Error'; $data['msg'] = $resp['msg'];
+        } else {
+            $data['file_url'] = $resp['file_url'];
+        }
+
+        // Si viene contrato_id, incluirlo en la respuesta
+        if (isset($param['contrato_id']) && $param['contrato_id'] !== '') { $data['id'] = intval($param['contrato_id']); }
+
+        print(json_encode($data));
     }
 
 
