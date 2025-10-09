@@ -37,12 +37,12 @@
             <thead>
                 <tr>
                   <!-- <th data-field="id" data-sortable="true">ID</th>  -->
-                    <th data-field="cargo_nombre" data-sortable="true">Cargo</th>
+                  <th data-field="carnet_identidad" data-sortable="true">CI</th>
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="apellidos" data-sortable="true">Apellidos</th>
-                    <th data-field="carnet_identidad" data-sortable="true">CI</th>
-                    <th data-field="sexo" data-sortable="true">Sexo</th>
-                    <th data-field="edad" data-sortable="true">Edad</th>
+                    <th data-field="cargo_nombre" data-sortable="true">Cargo</th>
+                    <!-- <th data-field="sexo" data-sortable="true">Sexo</th>
+                    <th data-field="edad" data-sortable="true">Edad</th> -->
                    <!-- <th data-field="estatus" data-align="center" data-formatter="formatoActivo" data-sortable="false">Estado</th>  -->
                     <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Opciones</th>
 
@@ -56,3 +56,29 @@
 <!--===================================================-->
 
 
+
+<!-- Modal de confirmación para dar de baja -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel">Confirmar dar de baja</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Para confirmar, escribe <strong>ELIMINAR</strong> en el siguiente campo. Esta acción establecerá la fecha de baja automáticamente.</p>
+        <input type="text" id="confirm-delete-text" class="form-control" placeholder="Escribe ELIMINAR" autocomplete="off">
+        <small id="confirm-delete-help" class="text-danger" style="display:none;">Debes escribir exactamente "ELIMINAR".</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-confirm-delete" class="btn btn-danger">Confirmar baja</button>
+      </div>
+    </div>
+  </div>
+  <!-- Datos temporales -->
+  <input type="hidden" id="confirm-delete-id" value="">
+  <input type="hidden" id="confirm-delete-row" value="">
+</div>

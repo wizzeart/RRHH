@@ -57,7 +57,7 @@
                         
                         <button id="btn-filter" class="btn btn-primary">Filtrar</button>
                         <button id="btn-reset" class="btn btn-default" style="margin-left: 5px;">Limpiar</button>
-                        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus pull-right" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador">Añadir Nuevo Trabajador</button>
+                        <button id="btn-add-new" class="btn btn-mint btn-icon  pull-right" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador"><span class="icon-lg fa fa-plus"></span>  Añadir Nuevo Trabajador</button>
                     </div>
                 </div>
                 <table

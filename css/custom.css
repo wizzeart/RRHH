@@ -7,6 +7,41 @@
     -webkit-transition: max-height 0.1s ease-in-out, padding 0.1s ease-in-out;
     transition: max-height 0.1s ease-in-out, padding 0.1s ease-in-out;
 }
+/* Ensurar botones de "Añadir Nuevo/Añadir Nueva" usan la fuente general del sitio */
+#btn-add-new,
+button#btn-add-new,
+.btn-add-new,
+button[title*="Añadir Nuevo"],
+button[title*="Añadir Nueva"],
+button[title*="Añadir nuevo"],
+button[title*="Añadir nueva"],
+a[title*="Añadir Nuevo"],
+a[title*="Añadir Nueva"],
+a[title*="Añadir nuevo"],
+a[title*="Añadir nueva"],
+[role="button"][title*="Añadir Nuevo"],
+[role="button"][title*="Añadir Nueva"],
+[role="button"][title*="Añadir nuevo"],
+[role="button"][title*="Añadir nueva"],
+[id="btn-add-new"] {
+  font-family: inherit !important;
+}
+
+/* Asegurar que todos los botones Bootstrap hereden la fuente general */
+.btn,
+.btn-default {
+  font-family: inherit !important;
+}
+
+/* Robustez: asegurar explícitamente en variantes principales */
+.btn-primary,
+.btn-success,
+.btn-primary.btn-lg,
+.btn-primary.btn-sm,
+.btn-success.btn-lg,
+.btn-success.btn-sm {
+  font-family: inherit !important;
+}
 .dropzone-img.list-group .preview-container {
     padding: 15px 8px 20px;
     -webkit-box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.05);

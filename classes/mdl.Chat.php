@@ -24,44 +24,35 @@ class Chat {
             return;
         }
 
+        // Helper: ensure table exists and has new columns
+        $this->ensureSchema();
+
         switch ($param['method']) {
             case 'getChatMessages':
                 try {
-                    try {
-                        $this->db->directExec("SELECT 1 FROM chat LIMIT 1");
-                    } catch (Exception $e) {
-                        $createTableSQL = "CREATE TABLE IF NOT EXISTS chat (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(50) NOT NULL, content TEXT NOT NULL, date DATETIME NOT NULL) DEFAULT CHARSET=utf8;";
-                        $this->db->directExec($createTableSQL);
+                    // Determine current user and role
+                    $currentUser = $this->getCurrentUsername();
+                    $isAdmin = $this->isCurrentUserAdmin();
+
+                    // Build query per role
+                    if ($isAdmin) {
+                        $sql = "SELECT id, user, content, date, sender_role, receiver_user FROM chat ORDER BY date ASC";
+                        $result = $this->db->fetchAll($sql);
+                    } else {
+                        $sql = "SELECT id, user, content, date, sender_role, receiver_user
+                                FROM chat
+                                WHERE user = :u
+                                   OR (sender_role = 'admin' AND receiver_user = :u2)
+                                ORDER BY date ASC";
+                        $result = $this->db->fetchAll($sql, array('u' => $currentUser, 'u2' => $currentUser));
                     }
-                    // Get the last 50 messages (most recent), then reverse so we return oldest->newest
-                    $sql = "SELECT id, user, content, date FROM chat ORDER BY date DESC LIMIT 50";
-                    $result = $this->db->fetchAll($sql);
                     if (!$result) {
                         $result = array();
-                    } else {
-                        $result = array_reverse($result);
-                    }
-                    // Determinar el usuario actual: preferir $_SESSION['usuario'], sino buscar en tabla usuarios por id de sesión
-                    $currentUser = '';
-                    if (session_status() == PHP_SESSION_NONE) session_start();
-                    if (isset($_SESSION['usuario']) && $_SESSION['usuario'] !== '') {
-                        $currentUser = $_SESSION['usuario'];
-                    } else {
-                        if (isset($_SESSION['guser_id']) && $_SESSION['guser_id'] !== '') {
-                            try {
-                                $rowu = $this->db->fetchRow("SELECT xusuario FROM usuarios WHERE xusuario_id = :id", array('id' => $_SESSION['guser_id']));
-                                if ($rowu && isset($rowu['xusuario']) && $rowu['xusuario'] !== '') {
-                                    $currentUser = $rowu['xusuario'];
-                                }
-                            } catch (Exception $e) {
-                                // ignore
-                            }
-                        }
                     }
                     foreach ($result as $k => $row) {
                         $result[$k]['is_current'] = ($row['user'] === $currentUser);
                     }
-                    echo json_encode(array('status' => 1, 'messages' => $result, 'currentUser' => $currentUser));
+                    echo json_encode(array('status' => 1, 'messages' => $result, 'currentUser' => $currentUser, 'is_admin' => $isAdmin ? 1 : 0));
                 } catch (Exception $ex) {
                     echo json_encode(array('status' => 0, 'msg' => $ex->getMessage()));
                 }
@@ -76,34 +67,21 @@ class Chat {
                     if (strlen($message) > 200) {
                         throw new Exception("El mensaje no puede exceder los 200 caracteres");
                     }
-                    try {
-                        $this->db->directExec("SELECT 1 FROM chat LIMIT 1");
-                    } catch (Exception $e) {
-                        $createTableSQL = "CREATE TABLE IF NOT EXISTS chat (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(50) NOT NULL, content TEXT NOT NULL, date DATETIME NOT NULL) DEFAULT CHARSET=utf8;";
-                        $this->db->directExec($createTableSQL);
-                    }
-                    if (session_status() == PHP_SESSION_NONE) session_start();
-                    $user = '';
-                    if (isset($_SESSION['usuario']) && $_SESSION['usuario'] !== '') {
-                        $user = $_SESSION['usuario'];
-                    } else if (isset($_SESSION['guser_id']) && $_SESSION['guser_id'] !== '') {
-                        try {
-                            $rowu = $this->db->fetchRow("SELECT xusuario FROM usuarios WHERE xusuario_id = :id", array('id' => $_SESSION['guser_id']));
-                            if ($rowu && isset($rowu['xusuario']) && $rowu['xusuario'] !== '') {
-                                $user = $rowu['xusuario'];
-                            }
-                        } catch (Exception $e) {
-                            // ignore
-                        }
-                    }
+                    $user = $this->getCurrentUsername();
                     if ($user === '') $user = 'Anónimo';
-                    $sql = "INSERT INTO chat (user, content, date)
-                            SELECT ?, ?, NOW()
+
+                    $isAdmin = $this->isCurrentUserAdmin();
+                    $senderRole = $isAdmin ? 'admin' : 'worker';
+                    $receiver = isset($param['receiver_user']) ? trim($param['receiver_user']) : '';
+                    if (!$isAdmin) { $receiver = ''; }
+
+                    $sql = "INSERT INTO chat (user, content, date, sender_role, receiver_user)
+                            SELECT ?, ?, NOW(), ?, NULLIF(?, '')
                             FROM DUAL
                             WHERE NOT EXISTS (
                                 SELECT 1 FROM chat WHERE user = ? AND content = ? AND date >= (NOW() - INTERVAL 5 SECOND)
                             )";
-                    $r = $this->db->directExec($sql, array($user, $message, $user, $message));
+                    $r = $this->db->directExec($sql, array($user, $message, $senderRole, $receiver, $user, $message));
                     echo json_encode(array('status' => 1, 'msg' => 'Mensaje enviado'));
                 } catch (Exception $ex) {
                     echo json_encode(array('status' => 0, 'msg' => $ex->getMessage()));
@@ -114,5 +92,58 @@ class Chat {
                 echo json_encode(array('status' => 0, 'msg' => 'Método no soportado'));
                 break;
         }
+    }
+
+    private function ensureSchema() {
+        try {
+            // Ensure table exists
+            $this->db->directExec("CREATE TABLE IF NOT EXISTS chat (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user VARCHAR(50) NOT NULL,
+                content TEXT NOT NULL,
+                date DATETIME NOT NULL
+            ) DEFAULT CHARSET=utf8");
+
+            // Add sender_role if missing
+            $col = $this->db->fetchRow("SHOW COLUMNS FROM chat LIKE 'sender_role'");
+            if (!$col) {
+                $this->db->directExec("ALTER TABLE chat ADD COLUMN sender_role ENUM('admin','worker') NOT NULL DEFAULT 'worker'");
+            }
+            // Add receiver_user if missing
+            $col2 = $this->db->fetchRow("SHOW COLUMNS FROM chat LIKE 'receiver_user'");
+            if (!$col2) {
+                $this->db->directExec("ALTER TABLE chat ADD COLUMN receiver_user VARCHAR(100) NULL");
+            }
+        } catch (Exception $e) {
+            // silent fail, handled on use
+        }
+    }
+
+    private function getCurrentUsername() {
+        $currentUser = '';
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        if (isset($_SESSION['usuario']) && $_SESSION['usuario'] !== '') {
+            $currentUser = $_SESSION['usuario'];
+        } else if (isset($_SESSION['guser_id']) && $_SESSION['guser_id'] !== '') {
+            try {
+                $rowu = $this->db->fetchRow("SELECT xusuario FROM usuarios WHERE xusuario_id = :id", array('id' => $_SESSION['guser_id']));
+                if ($rowu && isset($rowu['xusuario']) && $rowu['xusuario'] !== '') {
+                    $currentUser = $rowu['xusuario'];
+                }
+            } catch (Exception $e) { /* ignore */ }
+        }
+        return $currentUser;
+    }
+
+    private function isCurrentUserAdmin() {
+        // Try to detect admin based on session/app role
+        $role = '';
+        if (isset($this->app->rol) && $this->app->rol !== '') $role = $this->app->rol;
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        if (!$role && isset($_SESSION['grol'])) $role = $_SESSION['grol'];
+        $roleStr = strtolower((string)$role);
+        // Consider admin if role id == 1 or role string contains 'admin'
+        if ($roleStr === '1' || strpos($roleStr, 'admin') !== false) return true;
+        return false;
     }
 }

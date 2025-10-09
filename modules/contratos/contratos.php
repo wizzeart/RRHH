@@ -6,6 +6,7 @@
         <form id="form-contrato" enctype="multipart/form-data">
             <input type="hidden" id="f-id" name="id" value="<?php if (isset($data['id'])) print($data['id']); ?>">
 
+            <!-- Fila 1: Trabajador y Tipo de Contrato -->
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -16,7 +17,7 @@
                             if (isset($data_form['trabajadores']) && is_array($data_form['trabajadores'])) {
                                 foreach ($data_form['trabajadores'] as $t) {
                                     $id = $t['id'];
-                                    $full = trim(($t['nombre'] ?? '') . ' ' . ($t['apellidos'] ?? ''));
+                                    $full = trim(($t['nombre'] ?? '') . ' ' . ($t['apellidos'] ?? '') . ' ' . ($t['apellidos_segundos'] ?? ''));
                                     if ($full === '') continue;
                                     $sel = (isset($data['trabajador_id']) && $data['trabajador_id'] == $id) ? 'selected' : '';
                                     print('<option value="' . intval($id) . '" ' . $sel . '>' . htmlspecialchars($full, ENT_QUOTES, 'UTF-8') . '</option>');
@@ -28,40 +29,170 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="f-tipo">Tipo <span class="text-danger">*</span></label>
-                        <select id="f-tipo" name="tipo" class="form-control">
+                        <label class="control-label" for="f-tipo-contrato">Tipo de Contrato <span class="text-danger">*</span></label>
+                        <select id="f-tipo-contrato" name="tipo_contrato" class="form-control">
                             <option value="">Seleccione tipo</option>
-                            <?php 
-                                $tipos = array('Contrato por Tiempo Indeterminado', 'Contrato por Tiempo Determinado');
-                                $tipoSel = isset($data['tipo']) ? $data['tipo'] : '';
-                                foreach ($tipos as $tp) {
-                                    $sel = ($tipoSel === $tp) ? 'selected' : '';
-                                    print('<option value="' . htmlspecialchars($tp, ENT_QUOTES, 'UTF-8') . '" ' . $sel . '>' . htmlspecialchars($tp, ENT_QUOTES, 'UTF-8') . '</option>');
-                                }
-                            ?>
+                            <option value="1" <?php echo (isset($data['tipo']) && $data['tipo'] == '1') ? 'selected' : ''; ?>>1 - Tiempo Determinado</option>
+                            <option value="2" <?php echo (isset($data['tipo']) && $data['tipo'] == '2') ? 'selected' : ''; ?>>2 - Tiempo Indeterminado</option>
                         </select>
                     </div>
                 </div>
             </div>
 
+            <!-- Fila 2: Datos del Trabajador (Solo lectura) -->
             <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="control-label" for="f-fecha-inicio">Fecha Inicio <span class="text-danger">*</span></label>
-                        <input type="date" id="f-fecha-inicio" name="fecha_inicio" class="form-control" value="<?php if (isset($data['fecha_inicio'])) print($data['fecha_inicio']); ?>">
-                    </div>
-                </div>
-             
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="control-label">Archivo del Contrato</label>
-                        <div class="form-control" style="height:auto;">
-                            <small class="text-muted">Se generará automáticamente en PDF al guardar.</small><br>
-                            <?php if (!empty($data['archivo_contrato'])) { echo '<a class="btn btn-link p-0" href="' . htmlspecialchars($data['archivo_contrato'], ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver contrato generado</a>'; } ?>
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Datos del Trabajador</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>Nombre:</label>
+                                    <div id="trabajador-nombre" class="form-control-static">-</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Apellidos:</label>
+                                    <div id="trabajador-apellidos" class="form-control-static">-</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Segundos Apellidos:</label>
+                                    <div id="trabajador-apellidos-segundos" class="form-control-static">-</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Cargo:</label>
+                                    <div id="trabajador-cargo" class="form-control-static">-</div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-md-4">
+                                    <label>Provincia:</label>
+                                    <div id="trabajador-provincia" class="form-control-static">-</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Municipio:</label>
+                                    <div id="trabajador-municipio" class="form-control-static">-</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Dirección:</label>
+                                    <div id="trabajador-direccion" class="form-control-static">-</div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-md-12">
+                                    <label class="control-label">Régimen de Trabajo</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-regimen-trabajo-desde" class="control-label">Desde (día)</label>
+                                        <select id="f-regimen-trabajo-desde" name="regimen_trabajo_desde" class="form-control">
+                                            <option value="">Seleccione día</option>
+                                            <option value="Lunes">Lunes</option>
+                                            <option value="Martes">Martes</option>
+                                            <option value="Miércoles">Miércoles</option>
+                                            <option value="Jueves">Jueves</option>
+                                            <option value="Viernes">Viernes</option>
+                                            <option value="Sábado">Sábado</option>
+                                            <option value="Domingo">Domingo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-regimen-trabajo-hasta" class="control-label">Hasta (día)</label>
+                                        <select id="f-regimen-trabajo-hasta" name="regimen_trabajo_hasta" class="form-control">
+                                            <option value="">Seleccione día</option>
+                                            <option value="Lunes">Lunes</option>
+                                            <option value="Martes">Martes</option>
+                                            <option value="Miércoles">Miércoles</option>
+                                            <option value="Jueves">Jueves</option>
+                                            <option value="Viernes">Viernes</option>
+                                            <option value="Sábado">Sábado</option>
+                                            <option value="Domingo">Domingo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-desde-hora" class="control-label">Desde Hora</label>
+                                        <input type="time" id="f-desde-hora" name="hora_desde_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-hasta-hora" class="control-label">Hasta Hora</label>
+                                        <input type="time" id="f-hasta-hora" name="hora_hasta_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+            </div>
+
+            <!-- Fila 3: Campos del Contrato -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="f-ubicacion-laboral">Ubicación Laboral <span class="text-danger">*</span></label>
+                        <select id="f-ubicacion-laboral" name="departamento_id" class="form-control">
+                            <option value="">Seleccione departamento</option>
+                            <?php 
+                            if (isset($data_form['departamentos']) && is_array($data_form['departamentos'])) {
+                                foreach ($data_form['departamentos'] as $d) {
+                                    $sel = (isset($data['departamento_id']) && $data['departamento_id'] == $d['id']) ? 'selected' : '';
+                                    print('<option value="' . intval($d['id']) . '" ' . $sel . '>' . htmlspecialchars($d['nombre'], ENT_QUOTES, 'UTF-8') . '</option>');
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="f-regimen-descanso">Régimen de Descanso <span class="text-danger">*</span></label>
+                        <input type="text" id="f-regimen-descanso" name="regimen_descanso" class="form-control" value="<?php echo isset($data['regimen_descanso']) ? htmlspecialchars($data['regimen_descanso'], ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Ej: Lunes a Viernes">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="f-salario-base">Salario Base <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" id="f-salario-base" name="salario_base" class="form-control" value="<?php echo isset($data['salario_base']) ? $data['salario_base'] : ''; ?>" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="f-frecuencia-trabajo">Frecuencia de Pago/Trabajo</label>
+                        <select id="f-frecuencia-trabajo" name="frecuencia_trabajo" class="form-control">
+                            <option value="">Seleccione frecuencia</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="quincenal">Quincenal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                        <small class="text-muted">Se reflejará como (X) en el contrato.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 4: Modalidad de Trabajo -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="f-modalidad-trabajo">Modalidad de Trabajo <span class="text-danger">*</span></label>
+                        <select id="f-modalidad-trabajo" name="modalidad_trabajo" class="form-control">
+                            <option value="">Seleccione modalidad</option>
+                            <option value="1" <?php echo (isset($data['modalidad_trabajo']) && $data['modalidad_trabajo'] == '1') ? 'selected' : ''; ?>>Presencial</option>
+                            <option value="2" <?php echo (isset($data['modalidad_trabajo']) && $data['modalidad_trabajo'] == '2') ? 'selected' : ''; ?>>A distancia</option>
+                            <option value="3" <?php echo (isset($data['modalidad_trabajo']) && $data['modalidad_trabajo'] == '3') ? 'selected' : ''; ?>>Teletrabajo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="f-firma">Firma Digital</label>
                         <input type="file" id="f-firma" name="firma_digital" class="form-control" accept=".png,.jpg,.jpeg,.pdf">
@@ -69,32 +200,38 @@
                     </div>
                 </div>
             </div>
-            <!-- Contenedor para campos extras según tipo de contrato -->
-            <div id="extra-contrato-fields" class="row" style="margin-top:10px;"></div>
         </form>
 
         <div class="panel-footer text-center">
             <img id="img-loading" class="hidden" src="img/spinners/282.gif"/>
            
-            <button id="btn-open-template" class="btn btn-primary icon-lg" type="button">
-                <i class="fa fa-file-pdf-o"></i>
-                Generar Contrato
+            <button id="btn-save" class="btn btn-success icon-lg" type="button">
+                <i class="fa fa-save"></i>
+                Guardar Contrato
             </button>
             
-            
-            <button id="btn-generate-fpdf" class="btn btn-info icon-lg" type="button">
+            <button id="btn-generate-pdf" class="btn btn-primary icon-lg" type="button">
                 <i class="fa fa-file-pdf-o"></i>
-                Generar PDF (FPDF)
+                Generar PDF
             </button>
+            
             <button id="btn-back" class="btn btn-default icon-lg" type="button">
                 <i class="fa fa-undo"></i>
                 Volver
             </button>
-          
         </div>
     </div>
 </div>
 
-<!-- In-page template preview (full page) -->
-<div id="contrato-template-container" style="margin-top:20px; border:1px solid #e1e1e1; padding:12px; max-height:80vh; overflow:auto; background:#fff;">Seleccione tipo y haga clic en "Generar Contrato" para cargar la plantilla aquí.</div>
+<!-- Vista previa del contrato en tiempo real -->
+<div class="panel" style="margin-top:20px;">
+    <div class="panel-heading">
+        <h4 class="panel-title">Vista Previa del Contrato</h4>
+    </div>
+    <div class="panel-body">
+        <div id="contrato-preview" style="border:1px solid #e1e1e1; height:90vh; overflow:hidden; background:#fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
+            <p class="text-muted text-center">Complete los campos del formulario para ver la vista previa del contrato</p>
+        </div>
+    </div>
+</div>
 

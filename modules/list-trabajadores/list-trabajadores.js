@@ -405,9 +405,8 @@ function formatoActivo(value, row) {
 // Sample Format for Tracking Number Column.
 // =================================================================
 function formatoToolbar(value, row) {
-    var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar trabajador"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ver detalles"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-tablet" title="Pase de acceso"></button>';
+    var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar trabajador"> Editar</button>\n\
+                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ficha Trabajador"> Ficha Trabajador</button>';
 
     return s;
 }

@@ -1,6 +1,6 @@
 <div class="panel">
     <div class="form-control">
-        <button id="btn-add-new" class="btn btn-mint btn-icon icon-lg fa fa-plus" title="Añadir Nuevo Departamento">Añadir Nuevo Departamento</button>
+        <button id="btn-add-new" class="btn btn-mint btn-icon" title="Añadir Nuevo Departamento"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Departamento</button>
     </div>
 </div>
 
