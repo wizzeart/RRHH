@@ -303,26 +303,28 @@
                     <div class="panel-body orm-padding">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="control-label" for="f-email">Correo Electrónico</label>
-                                    <input type="email" id="f-email" name="email" class="form-control" placeholder="correo@ejemplo.com" value="<?php if (isset($data['email'])) print(htmlspecialchars($data['email'], ENT_QUOTES, 'UTF-8')); ?>" readonly>
-                                </div>
+
 
                                 <div class="form-group">
                                     <label class="control-label" for="f-telefono">Teléfono Móvil</label>
                                     <input type="text" id="f-telefono" name="telefono" class="form-control" placeholder="Teléfono de contacto" value="<?php if (isset($data['telefono'])) print($data['telefono']); ?>" readonly>
                                 </div>
 
+
                                 <div class="form-group">
-                                    <label class="control-label" for="f-telefono-fijo">Teléfono Fijo</label>
-                                    <input type="text" id="f-telefono-fijo" name="telefono_fijo" class="form-control" placeholder="+56 X XXXX XXXX" value="<?php if (isset($data['telefono_fijo'])) print(htmlspecialchars($data['telefono_fijo'], ENT_QUOTES, 'UTF-8')); ?>" readonly>
+                                    <label class="control-label" for="f-direccion">Dirección</label>
+                                    <textarea id="f-direccion" name="direccion" class="form-control" rows="2" placeholder="Dirección completa" readonly><?php if (isset($data['direccion'])) print(htmlspecialchars($data['direccion'], ENT_QUOTES, 'UTF-8')); ?></textarea>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="control-label" for="f-direccion">Dirección</label>
-                                    <textarea id="f-direccion" name="direccion" class="form-control" rows="3" placeholder="Dirección completa" readonly><?php if (isset($data['direccion'])) print(htmlspecialchars($data['direccion'], ENT_QUOTES, 'UTF-8')); ?></textarea>
+                                    <label class="control-label" for="f-provincia">Provincia</label>
+                                    <input type="text" id="f-provincia" name="provincia" class="form-control" placeholder="Provincia" readonly value="<?php if (isset($data['provincia_nombre'])) print(htmlspecialchars($data['provincia_nombre'], ENT_QUOTES, 'UTF-8')); ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="f-municipio">Municipio</label>
+                                    <input type="text" id="f-municipio" name="municipio" class="form-control" placeholder="Municipio" readonly value="<?php if (isset($data['municipio_nombre'])) print(htmlspecialchars($data['municipio_nombre'], ENT_QUOTES, 'UTF-8')); ?>">
                                 </div>
 
                             </div>
@@ -448,8 +450,19 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Salario</h3>
+                                            
                     </div>
                     <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="control-label" for="f-num-tarjeta">Número de Tarjeta</label>
+                                <input type="text" id="f-num-tarjeta" name="num-tarjeta" class="form-control" placeholder="Tarjeta Salario" readonly value="<?php if (isset($data['tarjeta_salario'])) print(htmlspecialchars($data['tarjeta_salario'], ENT_QUOTES, 'UTF-8')); ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label" for="f-num-cuenta">Número de Cuenta Estándar</label>
+                                <input type="text" id="f-num-cuenta" name="num-cuenta" class="form-control" placeholder="Cuenta Estándar" readonly value="<?php if (isset($data['cuenta_estandar'])) print(htmlspecialchars($data['cuenta_estandar'], ENT_QUOTES, 'UTF-8')); ?>">
+                            </div>
+                        </div>
                         <table id="table-salarios"
                             data-toggle="table"
                             data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
@@ -487,7 +500,7 @@
                 </div>
 
             </div>
-            
+
             <div class="tab-pane fade" id="tab-vacaciones">
                 <div class="panel">
                     <div class="panel-heading">

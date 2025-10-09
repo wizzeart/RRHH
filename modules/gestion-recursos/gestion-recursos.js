@@ -1,5 +1,27 @@
 var e, tmp, cmd_params;
 
+function descargar_acta(idRecurso) {
+    // Ruta donde se guardó el archivo (debe coincidir con la ruta en PHP)
+    var rutaArchivo = '/docs/actas_guardadas/acta_entrega_' + idRecurso + '.pdf';
+    
+    // Crear un enlace temporal
+    var link = document.createElement('a');
+    link.href = rutaArchivo;
+    link.target = '_blank';
+    link.download = 'acta_entrega_' + idRecurso + '.pdf';
+    
+    // Simular clic en el enlace
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar después de la descarga
+    setTimeout(function() {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href);
+    }, 100);
+}
+
+
 $(document).ready(function () {
     $('#f-almacen').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
     $('#f-punto-venta').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
@@ -51,7 +73,7 @@ $(document).ready(function () {
         var msg = '';
         
         
-         if ($('#f-trabajador').val() == '') {
+        if ($('#f-trabajador').val() == '') {
             status = 0;
             msg += '<div>Debe seleccionar un trabajador.</div>';
         }
@@ -96,6 +118,10 @@ $(document).ready(function () {
             formDataObj.append('trabajador_id', $('#f-trabajador').val());
             formDataObj.append('fecha_entrega_a_t', $('#f-fecha-registro').val());
             formDataObj.append('nombre', $('#f-recurso').val());
+            formDataObj.append('marca',$('#f-marca').val());
+            formDataObj.append('modelo',$('#f-modelo').val());
+            formDataObj.append('color',$('#f-color').val());
+            formDataObj.append('otros_recursos',$('#f-otros_recursos').val());
             
             // Debug: mostrar datos que se van a enviar
             console.log('Enviando datos:');
@@ -119,18 +145,22 @@ $(document).ready(function () {
                             action = 'update';
                             $('#f-id').val(d.id);
                         }
+                        
                         $('#f-pass').val('');
+                        descargar_acta(d.id);
                         $.niftyNoty({
                             type: 'success',
                             container: 'floating',
                             title: '¡Éxito!',
                             message: action === 'insert' ? 
-                                'La postulación ha sido registrada correctamente.' :
+                                'El recurso ha sido registrado correctamente.' :
                                 'Los datos han sido actualizados correctamente.',
                             timer: 5000,
                             closeBtn: true,
                             focus: true
                         });
+
+
                     } else {
                         $.niftyNoty({
                             type: 'danger',
@@ -160,7 +190,8 @@ $(document).ready(function () {
                     });
                 }
             });
-        } else {
+        } 
+        else {
             $.niftyNoty({
                 type: 'danger',
                 title: 'Guardar datos',
@@ -175,3 +206,5 @@ $(document).ready(function () {
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
 }
+
+// Función para descargar el acta de entrega

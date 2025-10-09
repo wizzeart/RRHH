@@ -53,6 +53,27 @@
                                     </select>
                                 </div>
                             </div>
+                            
+                                
+                                    <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label" for="f-fecha-registro">Fecha Entrega <span class="text-danger">*</span></label>
+                                        <input type="date" id="f-fecha-registro" name="fecha_entrega_a_t" class="form-control" value="<?php if (isset($data['fecha_entrega_a_t'])) print($data['fecha_entrega_a_t']);else print(date('Y-m-d')); ?>">
+                                    </div>
+                                    </div>
+                                    <div class="col-md-4" <?php if (!isset($data['id'])) print("hidden"); ?>>
+                                    <div class="form-group" >
+                                        <label class="control-label" for="f-fecha-devolucion">Fecha Entrega a RH</label>
+                                        <input type="date" id="f-fecha-devolucion" name="fecha_entrega_a_rh" class="form-control" value="<?php if (isset($data['fecha_entrega_a_rh'])) print($data['fecha_entrega_a_rh']);else print(date('Y-m-d')); ?>">
+                                    </div>  
+                                    </div>
+                                
+                            
+
+                            
+                        </div>
+                        
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label" for="f-recurso">Recurso <span class="text-danger">*</span></label>
@@ -60,27 +81,32 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="f-fecha-registro">Fecha Entrega <span class="text-danger">*</span></label>
-                                        <input type="date" id="f-fecha-registro" name="fecha_entrega_a_t" class="form-control" value="<?php if (isset($data['fecha_entrega_a_t'])) print($data['fecha_entrega_a_t']);else print(date('Y-m-d')); ?>">
-                                    </div>
-                                    </div>
-                                    <div class="col-md-6" <?php if (!isset($data['id'])) print("hidden"); ?>>
-                                    <div class="form-group" >
-                                        <label class="control-label" for="f-fecha-devolucion">Fecha Entrega a RH</label>
-                                        <input type="date" id="f-fecha-devolucion" name="fecha_entrega_a_rh" class="form-control" value="<?php if (isset($data['fecha_entrega_a_rh'])) print($data['fecha_entrega_a_rh']);else print(date('Y-m-d')); ?>">
-                                    </div>  
-                                    </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="f-marca">Marca <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-marca" name="marca" class="form-control" placeholder="Marca" value="<?php if (isset($data['marca'])) print($data['marca']); ?> " <?php if (isset($data['marca'])) echo 'disabled'; ?>>
                                 </div>
                             </div>
-                            <div class="col-md-4" >
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-modelo">Modelo <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-modelo" name="modelo" class="form-control" placeholder="Modelo" value="<?php if (isset($data['modelo'])) print($data['modelo']); ?> " <?php if (isset($data['modelo'])) echo 'disabled'; ?>>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-color">Color <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-color" name="color" class="form-control" placeholder="Color" value="<?php if (isset($data['color'])) print($data['color']); ?> " <?php if (isset($data['color'])) echo 'disabled'; ?>>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-otros_recursos">Otros recursos <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-otros_recursos" name="otros_recursos" class="form-control" placeholder="Otros recursos" value="<?php if (isset($data['otros_recursos'])) print($data['otros_recursos']); ?> " <?php if (isset($data['otros_recursos'])) echo 'disabled'; ?>>
+                                </div>
+    
                             </div>
 
                         </div>
-
-
 
                     </div>
                     <div class="panel-footer text-center">
