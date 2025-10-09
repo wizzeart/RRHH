@@ -23,9 +23,9 @@ class Cuentas {
     }
 
     public function controlador($param) {
+        global $data, $page;
         $data = array();
-        $page = array();
-
+        // Mantener consistencia con otros controladores que setean $page global
         switch ($param['module']) {
             case 'list-cuentas':
                 $page['title'] = 'Cuentas Bancarias';
@@ -36,11 +36,7 @@ class Cuentas {
                 $page['subtitle'] = 'Gestión de Cuentas Bancarias';
                 break;
         }
-
         $page['module'] = $param['module'];
-        $data['page'] = $page;
-        
-        return $data;
     }
 
     private function _list($param) {

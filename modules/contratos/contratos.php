@@ -32,8 +32,8 @@
                         <label class="control-label" for="f-tipo-contrato">Tipo de Contrato <span class="text-danger">*</span></label>
                         <select id="f-tipo-contrato" name="tipo_contrato" class="form-control">
                             <option value="">Seleccione tipo</option>
-                            <option value="1" <?php echo (isset($data['tipo_contrato']) && $data['tipo_contrato'] == '1') ? 'selected' : ''; ?>>1 - Tiempo Determinado</option>
-                            <option value="2" <?php echo (isset($data['tipo_contrato']) && $data['tipo_contrato'] == '2') ? 'selected' : ''; ?>>2 - Tiempo Indeterminado</option>
+                            <option value="1" <?php echo (isset($data['tipo']) && $data['tipo'] == '1') ? 'selected' : ''; ?>>1 - Tiempo Determinado</option>
+                            <option value="2" <?php echo (isset($data['tipo']) && $data['tipo'] == '2') ? 'selected' : ''; ?>>2 - Tiempo Indeterminado</option>
                         </select>
                     </div>
                 </div>
@@ -79,6 +79,57 @@
                                     <div id="trabajador-direccion" class="form-control-static">-</div>
                                 </div>
                             </div>
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col-md-12">
+                                    <label class="control-label">Régimen de Trabajo</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-regimen-trabajo-desde" class="control-label">Desde (día)</label>
+                                        <select id="f-regimen-trabajo-desde" name="regimen_trabajo_desde" class="form-control">
+                                            <option value="">Seleccione día</option>
+                                            <option value="Lunes">Lunes</option>
+                                            <option value="Martes">Martes</option>
+                                            <option value="Miércoles">Miércoles</option>
+                                            <option value="Jueves">Jueves</option>
+                                            <option value="Viernes">Viernes</option>
+                                            <option value="Sábado">Sábado</option>
+                                            <option value="Domingo">Domingo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-regimen-trabajo-hasta" class="control-label">Hasta (día)</label>
+                                        <select id="f-regimen-trabajo-hasta" name="regimen_trabajo_hasta" class="form-control">
+                                            <option value="">Seleccione día</option>
+                                            <option value="Lunes">Lunes</option>
+                                            <option value="Martes">Martes</option>
+                                            <option value="Miércoles">Miércoles</option>
+                                            <option value="Jueves">Jueves</option>
+                                            <option value="Viernes">Viernes</option>
+                                            <option value="Sábado">Sábado</option>
+                                            <option value="Domingo">Domingo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-desde-hora" class="control-label">Desde Hora</label>
+                                        <input type="time" id="f-desde-hora" name="hora_desde_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="f-hasta-hora" class="control-label">Hasta Hora</label>
+                                        <input type="time" id="f-hasta-hora" name="hora_hasta_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -112,6 +163,18 @@
                     <div class="form-group">
                         <label class="control-label" for="f-salario-base">Salario Base <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" id="f-salario-base" name="salario_base" class="form-control" value="<?php echo isset($data['salario_base']) ? $data['salario_base'] : ''; ?>" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="f-frecuencia-trabajo">Frecuencia de Pago/Trabajo</label>
+                        <select id="f-frecuencia-trabajo" name="frecuencia_trabajo" class="form-control">
+                            <option value="">Seleccione frecuencia</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="quincenal">Quincenal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                        <small class="text-muted">Se reflejará como (X) en el contrato.</small>
                     </div>
                 </div>
             </div>
@@ -166,7 +229,7 @@
         <h4 class="panel-title">Vista Previa del Contrato</h4>
     </div>
     <div class="panel-body">
-        <div id="contrato-preview" style="border:1px solid #e1e1e1; padding:20px; max-height:80vh; overflow:auto; background:#fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
+        <div id="contrato-preview" style="border:1px solid #e1e1e1; height:90vh; overflow:hidden; background:#fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
             <p class="text-muted text-center">Complete los campos del formulario para ver la vista previa del contrato</p>
         </div>
     </div>

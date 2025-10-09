@@ -38,13 +38,14 @@
             data-response-handler="responseHandler">
             <thead>
                 <tr>
+                    <th data-field="carnet_identidad" data-sortable="true">CI</th>
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="apellidos" data-sortable="true">Apellidos</th>
-                    <th data-field="carnet_identidad" data-sortable="true">CI</th>
+                    
                     <th data-field="cargo_nombre" data-sortable="true">Cargo</th>
                     <th data-field="fecha_contratacion" data-sortable="true">Fecha Contratación</th>
                     <th data-field="fecha_baja" data-sortable="true">Fecha Baja</th>
-                    <th data-field="estatus" data-sortable="true">Estado</th>
+                    
                 </tr>
             </thead>
         </table>

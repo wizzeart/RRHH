@@ -67,7 +67,7 @@ $(document).ready(function () {
   });
 
   // Event listeners para actualización en tiempo real
-  $('#f-tipo-contrato, #f-ubicacion-laboral, #f-regimen-descanso, #f-salario-base, #f-modalidad-trabajo').on('change input', function() {
+  $('#f-tipo-contrato, #f-ubicacion-laboral, #f-regimen-descanso, #f-salario-base, #f-modalidad-trabajo, #f-regimen-trabajo-desde, #f-regimen-trabajo-hasta, #f-desde-hora, #f-hasta-hora, #f-frecuencia-trabajo').on('change input', function() {
     actualizarVistaPrevia();
   });
 
@@ -78,23 +78,100 @@ $(document).ready(function () {
     var regimenDescanso = $('#f-regimen-descanso').val();
     var salarioBase = $('#f-salario-base').val();
     var modalidadTrabajo = $('#f-modalidad-trabajo option:selected').text();
-    
+    var regimenDesde = $('#f-regimen-trabajo-desde').val();
+    var regimenHasta = $('#f-regimen-trabajo-hasta').val();
+    var desdeHora = $('#f-desde-hora').val();
+    var hastaHora = $('#f-hasta-hora').val();
+    var frecuencia = $('#f-frecuencia-trabajo').val();
+
     if (!trabajadorData.nombre) {
       $('#contrato-preview').html('<p class="text-muted text-center">Seleccione un trabajador para ver la vista previa del contrato</p>');
       return;
     }
 
     var tipoTexto = tipoContrato == '1' ? 'Tiempo Determinado' : (tipoContrato == '2' ? 'Tiempo Indeterminado' : '');
-    var nombreCompleto = (trabajadorData.nombre + ' ' + trabajadorData.apellidos + ' ' + (trabajadorData.apellidos_segundos || '')).trim();
-    
-    var contratoHtml = generarContratoHtml(nombreCompleto, tipoTexto, ubicacionLaboral, regimenDescanso, salarioBase, modalidadTrabajo);
-    $('#contrato-preview').html(contratoHtml);
+
+    // Mostrar estado de carga
+    $('#contrato-preview').html('<p class="text-center text-muted">Generando vista previa...</p>');
+
+    // Construir payload para backend render-contrato-unico
+    var payload = {
+      module: 'contratos',
+      method: 'render-contrato-unico',
+      trabajador_nombre: trabajadorData.nombre || '',
+      trabajador_apellidos: trabajadorData.apellidos || '',
+      trabajador_apellidos_segundos: trabajadorData.apellidos_segundos || '',
+      trabajador_direccion: trabajadorData.direccion || '',
+      trabajador_municipio: trabajadorData.municipio_nombre || '',
+      trabajador_provincia: trabajadorData.provincia_nombre || '',
+      trabajador_ci: trabajadorData.carnet_identidad || '',
+      cargo_nombre: trabajadorData.cargo_nombre || '',
+      tipo_contrato_texto: tipoTexto || '',
+      modalidad_trabajo_texto: modalidadTrabajo || '',
+      ubicacion_laboral_texto: (ubicacionLaboral && ubicacionLaboral !== 'Seleccione departamento') ? ubicacionLaboral : '',
+      regimen_descanso: regimenDescanso || '',
+      salario_base: salarioBase || '',
+      regimen_trabajo_desde: regimenDesde || '',
+      regimen_trabajo_hasta: regimenHasta || '',
+      hora_desde_h: desdeHora || '',
+      hora_hasta_h: hastaHora || '',
+      frecuencia_trabajo: frecuencia || ''
+      // Horarios/otros opcionales pueden añadirse aquí si luego se agregan campos al formulario
+    };
+
+    $.ajax({
+      url: 'api-app.php',
+      method: 'POST',
+      data: payload,
+      dataType: 'json'
+    }).done(function(d){
+      if (d && d.status == 1 && d.html) {
+        // Renderizar documento completo EXACTO dentro de un iframe usando srcdoc
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('style', 'width:100%;height:100%;border:0;');
+        iframe.setAttribute('title', 'Vista previa del contrato');
+        // Mantener el documento tal cual
+        iframe.srcdoc = d.html;
+        var $wrap = $('#contrato-preview');
+        $wrap.empty().append(iframe);
+      } else {
+        // Fallback a la plantilla JS simple si el backend falla, dentro de un documento mínimo
+        var nombreCompleto = (trabajadorData.nombre + ' ' + trabajadorData.apellidos + ' ' + (trabajadorData.apellidos_segundos || '')).trim();
+        var contratoHtml = generarContratoHtml(nombreCompleto, tipoTexto, ubicacionLaboral, regimenDescanso, salarioBase, modalidadTrabajo);
+        var fallbackDoc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\
+<style>html,body{margin:0;padding:0;height:100%} body{padding:16px; box-sizing:border-box; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}</style></head><body>' + contratoHtml + '</body></html>';
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('style', 'width:100%;height:100%;border:0;');
+        iframe.setAttribute('title', 'Vista previa del contrato');
+        iframe.srcdoc = fallbackDoc;
+        var $wrap = $('#contrato-preview');
+        $wrap.empty().append(iframe);
+      }
+    }).fail(function(){
+      var nombreCompleto = (trabajadorData.nombre + ' ' + trabajadorData.apellidos + ' ' + (trabajadorData.apellidos_segundos || '')).trim();
+      var contratoHtml = generarContratoHtml(nombreCompleto, tipoTexto, ubicacionLaboral, regimenDescanso, salarioBase, modalidadTrabajo);
+      var fallbackDoc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\
+<style>html,body{margin:0;padding:0;height:100%} body{padding:16px; box-sizing:border-box; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}</style></head><body>' + contratoHtml + '</body></html>';
+      var iframe = document.createElement('iframe');
+      iframe.setAttribute('style', 'width:100%;height:100%;border:0;');
+      iframe.setAttribute('title', 'Vista previa del contrato');
+      iframe.srcdoc = fallbackDoc;
+      var $wrap = $('#contrato-preview');
+      $wrap.empty().append(iframe);
+    });
   }
 
   // Función para generar el HTML del contrato
   function generarContratoHtml(nombreCompleto, tipoContrato, ubicacionLaboral, regimenDescanso, salarioBase, modalidadTrabajo) {
     var fechaActual = new Date().toLocaleDateString('es-ES');
+    var desdeHora = $('#f-desde-hora').val() || '';
+    var hastaHora = $('#f-hasta-hora').val() || '';
+    var regimenDesde = $('#f-regimen-trabajo-desde').val() || '';
+    var regimenHasta = $('#f-regimen-trabajo-hasta').val() || '';
     
+    var frecuencia = $('#f-frecuencia-trabajo').val() || '';
+    var freqTexto = frecuencia ? frecuencia.charAt(0).toUpperCase() + frecuencia.slice(1) : '';
+
     return `
       <div style="text-align: center; margin-bottom: 30px;">
         <h2 style="margin-bottom: 10px;">SUPLEMENTO AL CONTRATO DE TRABAJO</h2>
@@ -110,8 +187,9 @@ $(document).ready(function () {
         <strong>${modalidadTrabajo || '[MODALIDAD DE TRABAJO]'}</strong>.</p>
         
         <p><strong>TERCERA:</strong> El régimen de descanso será: <strong>${regimenDescanso || '[RÉGIMEN DE DESCANSO]'}</strong>.</p>
+        <p><strong>JORNADA:</strong> Desde <strong>${(regimenDesde||'[DÍA DESDE]')}</strong> a <strong>${(regimenHasta||'[DÍA HASTA]')}</strong>, en el horario de <strong>${(desdeHora||'[HORA DESDE]')}</strong> a <strong>${(hastaHora||'[HORA HASTA]')}</strong>.</p>
         
-        <p><strong>CUARTA:</strong> El salario base acordado es de <strong>$${salarioBase || '0.00'}</strong> mensuales.</p>
+        <p><strong>CUARTA:</strong> El salario base acordado es de <strong>$${salarioBase || '0.00'}</strong> mensuales. Frecuencia: <strong>${freqTexto || '[FRECUENCIA]'}</strong>.</p>
         
         <p><strong>QUINTA:</strong> El presente contrato entra en vigor a partir del <strong>${fechaActual}</strong>.</p>
         
@@ -148,18 +226,15 @@ $(document).ready(function () {
     var errores = [];
     var trabajadorId = $('#f-trabajador').val();
     var tipoContrato = $('#f-tipo-contrato').val();
-    var departamentoId = $('#f-ubicacion-laboral').val();
-    var regimenDescanso = $('#f-regimen-descanso').val();
-    var salarioBase = $('#f-salario-base').val();
-    var modalidadTrabajo = $('#f-modalidad-trabajo').val();
 
     // Validaciones
     if (!trabajadorId) { errores.push('El trabajador es obligatorio'); $('#f-trabajador').addClass('is-invalid'); } else { $('#f-trabajador').removeClass('is-invalid'); }
     if (!tipoContrato) { errores.push('El tipo de contrato es obligatorio'); $('#f-tipo-contrato').addClass('is-invalid'); } else { $('#f-tipo-contrato').removeClass('is-invalid'); }
-    if (!departamentoId) { errores.push('La ubicación laboral es obligatoria'); $('#f-ubicacion-laboral').addClass('is-invalid'); } else { $('#f-ubicacion-laboral').removeClass('is-invalid'); }
-    if (!regimenDescanso) { errores.push('El régimen de descanso es obligatorio'); $('#f-regimen-descanso').addClass('is-invalid'); } else { $('#f-regimen-descanso').removeClass('is-invalid'); }
-    if (!salarioBase || parseFloat(salarioBase) <= 0) { errores.push('El salario base debe ser mayor a 0'); $('#f-salario-base').addClass('is-invalid'); } else { $('#f-salario-base').removeClass('is-invalid'); }
-    if (!modalidadTrabajo) { errores.push('La modalidad de trabajo es obligatoria'); $('#f-modalidad-trabajo').addClass('is-invalid'); } else { $('#f-modalidad-trabajo').removeClass('is-invalid'); }
+    // Los demás campos son opcionales para guardar. Se mantienen visibles para la vista previa y futura expansión.
+    $('#f-ubicacion-laboral').removeClass('is-invalid');
+    $('#f-regimen-descanso').removeClass('is-invalid');
+    $('#f-salario-base').removeClass('is-invalid');
+    $('#f-modalidad-trabajo').removeClass('is-invalid');
 
     if (errores.length) { 
       notify('warning','Validación',errores.join('<br>'),5000); 
@@ -212,7 +287,19 @@ $(document).ready(function () {
       return;
     }
 
-    var contratoHtml = $('#contrato-preview').html();
+    // Obtener el HTML real dentro del iframe de vista previa
+    var $iframe = $('#contrato-preview iframe');
+    if ($iframe.length === 0) {
+      notify('warning','Validación','La vista previa no está lista. Genere la vista previa antes de crear el PDF');
+      return;
+    }
+    var iframeEl = $iframe[0];
+    var contratoHtml = '';
+    if (iframeEl.srcdoc && iframeEl.srcdoc.length > 0) {
+      contratoHtml = iframeEl.srcdoc;
+    } else if (iframeEl.contentDocument && iframeEl.contentDocument.documentElement) {
+      contratoHtml = '<!doctype html>' + iframeEl.contentDocument.documentElement.outerHTML;
+    }
     if (!contratoHtml || contratoHtml.indexOf('Seleccione un trabajador') !== -1) {
       notify('warning','Validación','Complete todos los campos para generar el PDF');
       return;
@@ -226,7 +313,7 @@ $(document).ready(function () {
       data: { 
         module: 'contratos', 
         method: 'generatePdfFromHtml', 
-        html: '<!doctype html><html><head><style>body{font-family:Arial,sans-serif;}</style></head><body>' + contratoHtml + '</body></html>',
+        html: contratoHtml,
         contrato_id: contratoId 
       }, 
       dataType: 'json',
@@ -236,12 +323,14 @@ $(document).ready(function () {
           notify('success','Generado','PDF creado correctamente'); 
           if (d.file_url) window.open(d.file_url,'_blank'); 
         } else { 
-          notify('danger','Error', d.msg || 'No se pudo generar PDF'); 
+          try { console.warn('generatePdfFromHtml response:', d); } catch(e) {}
+          notify('danger','Error', (d && d.msg) ? d.msg : 'No se pudo generar PDF'); 
         } 
       },
-      error: function(){ 
+      error: function(xhr){ 
         $('#btn-generate-pdf').attr('disabled', false).text('Generar PDF'); 
-        notify('danger','Error','No se pudo generar PDF'); 
+        var msg = (xhr && xhr.responseText) ? xhr.responseText : 'No se pudo generar PDF';
+        notify('danger','Error', msg); 
       }
     });
   });
