@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Firma Electronica</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 24px; background: #f6f7fb; color:#111; }
+  h1 { font-size: 20px; margin-bottom: 8px; }
+  .app { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items:start; max-width:1000px; }
+  .panel { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 6px 18px rgba(20,30,60,0.08); }
+  #canvasWrap { position: relative; padding: 12px; display:flex; justify-content:center; align-items:center; }
+  canvas { border: 1px dashed rgba(0,0,0,0.08); border-radius: 8px; touch-action: none; background: transparent; }
+  .controls { display:flex; flex-direction:column; gap:8px; }
+  .row { display:flex; gap:8px; align-items:center; }
+  button { padding:8px 12px; border-radius:8px; border: none; cursor:pointer; background:#2b7cff; color:white; font-weight:600; }
+  button.secondary { background: #e6e9f3; color:#222; }
+  label { font-size: 13px; }
+  input[type=range] { width:100%; }
+  .tips { font-size: 12px; color:#556; margin-top:8px; }
+</style>
+</head>
+<body>
+  <h1>Firma Electrónica</h1>
+  <div class="app">
+    <div class="panel" id="left">
+      <div id="canvasWrap">
+        <!-- Tamaño visual del canvas -->
+        <canvas id="drawCanvas" width="800" height="500"></canvas>
+      </div>
+    </div>
+
+    <div class="panel controls" id="right">
+      <div class="row">
+        <button id="saveBtn">Guardar PNG</button>
+        <button class="secondary" id="clearBtn">Limpiar</button>
+      </div>
+
+      <div class="row">
+        <label for="color">Color:</label>
+        <input id="color" type="color" value="#000000" />
+      </div>
+
+      <div class="row">
+        <label for="size">Grosor: <span id="sizeVal">4</span> px</label>
+        <input id="size" type="range" min="1" max="60" value="4" />
+      </div>
+
+      <div class="row">
+        <label for="pad">Padding al recortar (px): <span id="padVal">4</span></label>
+        <input id="pad" type="range" min="0" max="50" value="4" />
+      </div>
+
+      <div class="tips">
+        Dibuja con mouse o con el dedo. Al guardar, la app recorta la imagen para que el PNG contenga únicamente lo que dibujaste y mantenga el fondo transparente.
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d', { alpha: true });
+  const colorInput = document.getElementById('color');
+  const sizeInput = document.getElementById('size');
+  const sizeVal = document.getElementById('sizeVal');
+  const saveBtn = document.getElementById('saveBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const padInput = document.getElementById('pad');
+  const padVal = document.getElementById('padVal');
+
+  // Ajuste para pantallas de alta DPI para que no se vea borroso
+  function fixDPI() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    canvas.style.width = rect.width + "px";
+    canvas.style.height = rect.height + "px";
+    ctx.scale(dpr, dpr);
+  }
+
+  // Si quieres que el canvas sea responsive visualmente, ajusta el ancho/alto aquí:
+  function setCanvasVisualSize(w = 800, h = 500) {
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    fixDPI();
+  }
+
+  // Inicial
+  setCanvasVisualSize(800, 500);
+
+  // Estado de dibujo
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  // Propiedades de trazo
+  function applyStrokeSettings() {
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = parseInt(sizeInput.value, 10);
+    ctx.strokeStyle = colorInput.value;
+  }
+  applyStrokeSettings();
+
+  sizeInput.addEventListener('input', () => {
+    sizeVal.textContent = sizeInput.value;
+    applyStrokeSettings();
+  });
+  colorInput.addEventListener('input', applyStrokeSettings);
+  padInput.addEventListener('input', () => { padVal.textContent = padInput.value; });
+
+  // Coordenadas relativas al canvas en unidades CSS (no en pixels del buffer)
+  function pointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX ?? (e.touches && e.touches[0] && e.touches[0].clientX);
+    const clientY = e.clientY ?? (e.touches && e.touches[0] && e.touches[0].clientY);
+    return {
+      x: (clientX - rect.left),
+      y: (clientY - rect.top)
+    };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    drawing = true;
+    const p = pointerPos(e);
+    lastX = p.x;
+    lastY = p.y;
+    // Empezar una nueva traza
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = pointerPos(e);
+    // Dibuja una línea desde (lastX,lastY) hasta (p.x,p.y)
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x;
+    lastY = p.y;
+  }
+
+  function endDraw(e) {
+    if (!drawing) return;
+    drawing = false;
+    ctx.closePath();
+  }
+
+  // Eventos pointer (maneja mouse+touch+stylus mejor que mouse/touch separados)
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    applyStrokeSettings();
+    startDraw(e);
+  });
+  canvas.addEventListener('pointermove', draw);
+  canvas.addEventListener('pointerup', (e) => {
+    canvas.releasePointerCapture(e.pointerId);
+    endDraw(e);
+  });
+  canvas.addEventListener('pointercancel', endDraw);
+  canvas.addEventListener('pointerout', endDraw);
+  canvas.addEventListener('pointerleave', endDraw);
+
+  // Botón limpiar
+  clearBtn.addEventListener('click', () => {
+    // Borrar canvas (se queda transparente)
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Si se escaló por devicePixelRatio, clearRect en unidades de buffer; más seguro:
+    // reset transform then clear, but aquí usamos ctx.clearRect con buffer coords:
+    // Para mantener correcto en dpr, recalculamos:
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(1,0,0,1,0,0); // temporal
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fixDPI();
+  });
+
+  // Guardar PNG recortado: encontrar bounding box de píxeles con alpha > 0
+  saveBtn.addEventListener('click', () => {
+    // Obtener imagen completa en buffer (en unidades de buffer)
+    // Para trabajar en coordenadas CSS (más intuitivo), convertiremos usando devicePixelRatio
+    const dpr = window.devicePixelRatio || 1;
+    // Leemos en buffer coords (getImageData exige coords en canvas pixels)
+    const w = canvas.width;
+    const h = canvas.height;
+    if (w === 0 || h === 0) { alert('Canvas vacío.'); return; }
+
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+    let found = false;
+
+    // Recorremos cada píxel buscando alpha > 0
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const alpha = data[idx + 3];
+        if (alpha > 0) {
+          found = true;
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    if (!found) {
+      alert('No hay nada dibujado para guardar.');
+      return;
+    }
+
+    // Padding en píxeles CSS convertido a buffer coords
+    const padCss = parseInt(padInput.value, 10) || 0;
+    const pad = Math.round(padCss * dpr);
+
+    // Ajustar límites con padding y asegurarse dentro del canvas
+    const sx = Math.max(0, minX - pad);
+    const sy = Math.max(0, minY - pad);
+    const sw = Math.min(w - sx, (maxX - minX + 1) + 2 * pad);
+    const sh = Math.min(h - sy, (maxY - minY + 1) + 2 * pad);
+
+    // Crear canvas temporal del tamaño recortado en *buffer* coords para preservar calidad
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = sw;
+    outCanvas.height = sh;
+    const outCtx = outCanvas.getContext('2d', { alpha: true });
+
+    // Dibujar la porción deseada desde el canvas original
+    // Para ello convertimos el canvas original a imagen y dibujamos la región.
+    // Usamos drawImage con coordenadas en buffer coords.
+    // Primero necesitamos una imagen del canvas actual (en buffer)
+    const tmpImg = new Image();
+    // Important: usar toDataURL en el canvas original (mantiene alpha)
+    tmpImg.onload = () => {
+      // DIBUJAR: destin 0,0 tamaño sw,sh ; source sx,sy,sw,sh
+      outCtx.drawImage(tmpImg, sx, sy, sw, sh, 0, 0, sw, sh);
+
+      // Crear enlace de descarga usando dataURL
+      outCanvas.toBlob((blob) => {
+        if (!blob) { alert('Error al generar PNG.'); return; }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'dibujo_transparente.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+
+    // Generar dataURL a escala de buffer: para asegurar que la imagen cargue exactamente como el buffer,
+    // convertimos el canvas a dataURL sin cambiar tamaño.
+    // Nota: toDataURL usa el estado actual del canvas (buffer coords).
+    tmpImg.src = canvas.toDataURL('image/png');
+  });
+
+  // Si el usuario redimensiona la ventana, volvemos a ajustar DPI (no borra el dibujo si hacemos snapshot)
+  window.addEventListener('resize', () => {
+    // Para mantener lo dibujado al cambiar DPI/size, necesitamos copiar el contenido y reescalar.
+    // Aquí, para simplicidad, solo volvemos a fijar el DPI (si haces responsive más agresivo, se necesita conservar contenido)
+    fixDPI();
+  });
+
+  // Previene gesto de scroll en móviles al dibujar
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+})();
+</script>
+</body>
+</html>

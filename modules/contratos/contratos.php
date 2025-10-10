@@ -195,7 +195,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="f-firma">Firma Digital</label>
+                        <label class="control-label" for="f-firma">Firma Trabajador</label>
                         <input type="file" id="f-firma" name="firma_digital" class="form-control" accept=".png,.jpg,.jpeg,.pdf">
                         <?php if (!empty($data['firma_digital'])) { echo '<small><a href="' . htmlspecialchars($data['firma_digital'], ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver firma actual</a></small>'; } ?>
                     </div>
@@ -212,8 +212,8 @@
             </button>
             
             <button id="btn-generate-pdf" class="btn btn-primary icon-lg" type="button">
-                <i class="fa fa-file-pdf-o"></i>
-                Generar PDF
+                <i class="fa fa-arrows-alt"></i>
+                Ver grande
             </button>
 
             <?php if (isset($data['archivo_contrato']) && !empty($data['archivo_contrato'])): ?>

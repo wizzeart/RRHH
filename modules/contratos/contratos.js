@@ -66,19 +66,12 @@ $(document).ready(function () {
     cargarDatosTrabajador(trabajadorId);
   });
 
-  // Estado inicial del botón Generar PDF según existencia de archivo previo
-  (function initGeneratePdfState(){
-    var existingUrl = $('#f-archivo-contrato').val();
-    if (existingUrl) {
-      $('#btn-generate-pdf').prop('disabled', true).attr('title','Ya existe un PDF. Modifique los campos para regenerar.');
-    }
-  })();
+  // Estado inicial del botón "Ver grande" (antes Generar PDF): sin lógica especial
+  // (Se mantiene habilitado; no depende de existencia de archivo PDF)
 
   // Event listeners para actualización en tiempo real
   $('#f-tipo-contrato, #f-ubicacion-laboral, #f-regimen-descanso, #f-salario-base, #f-modalidad-trabajo, #f-regimen-trabajo-desde, #f-regimen-trabajo-hasta, #f-desde-hora, #f-hasta-hora, #f-frecuencia-trabajo').on('change input', function() {
     actualizarVistaPrevia();
-    // Habilitar regeneración si había un PDF existente
-    $('#btn-generate-pdf').prop('disabled', false).removeAttr('title');
   });
 
   // UX: abrir selector de hora al clickear cualquier parte del input
@@ -320,63 +313,9 @@ $(document).ready(function () {
     });
   });
 
-  // Función para generar PDF
-  $('#btn-generate-pdf').click(function(){
-    var contratoId = $('#f-id').val();
-    if (!contratoId) {
-      notify('warning','Validación','Debe guardar el contrato antes de generar el PDF');
-      return;
-    }
-
-    $('#btn-generate-pdf').attr('disabled', true).text('Generando...');
-    
-    $.ajax({ 
-      url: 'api-app.php', 
-      method: 'POST', 
-      data: { 
-        module: 'contratos', 
-        method: 'generatePdfById', 
-        contrato_id: contratoId 
-      }, 
-      dataType: 'json',
-      success: function(d){ 
-        $('#btn-generate-pdf').attr('disabled', false).text('Generar PDF'); 
-        if (d && d.status==1) { 
-          notify('success', d.msg_title || 'Generado', d.msg || 'PDF creado correctamente'); 
-          if (d.file_url) {
-            // Abrir en nueva pestaña
-            window.open(d.file_url,'_blank');
-            // Crear o actualizar botón de descarga sin recargar la página
-            var $btn = $('#btn-download-pdf');
-            if ($btn.length === 0) {
-              $btn = $('<a>', {
-                id: 'btn-download-pdf',
-                class: 'btn btn-info icon-lg',
-                target: '_blank',
-                href: d.file_url,
-                html: '<i class="fa fa-download"></i> Descargar PDF'
-              });
-              // Insertar después del botón Generar PDF
-              $('#btn-generate-pdf').after(' ', $btn);
-            } else {
-              $btn.attr('href', d.file_url).removeClass('hidden');
-            }
-            // Deshabilitar botón hasta que se cambien campos clave nuevamente
-            $('#btn-generate-pdf').prop('disabled', true).attr('title','Ya existe un PDF. Modifique los campos para regenerar.');
-            // Actualizar hidden con nueva URL
-            $('#f-archivo-contrato').val(d.file_url);
-          }
-        } else { 
-          try { console.warn('generatePdfById response:', d); } catch(e) {}
-          notify('danger', (d && d.msg_title) ? d.msg_title : 'Error', (d && d.msg) ? d.msg : 'No se pudo generar PDF'); 
-        } 
-      },
-      error: function(xhr){ 
-        $('#btn-generate-pdf').attr('disabled', false).text('Generar PDF'); 
-        var msg = (xhr && xhr.responseText) ? xhr.responseText : 'No se pudo generar PDF';
-        notify('danger','Error', msg); 
-      }
-    });
+  // Botón "Ver grande" (antes Generar PDF) -> reutiliza la lógica de pantalla completa
+  $('#btn-generate-pdf').off('click').on('click', function(){
+    $('#btn-preview-fullscreen').trigger('click');
   });
 
   // Fallback: si el backend no cargó trabajadores en el HTML, poblar vía API
@@ -450,19 +389,307 @@ $(document).ready(function () {
     }).fail(function(){ /* silencioso */ });
   })();
 
-  // Ver grande: abrir vista previa en nueva pestaña/ventana (pantalla completa del documento)
+  // Ver grande: abrir vista previa en nueva pestaña/ventana con barra de acciones
   $(document).on('click', '#btn-preview-fullscreen', function(){
     var $iframe = $('#contrato-preview iframe');
-    if ($iframe.length) {
-      var html = $iframe[0].srcdoc || ($iframe[0].contentDocument ? '<!doctype html>' + $iframe[0].contentDocument.documentElement.outerHTML : '');
-      if (html) {
-        var w = window.open('', '_blank');
-        if (w) { w.document.open(); w.document.write(html); w.document.close(); }
-        else { notify('warning','Popup bloqueado','Permite ventanas emergentes para ver a pantalla completa'); }
-        return;
-      }
-    }
-    notify('warning','Vista previa','La vista previa no está lista aún');
+    if (!$iframe.length) { notify('warning','Vista previa','La vista previa no está lista aún'); return; }
+    var innerHtml = $iframe[0].srcdoc || ($iframe[0].contentDocument ? '<!doctype html>' + $iframe[0].contentDocument.documentElement.outerHTML : '');
+    if (!innerHtml) { notify('warning','Vista previa','La vista previa no está lista aún'); return; }
+
+    var contratoId = $('#f-id').val() || '';
+    var win = window.open('', '_blank');
+    if (!win) { notify('warning','Popup bloqueado','Permite ventanas emergentes para ver a pantalla completa'); return; }
+
+    var shell = `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vista del Contrato</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { display: flex; flex-direction: column; }
+    .toolbar { position: sticky; top: 0; z-index: 1000; display: flex; gap: 8px; align-items: center; padding: 10px; background: #f7f7f7; border-bottom: 1px solid #ddd; font-family: Arial, sans-serif; }
+    .toolbar button { padding: 8px 12px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
+    .toolbar button:hover { background: #f0f0f0; }
+    .status { margin-left: auto; font-size: 12px; color: #555; }
+    .content { position: relative; flex: 1; min-height: 0; }
+    .content iframe { position: relative; z-index: 1; width: 100%; height: 100%; border: 0; }
+    @media print { .toolbar { display: none !important; } }
+    /* Modal firma */
+    .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5); }
+    .modal .modal-dialog { background: #fff; max-width: 1000px; margin: 40px auto; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-header, .modal-footer { padding: 10px 16px; border-bottom: 1px solid #eee; }
+    .modal-header { display:flex; align-items:center; justify-content: space-between; }
+    .modal-title { margin: 0; font-size: 16px; }
+    .modal-body { padding: 16px; }
+    .form-row { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-row label { font-size: 12px; color: #333; }
+    .form-row input[type="number"] { width: 90px; }
+    .btn { padding: 8px 12px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
+    .btn.primary { background: #1976d2; color:#fff; border-color:#1976d2; }
+    .btn.danger { background: #d32f2f; color:#fff; border-color:#d32f2f; }
+    .btn:hover { opacity: .95; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="btn-full-generate">Generar PDF</button>
+    <button id="btn-full-print">Imprimir</button>
+    <button id="btn-full-sign">Firmar</button>
+    <span class="status" id="status-msg"></span>
+  </div>
+  <div class="content"><iframe id="docFrame"></iframe></div>
+  <!-- Modal Firma -->
+  <div id="signModal" class="modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h4 class="modal-title">Firmar documento</h4>
+        <button id="closeModal" class="btn" title="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Color: <input type="color" id="color" value="#000000" /></label>
+          <label>Tamaño: <input type="range" id="size" min="1" max="15" value="3" /> <span id="sizeVal">3</span> px</label>
+          <label>Padding: <input type="number" id="pad" min="0" max="60" value="6" /> <span id="padVal">6</span> px</label>
+          <button id="clearBtn" class="btn danger" type="button">Limpiar</button>
+        </div>
+        <div style="border:1px dashed #bbb; background:#fafafa; border-radius:4px;">
+          <canvas id="drawCanvas" style="display:block; width:100%; height:360px; touch-action:none;"></canvas>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="saveBtn" class="btn primary" type="button">Guardar firma en el documento</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var contratoId = ${JSON.stringify(contratoId)};
+      var iframe = document.getElementById('docFrame');
+      var statusEl = document.getElementById('status-msg');
+      // Cargar contenido del contrato en el iframe
+      iframe.srcdoc = ${JSON.stringify(innerHtml)};
+
+      function setStatus(msg){ if(statusEl){ statusEl.textContent = msg || ''; } }
+
+      document.getElementById('btn-full-print').addEventListener('click', function(){
+        try {
+          var w = document.getElementById('docFrame').contentWindow;
+          if (w && w.focus) w.focus();
+          if (w && w.print) w.print();
+          else window.print();
+        } catch(e){ window.print(); }
+      });
+
+      document.getElementById('btn-full-generate').addEventListener('click', function(){
+        if (!contratoId) { alert('Primero guarde el contrato para poder generar el PDF.'); return; }
+        setStatus('Generando PDF...');
+        var htmlActual = '';
+        try {
+          // Preferir DOM actual (incluye firmas añadidas)
+          var w = document.getElementById('docFrame').contentWindow;
+          if (w && w.document && w.document.documentElement) {
+            htmlActual = '<!doctype html>' + w.document.documentElement.outerHTML;
+          }
+          if (!htmlActual) {
+            htmlActual = document.getElementById('docFrame').srcdoc || '';
+          }
+        } catch(e) { htmlActual = document.getElementById('docFrame').srcdoc || ''; }
+
+        if (!htmlActual) {
+          setStatus('');
+          alert('No se pudo obtener el HTML de la vista para generar el PDF.');
+          return;
+        }
+
+        var params = new URLSearchParams();
+        params.set('module', 'contratos');
+        params.set('method', 'generatePdfFromHtml');
+        params.set('tipo', 'contrato');
+        params.set('contrato_id', contratoId);
+        params.set('html', htmlActual);
+
+        fetch('api-app.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+          body: params
+        }).then(function(r){ return r.json(); }).then(function(d){
+          if (d && d.status == 1) {
+            setStatus('PDF generado');
+            if (d.file_url) { try { window.open(d.file_url, '_blank'); } catch(e){} }
+          } else {
+            setStatus('');
+            alert((d && (d.msg_title||d.msg)) ? (d.msg_title || d.msg) : 'No se pudo generar el PDF');
+          }
+        }).catch(function(err){ setStatus(''); alert('Error al generar PDF'); });
+      });
+
+      // Abrir modal de firma
+      document.getElementById('btn-full-sign').addEventListener('click', function(){
+        var modal = document.getElementById('signModal');
+        if (!modal) { alert('No se encontró el modal de firma. Recargue la vista grande.'); return; }
+        modal.style.display = 'block';
+        // Inicializar canvas una vez visible (display:block) para que getBoundingClientRect no devuelva 0
+        setTimeout(function(){
+          try {
+            var canvas = document.getElementById('drawCanvas');
+            if (!canvas) return;
+            // Asegurar tamaño visual
+            if (!canvas.style.width) { canvas.style.width = '100%'; }
+            if (!canvas.style.height) { canvas.style.height = '360px'; }
+            var dpr = window.devicePixelRatio || 1;
+            var rect = canvas.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) {
+              // forzar un tamaño por defecto si el layout aún no calculó
+              canvas.style.width = '800px';
+              canvas.style.height = '360px';
+              rect = canvas.getBoundingClientRect();
+            }
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+            var ctx = canvas.getContext('2d', { alpha: true });
+            if (ctx) { ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr); }
+          } catch(e) { /* ignore */ }
+        }, 0);
+      });
+
+      // Lógica de dibujo y guardado de firma
+      (function(){
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        const colorInput = document.getElementById('color');
+        const sizeInput = document.getElementById('size');
+        const sizeVal = document.getElementById('sizeVal');
+        const saveBtn = document.getElementById('saveBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const padInput = document.getElementById('pad');
+        const padVal = document.getElementById('padVal');
+        const closeBtn = document.getElementById('closeModal');
+
+        function fixDPI() {
+          const dpr = window.devicePixelRatio || 1;
+          const rect = canvas.getBoundingClientRect();
+          canvas.width = Math.round(rect.width * dpr);
+          canvas.height = Math.round(rect.height * dpr);
+          canvas.style.width = rect.width + 'px';
+          canvas.style.height = rect.height + 'px';
+          ctx.setTransform(1,0,0,1,0,0);
+          ctx.scale(dpr, dpr);
+        }
+        function setCanvasVisualSize() {
+          // Nada: usamos width:100% en CSS; solo ajustar DPI
+          fixDPI();
+        }
+        setCanvasVisualSize();
+        window.addEventListener('resize', fixDPI);
+
+        let drawing = false; let lastX=0, lastY=0;
+        function applyStrokeSettings(){
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
+          ctx.lineWidth = parseInt(sizeInput.value,10);
+          ctx.strokeStyle = colorInput.value;
+        }
+        applyStrokeSettings();
+        sizeInput.addEventListener('input', ()=>{ sizeVal.textContent = sizeInput.value; applyStrokeSettings(); });
+        colorInput.addEventListener('input', applyStrokeSettings);
+        padInput.addEventListener('input', ()=>{ padVal.textContent = padInput.value; });
+
+        function pointerPos(e){
+          const rect = canvas.getBoundingClientRect();
+          const clientX = e.clientX ?? (e.touches && e.touches[0] && e.touches[0].clientX);
+          const clientY = e.clientY ?? (e.touches && e.touches[0] && e.touches[0].clientY);
+          return { x: (clientX-rect.left), y: (clientY-rect.top) };
+        }
+        function startDraw(e){ e.preventDefault(); drawing=true; const p=pointerPos(e); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.moveTo(lastX,lastY); }
+        function draw(e){ if(!drawing) return; e.preventDefault(); const p=pointerPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }
+        function endDraw(){ if(!drawing) return; drawing=false; ctx.closePath(); }
+
+        canvas.addEventListener('pointerdown', (e)=>{ canvas.setPointerCapture(e.pointerId); applyStrokeSettings(); startDraw(e); });
+        canvas.addEventListener('pointermove', draw);
+        canvas.addEventListener('pointerup', (e)=>{ canvas.releasePointerCapture(e.pointerId); endDraw(); });
+        canvas.addEventListener('pointercancel', endDraw);
+        canvas.addEventListener('pointerout', endDraw);
+        canvas.addEventListener('pointerleave', endDraw);
+        canvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); }, { passive:false });
+
+        clearBtn.addEventListener('click', ()=>{
+          ctx.setTransform(1,0,0,1,0,0);
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          fixDPI();
+        });
+
+        closeBtn.addEventListener('click', ()=>{
+          document.getElementById('signModal').style.display = 'none';
+        });
+
+        // Guardar firma e insertar al final del documento del iframe
+        saveBtn.addEventListener('click', ()=>{
+          const wBuf = canvas.width, hBuf = canvas.height;
+          if (!wBuf || !hBuf) { alert('Canvas vacío.'); return; }
+          const imgData = ctx.getImageData(0,0,wBuf,hBuf).data;
+          let minX=wBuf, minY=hBuf, maxX=0, maxY=0, found=false;
+          for (let y=0; y<hBuf; y++){
+            for (let x=0; x<wBuf; x++){
+              const a = imgData[(y*wBuf+x)*4 + 3];
+              if (a>0){ found=true; if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+            }
+          }
+          if (!found){ alert('No hay trazo para guardar.'); return; }
+          const dpr = window.devicePixelRatio || 1;
+          const padCss = parseInt(padInput.value,10)||0;
+          const pad = Math.round(padCss * dpr);
+          const sx=Math.max(0,minX-pad), sy=Math.max(0,minY-pad);
+          const sw=Math.min(wBuf - sx, (maxX-minX+1)+2*pad);
+          const sh=Math.min(hBuf - sy, (maxY-minY+1)+2*pad);
+          const out = document.createElement('canvas'); out.width=sw; out.height=sh; const octx = out.getContext('2d',{alpha:true});
+          const tmp = new Image();
+          tmp.onload = function(){
+            octx.drawImage(tmp, sx, sy, sw, sh, 0, 0, sw, sh);
+            // Usar data URL para que sea embebible y compatible con servidor (no blob:)
+            const dataUrl = out.toDataURL('image/png');
+            try {
+              var ifw = document.getElementById('docFrame').contentWindow;
+              var doc = ifw && ifw.document;
+              if (!doc) throw new Error('No se pudo acceder al documento.');
+              // Insertar UNA sola firma: si ya existe, reemplazar imagen; si no, crear contenedor
+              var existing = doc.getElementById('firma-digital-container');
+              if (existing) {
+                // Reemplazar la imagen y asegurar estilos (doblemente más arriba y a la derecha)
+                existing.setAttribute('style','page-break-inside:avoid; text-align:center; margin-top:-120px;');
+                // Ajustar título si existe
+                var titleEl = existing.querySelector('.firma-title');
+                if (titleEl) { titleEl.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;'); }
+                var sigImg = existing.querySelector('img');
+                if (!sigImg) { sigImg = doc.createElement('img'); existing.appendChild(sigImg); }
+                sigImg.src = dataUrl; sigImg.alt = 'Firma'; sigImg.style.maxWidth = '120px'; sigImg.style.height = 'auto'; sigImg.style.marginLeft = '100px'; sigImg.style.display = 'inline-block';
+              } else {
+                var container = doc.createElement('div');
+                container.id = 'firma-digital-container';
+                container.setAttribute('style','page-break-inside:avoid; text-align:center; margin-top:-120px;');
+                var title = doc.createElement('div'); title.className = 'firma-title'; title.textContent = 'Firma Trabajador'; title.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;');
+                var img = doc.createElement('img'); img.src = dataUrl; img.alt = 'Firma'; img.style.maxWidth = '120px'; img.style.height = 'auto'; img.style.marginLeft = '100px'; img.style.display = 'inline-block';
+                container.appendChild(title); container.appendChild(img);
+                (doc.body || doc.documentElement).appendChild(container);
+              }
+              // Actualizar srcdoc con DOM actual para conservar la firma en futuras acciones
+              try { var htmlNow = '<!doctype html>'+ doc.documentElement.outerHTML; document.getElementById('docFrame').srcdoc = htmlNow; } catch(e){}
+              document.getElementById('signModal').style.display = 'none';
+              setStatus('Firma insertada');
+            } catch(e){ alert('No se pudo insertar la firma en el documento.'); }
+          };
+          tmp.src = canvas.toDataURL('image/png');
+        });
+      })();
+    })();
+  </script>
+</body>
+</html>`;
+
+    win.document.open();
+    win.document.write(shell);
+    win.document.close();
   });
 
 });
