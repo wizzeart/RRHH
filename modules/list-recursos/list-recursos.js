@@ -28,17 +28,53 @@ function formatoToolbar(value, row) {
     // Botón de ver detalles
     html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
     html += 'data-id="' + row.id + '" title="Ver detalles"></button> ';
+    // Botón de descargar
+    html += '<button class="btn btn-warning btn-icon icon-sm fa fa-download download-recurso" ';
+    html += 'data-id="' + row.id + '" title="Descargar"></button>';
     // Botón de eliminar
     html += '<button class="btn btn-danger btn-icon icon-sm fa fa-trash delete-recurso" ';
     html += 'data-id="' + row.id + '" title="Eliminar"></button>';
+
     html += '</div>';
     return html;
+}
+function descargar_acta(idRecurso) {
+    // Ruta donde se guardó el archivo (debe coincidir con la ruta en PHP)
+    var rutaArchivo = '/docs/actas_guardadas/acta_entrega_' + idRecurso + '.pdf';
+    
+    // Crear un enlace temporal
+    var link = document.createElement('a');
+    link.href = rutaArchivo;
+    link.target = '_blank';
+    link.download = 'acta_entrega_' + idRecurso + '.pdf';
+    
+    // Simular clic en el enlace
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar después de la descarga
+    setTimeout(function() {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href);
+    }, 100);
 }
 
 $(document).ready(function () {
     // Botón para agregar nuevo recurso
     $('#btn-add-new').click(function () {
         location.href = 'index.php?module=gestion-recursos&method=new';
+    });
+
+    // Manejador para el botón de descargar
+    $('#table-todos, #table-asignados, #table-retornados').on('click', '.download-recurso', function () {
+        var $tr = $(this).closest('tr');
+        var $table = $tr.closest('table');
+
+        var index = $tr.data('index'); // O $tr.index()
+        var allData = $table.bootstrapTable('getData');
+        var rowData = allData[index];
+
+        descargar_acta(rowData.id);
     });
 
     // Manejador para el botón de ver detalles

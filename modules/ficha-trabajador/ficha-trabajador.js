@@ -13,7 +13,26 @@ function formatoEstado(value, row) {
         return '<span class="' + clase + '">' + estado + '</span>';
     }
 }
-
+function descargar_acta(idRecurso) {
+    // Ruta donde se guardó el archivo (debe coincidir con la ruta en PHP)
+    var rutaArchivo = '/docs/actas_guardadas/acta_entrega_' + idRecurso + '.pdf';
+    
+    // Crear un enlace temporal
+    var link = document.createElement('a');
+    link.href = rutaArchivo;
+    link.target = '_blank';
+    link.download = 'acta_entrega_' + idRecurso + '.pdf';
+    
+    // Simular clic en el enlace
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar después de la descarga
+    setTimeout(function() {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href);
+    }, 100);
+}
 
 function firmadoFormatter(value, row, index) {
     var firmado = (value && String(value).trim() !== '' && value !== 'null' && value !== null);
@@ -110,6 +129,17 @@ $(document).ready(function () {
         //$('#trabajadorModal').modal('show');
         // hacerle submit al formulario
         document.getElementById(formId).submit();
+    });
+    // Manejador para el botón de descargar
+    $('#table-recursos').on('click', '.download-recurso', function () {
+        var $tr = $(this).closest('tr');
+        var $table = $tr.closest('table');
+
+        var index = $tr.data('index'); // O $tr.index()
+        var allData = $table.bootstrapTable('getData');
+        var rowData = allData[index];
+
+        descargar_acta(rowData.id);
     });
     function notify(type, title, message, timer) {
         if ($.niftyNoty && typeof $.niftyNoty === 'function') {
@@ -557,12 +587,14 @@ function formatoPedido(value, row) {
 function formatoToolbar2(value, row) {
     var html = '<div class="btn-group">';
     
-    
- 
-    
     // Botón de ver detalles
     html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
     html += 'data-id="' + row.id + '" title="Ver detalles"></button> ';
+    
+ // Botón de descargar
+    html += '<button class="btn btn-warning btn-icon icon-sm fa fa-download download-recurso" ';
+    html += 'data-id="' + row.id + '" title="Descargar"></button>';
+    
     
     html += '</div>';
     return html;
@@ -628,8 +660,8 @@ function pdfFormatter(value, row, index) {
     }
     
     return '<div class="btn-group">' +
-           '<a href="' + url + '" download="' + filename + '" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
-           '<a href="' + url + '" target="_blank" class="btn btn-info btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
+    '<a href="' + url + '" target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
+           '<a href="' + url + '" download="' + filename + '" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
            '</div>';
 }
 
