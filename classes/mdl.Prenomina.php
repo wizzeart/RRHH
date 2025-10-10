@@ -108,12 +108,46 @@ class Prenomina {
                     (192.00 * COALESCE(c.salario, 0)) AS sal_dev,                                                                                                                                      -- Salario devengado (igual al salario base)
                     (SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') AS ausencias,                                                                  -- Conteo de ausencias desde registro_asistencia
                     ROUND(((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') * 8 * COALESCE(c.salario, 0)), 2) AS ausenciasCosto,                -- Costo por ausencias: ausencias × 8 × tarifa
-                    (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0) AS vacaciones,                               -- Suma de días de vacaciones disfrutadas
-                    ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2) AS pago_vac,  -- Pago por vacaciones: (tarifa × 8) × días_vacaciones
-                    ((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) AS salario_neto,  -- Salario neto: salario_base + pago_vacaciones
+                    (
+                        SELECT COALESCE(SUM(
+                            CASE 
+                                WHEN pv.fecha_aprobacion IS NOT NULL AND pv.fecha_aprobacion <> '' AND pv.dias IS NOT NULL AND pv.dias <> ''
+                                    THEN (LENGTH(pv.dias) - LENGTH(REPLACE(pv.dias, ',', '')) + 1)
+                                ELSE 0
+                            END
+                        ), 0)
+                        FROM plan_vacaciones pv
+                        WHERE pv.trabajador_id = t.id
+                    ) AS vacaciones,                                                                                                                           -- Días de vacaciones aprobadas
+                    ROUND(((COALESCE(c.salario, 0) * 8) * (
+                        SELECT COALESCE(SUM(
+                            CASE 
+                                WHEN pv.fecha_aprobacion IS NOT NULL AND pv.fecha_aprobacion <> '' AND pv.dias IS NOT NULL AND pv.dias <> ''
+                                    THEN (LENGTH(pv.dias) - LENGTH(REPLACE(pv.dias, ',', '')) + 1)
+                                ELSE 0
+                            END
+                        ), 0) FROM plan_vacaciones pv WHERE pv.trabajador_id = t.id
+                    )), 2) AS pago_vac,  -- Pago por vacaciones: (tarifa × 8) × días_vacaciones
+                    ((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (
+                        SELECT COALESCE(SUM(
+                            CASE 
+                                WHEN pv.fecha_aprobacion IS NOT NULL AND pv.fecha_aprobacion <> '' AND pv.dias IS NOT NULL AND pv.dias <> ''
+                                    THEN (LENGTH(pv.dias) - LENGTH(REPLACE(pv.dias, ',', '')) + 1)
+                                ELSE 0
+                            END
+                        ), 0) FROM plan_vacaciones pv WHERE pv.trabajador_id = t.id
+                    )), 2)) AS salario_neto,  -- Salario neto: salario_base + pago_vacaciones
                     ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) AS seg_social,                                                                                                               -- Descuento seguridad social: 5% del salario base
                     ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) AS ing_pers,                                                                                                              -- Descuento ingresos personales: 3.75% del salario base
-                    ROUND(((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0)), 2)) - (ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) + ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) + ROUND(((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') * 8 * COALESCE(c.salario, 0)), 2)), 2) AS salario_pagar,  -- Salario a pagar: salario_neto - (seg_social + ing_pers + ausenciasCosto)
+                    ROUND(((192.00 * COALESCE(c.salario, 0)) + ROUND(((COALESCE(c.salario, 0) * 8) * (
+                        SELECT COALESCE(SUM(
+                            CASE 
+                                WHEN pv.fecha_aprobacion IS NOT NULL AND pv.fecha_aprobacion <> '' AND pv.dias IS NOT NULL AND pv.dias <> ''
+                                    THEN (LENGTH(pv.dias) - LENGTH(REPLACE(pv.dias, ',', '')) + 1)
+                                ELSE 0
+                            END
+                        ), 0) FROM plan_vacaciones pv WHERE pv.trabajador_id = t.id
+                    )), 2)) - (ROUND((192.00 * COALESCE(c.salario, 0)) * 0.05, 2) + ROUND((192.00 * COALESCE(c.salario, 0)) * 0.0375, 2) + ROUND(((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1') * 8 * COALESCE(c.salario, 0)), 2)), 2) AS salario_pagar,  -- Salario a pagar: salario_neto - (seg_social + ing_pers + ausenciasCosto)
                     COALESCE(d.nombre, '') AS departamento                                                                                                                                             -- Nombre del departamento
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
@@ -221,10 +255,16 @@ class Prenomina {
                     $ausencias = $ausenciasRow ? intval($ausenciasRow['total_ausencias']) : 0;
                     $ausenciasCosto = round($ausencias * 8 * $tarifa, 2);
                     
-                    // Obtener vacaciones
-                    $sqlVacaciones = "SELECT SUM(dias_disfrutados) as total_dias_vacaciones 
-                                      FROM registro_vacaciones 
-                                      WHERE trabajador_id = :tid AND dias_disfrutados > 0";
+                    // Obtener vacaciones desde plan_vacaciones: contar comas + 1 cuando fecha_aprobacion esté definida y dias no vacío
+                    $sqlVacaciones = "SELECT COALESCE(SUM(
+                                            CASE 
+                                                WHEN fecha_aprobacion IS NOT NULL AND fecha_aprobacion <> '' AND dias IS NOT NULL AND dias <> ''
+                                                    THEN (LENGTH(dias) - LENGTH(REPLACE(dias, ',', '')) + 1)
+                                                ELSE 0
+                                            END
+                                        ), 0) AS total_dias_vacaciones
+                                        FROM plan_vacaciones
+                                        WHERE trabajador_id = :tid";
                     $vacacionesRow = $this->db->fetchRow($sqlVacaciones, ['tid' => $trabajador_id]);
                     $vacaciones = $vacacionesRow ? intval($vacacionesRow['total_dias_vacaciones']) : 0;
         
@@ -325,7 +365,17 @@ class Prenomina {
                     NULL AS bonif,
                     (COALESCE(p.horas, 192.00) * COALESCE(c.salario,0)) AS sal_dev,
                     COALESCE((SELECT COUNT(*) FROM registro_asistencia ra WHERE ra.trabajador_id = t.id AND ra.ausencia = '1'), 0) AS ausencias,
-                    COALESCE((SELECT COALESCE(SUM(dias_disfrutados), 0) FROM registro_vacaciones rv WHERE rv.trabajador_id = t.id AND rv.dias_disfrutados > 0), 0) AS vacaciones
+                    COALESCE((
+                        SELECT COALESCE(SUM(
+                            CASE 
+                                WHEN pv.fecha_aprobacion IS NOT NULL AND pv.fecha_aprobacion <> '' AND pv.dias IS NOT NULL AND pv.dias <> ''
+                                    THEN (LENGTH(pv.dias) - LENGTH(REPLACE(pv.dias, ',', '')) + 1)
+                                ELSE 0
+                            END
+                        ), 0)
+                        FROM plan_vacaciones pv
+                        WHERE pv.trabajador_id = t.id
+                    ), 0) AS vacaciones
                 FROM trabajadores t
                 LEFT JOIN cargos c ON t.cargos_id = c.id
                 LEFT JOIN departamentos d ON t.departamento_id = d.id

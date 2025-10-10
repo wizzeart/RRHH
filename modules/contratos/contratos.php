@@ -156,8 +156,8 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="control-label" for="f-regimen-descanso">Régimen de Descanso <span class="text-danger">*</span></label>
-                        <input type="text" id="f-regimen-descanso" name="regimen_descanso" class="form-control" value="<?php echo isset($data['regimen_descanso']) ? htmlspecialchars($data['regimen_descanso'], ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Ej: Lunes a Viernes">
+                        <label class="control-label" for="f-regimen-descanso">Dias de Descanso <span class="text-danger">*</span></label>
+                        <input type="text" id="f-regimen-descanso" name="regimen_descanso" class="form-control" value="<?php echo isset($data['regimen_descanso']) ? htmlspecialchars($data['regimen_descanso'], ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Ej: Dias de descanso">
                     </div>
                 </div>
                 <div class="col-md-4">
