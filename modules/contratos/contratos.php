@@ -5,6 +5,7 @@
     <div class="panel-body">
         <form id="form-contrato" enctype="multipart/form-data">
             <input type="hidden" id="f-id" name="id" value="<?php if (isset($data['id'])) print($data['id']); ?>">
+            <input type="hidden" id="f-archivo-contrato" value="<?php echo isset($data['archivo_contrato']) ? htmlspecialchars($data['archivo_contrato'], ENT_QUOTES, 'UTF-8') : ''; ?>">
 
             <!-- Fila 1: Trabajador y Tipo de Contrato -->
             <div class="row">
@@ -155,8 +156,8 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="control-label" for="f-regimen-descanso">Régimen de Descanso <span class="text-danger">*</span></label>
-                        <input type="text" id="f-regimen-descanso" name="regimen_descanso" class="form-control" value="<?php echo isset($data['regimen_descanso']) ? htmlspecialchars($data['regimen_descanso'], ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Ej: Lunes a Viernes">
+                        <label class="control-label" for="f-regimen-descanso">Dias de Descanso <span class="text-danger">*</span></label>
+                        <input type="text" id="f-regimen-descanso" name="regimen_descanso" class="form-control" value="<?php echo isset($data['regimen_descanso']) ? htmlspecialchars($data['regimen_descanso'], ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="Ej: Dias de descanso">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -214,6 +215,13 @@
                 <i class="fa fa-file-pdf-o"></i>
                 Generar PDF
             </button>
+
+            <?php if (isset($data['archivo_contrato']) && !empty($data['archivo_contrato'])): ?>
+            <a href="<?php echo htmlspecialchars($data['archivo_contrato'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" class="btn btn-info icon-lg" id="btn-download-pdf">
+                <i class="fa fa-download"></i>
+                Descargar PDF
+            </a>
+            <?php endif; ?>
             
             <button id="btn-back" class="btn btn-default icon-lg" type="button">
                 <i class="fa fa-undo"></i>
@@ -226,7 +234,16 @@
 <!-- Vista previa del contrato en tiempo real -->
 <div class="panel" style="margin-top:20px;">
     <div class="panel-heading">
-        <h4 class="panel-title">Vista Previa del Contrato</h4>
+        <div class="row" style="display:flex; align-items:center;">
+            <div class="col-xs-8 col-sm-9">
+                <h4 class="panel-title" style="margin:0;">Vista Previa del Contrato</h4>
+            </div>
+            <div class="col-xs-4 col-sm-3 text-right">
+                <button id="btn-preview-fullscreen" type="button" class="btn btn-default btn-sm" title="Ver a pantalla completa">
+                    <i class="fa fa-arrows-alt"></i> Ver grande
+                </button>
+            </div>
+        </div>
     </div>
     <div class="panel-body">
         <div id="contrato-preview" style="border:1px solid #e1e1e1; height:90vh; overflow:hidden; background:#fff; font-family: 'Times New Roman', serif; line-height: 1.6;">

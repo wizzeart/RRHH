@@ -72,4 +72,4 @@
     </div>
 </div>
 
-<script src="modules/prenomina/prenomina.js"></script>
+<?php // El JS del módulo se carga automáticamente desde index.php al final de la página (después de jQuery) ?>

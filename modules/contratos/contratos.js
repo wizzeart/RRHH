@@ -66,9 +66,19 @@ $(document).ready(function () {
     cargarDatosTrabajador(trabajadorId);
   });
 
+  // Estado inicial del botón Generar PDF según existencia de archivo previo
+  (function initGeneratePdfState(){
+    var existingUrl = $('#f-archivo-contrato').val();
+    if (existingUrl) {
+      $('#btn-generate-pdf').prop('disabled', true).attr('title','Ya existe un PDF. Modifique los campos para regenerar.');
+    }
+  })();
+
   // Event listeners para actualización en tiempo real
   $('#f-tipo-contrato, #f-ubicacion-laboral, #f-regimen-descanso, #f-salario-base, #f-modalidad-trabajo, #f-regimen-trabajo-desde, #f-regimen-trabajo-hasta, #f-desde-hora, #f-hasta-hora, #f-frecuencia-trabajo').on('change input', function() {
     actualizarVistaPrevia();
+    // Habilitar regeneración si había un PDF existente
+    $('#btn-generate-pdf').prop('disabled', false).removeAttr('title');
   });
 
   // UX: abrir selector de hora al clickear cualquier parte del input
@@ -318,24 +328,6 @@ $(document).ready(function () {
       return;
     }
 
-    // Obtener el HTML real dentro del iframe de vista previa
-    var $iframe = $('#contrato-preview iframe');
-    if ($iframe.length === 0) {
-      notify('warning','Validación','La vista previa no está lista. Genere la vista previa antes de crear el PDF');
-      return;
-    }
-    var iframeEl = $iframe[0];
-    var contratoHtml = '';
-    if (iframeEl.srcdoc && iframeEl.srcdoc.length > 0) {
-      contratoHtml = iframeEl.srcdoc;
-    } else if (iframeEl.contentDocument && iframeEl.contentDocument.documentElement) {
-      contratoHtml = '<!doctype html>' + iframeEl.contentDocument.documentElement.outerHTML;
-    }
-    if (!contratoHtml || contratoHtml.indexOf('Seleccione un trabajador') !== -1) {
-      notify('warning','Validación','Complete todos los campos para generar el PDF');
-      return;
-    }
-
     $('#btn-generate-pdf').attr('disabled', true).text('Generando...');
     
     $.ajax({ 
@@ -343,19 +335,40 @@ $(document).ready(function () {
       method: 'POST', 
       data: { 
         module: 'contratos', 
-        method: 'generatePdfFromHtml', 
-        html: contratoHtml,
+        method: 'generatePdfById', 
         contrato_id: contratoId 
       }, 
       dataType: 'json',
       success: function(d){ 
         $('#btn-generate-pdf').attr('disabled', false).text('Generar PDF'); 
         if (d && d.status==1) { 
-          notify('success','Generado','PDF creado correctamente'); 
-          if (d.file_url) window.open(d.file_url,'_blank'); 
+          notify('success', d.msg_title || 'Generado', d.msg || 'PDF creado correctamente'); 
+          if (d.file_url) {
+            // Abrir en nueva pestaña
+            window.open(d.file_url,'_blank');
+            // Crear o actualizar botón de descarga sin recargar la página
+            var $btn = $('#btn-download-pdf');
+            if ($btn.length === 0) {
+              $btn = $('<a>', {
+                id: 'btn-download-pdf',
+                class: 'btn btn-info icon-lg',
+                target: '_blank',
+                href: d.file_url,
+                html: '<i class="fa fa-download"></i> Descargar PDF'
+              });
+              // Insertar después del botón Generar PDF
+              $('#btn-generate-pdf').after(' ', $btn);
+            } else {
+              $btn.attr('href', d.file_url).removeClass('hidden');
+            }
+            // Deshabilitar botón hasta que se cambien campos clave nuevamente
+            $('#btn-generate-pdf').prop('disabled', true).attr('title','Ya existe un PDF. Modifique los campos para regenerar.');
+            // Actualizar hidden con nueva URL
+            $('#f-archivo-contrato').val(d.file_url);
+          }
         } else { 
-          try { console.warn('generatePdfFromHtml response:', d); } catch(e) {}
-          notify('danger','Error', (d && d.msg) ? d.msg : 'No se pudo generar PDF'); 
+          try { console.warn('generatePdfById response:', d); } catch(e) {}
+          notify('danger', (d && d.msg_title) ? d.msg_title : 'Error', (d && d.msg) ? d.msg : 'No se pudo generar PDF'); 
         } 
       },
       error: function(xhr){ 
@@ -436,5 +449,20 @@ $(document).ready(function () {
       if (renderDeps(list)) return;
     }).fail(function(){ /* silencioso */ });
   })();
+
+  // Ver grande: abrir vista previa en nueva pestaña/ventana (pantalla completa del documento)
+  $(document).on('click', '#btn-preview-fullscreen', function(){
+    var $iframe = $('#contrato-preview iframe');
+    if ($iframe.length) {
+      var html = $iframe[0].srcdoc || ($iframe[0].contentDocument ? '<!doctype html>' + $iframe[0].contentDocument.documentElement.outerHTML : '');
+      if (html) {
+        var w = window.open('', '_blank');
+        if (w) { w.document.open(); w.document.write(html); w.document.close(); }
+        else { notify('warning','Popup bloqueado','Permite ventanas emergentes para ver a pantalla completa'); }
+        return;
+      }
+    }
+    notify('warning','Vista previa','La vista previa no está lista aún');
+  });
 
 });
