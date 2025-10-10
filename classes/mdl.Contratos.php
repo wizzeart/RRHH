@@ -53,22 +53,25 @@ class Contrato {
             if (strcasecmp($tipo_contrato_texto, 'Tiempo Determinado') === 0) {
                 $var23 = '_X_';
                 $var7  = '___';
+                
             } elseif (strcasecmp($tipo_contrato_texto, 'Tiempo Indeterminado') === 0) {
                 $var23 = '___';
                 $var7  = '_X_';
+                
             } else {
                 // Fallback: si viene un texto libre, no marcamos X y dejamos mostrar texto si la plantilla lo contempla
                 $var23 = '___';
                 $var7  = '___';
+                
             }
 
             // Modalidad con tres marcadores: presencial ($var24), a distancia ($var25), teletrabajo ($var26)
             $var24 = '___';
-            $var25 = '___';
             $var26 = '___';
+            $var99 = '___';
             if ($modalidad_trabajo_texto !== '') {
                 if (stripos($modalidad_trabajo_texto, 'presencial') !== false) { $var24 = '_X_'; }
-                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var25 = '_X_'; }
+                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var99 = '_X_'; }
                 if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
             }
             // Frecuencia de pago/trabajo: tres marcadores (semanal, quincenal, mensual)
@@ -847,13 +850,14 @@ class Contrato {
             if (move_uploaded_file($_FILES['firma_digital']['tmp_name'], $path)) { $firma_digital_path = $path; }
         }
 
-        // Solo guardar columnas mínimas: trabajador_id, tipo, fecha_inicio, archivo_contrato, firma_digital
+        // Solo guardar columnas mínimas: trabajador_id, tipo, fecha_inicio, archivo_contrato, firma_digital (flag int)
         $insert = array(
             'trabajador_id'     => $trabajador_id,
             'tipo'              => $tipo_contrato, // mapeamos 'tipo_contrato' del form a columna 'tipo'
             'fecha_inicio'      => $fecha_inicio,
             'archivo_contrato'  => $archivo_contrato_path,
-            'firma_digital'     => $firma_digital_path
+            // columna firma_digital es entera: 1 si se subió archivo de firma en esta operación, 0 en caso contrario
+            'firma_digital'     => ($firma_digital_path ? 1 : 0)
         );
 
         try {
@@ -883,8 +887,8 @@ class Contrato {
                 if ($result === false) { $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al actualizar'; }
                 else {
                     $data['id'] = $id;
-                    // Regenerar PDF con datos actualizados
-                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, isset($insert['firma_digital']) ? $insert['firma_digital'] : $firma_digital_path);
+                    // Regenerar PDF con datos actualizados (usar ruta de firma si se subió en esta operación)
+                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, $firma_digital_path);
                     if ($pdfPath) {
                         $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $id));
                         $data['file_url'] = $pdfPath;
@@ -922,7 +926,7 @@ class Contrato {
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir()]);
 
         // Estilos simples (puedes reemplazar por plantilla propia)
-        $css = 'body { font-family: DejaVu Sans, sans-serif; font-size: 12px; } .title { text-align:center; font-weight:bold; font-size:18px; margin-bottom:10px; } .sec h3 { margin: 10px 0 5px; } .row { margin: 6px 0; } .label { color:#666; width: 180px; display:inline-block; }';
+        $css = 'body { font-family: DejaVu Sans, sans-serif; font-size: 12px; } .title { text-align:center; font-weight:bold; font-size:18px; margin-bottom:40px; } .sec h3 { margin: 10px 0 5px; } .row { margin: 6px 0; } .label { color:#666; width: 180px; display:inline-block; }';
         $html = '<html><head><style>' . $css . '</style></head><body>'
               . '<div class="title">Contrato #' . htmlspecialchars((string)$id) . '</div>'
               . '<div class="sec">'
@@ -932,7 +936,13 @@ class Contrato {
               . '<div class="row"><span class="label">Fecha Fin:</span> ' . htmlspecialchars($fecha_fin ?: 'Indefinido') . '</div>'
               . '</div>';
         if (!empty($firma_digital_path)) {
-            $html .= '<div class="sec"><h3>Firma Digital</h3><div class="row"><img src="' . htmlspecialchars($firma_digital_path) . '" style="max-width:250px; max-height:120px;"></div></div>';
+            // Subir el doble la sección de firma (título e imagen) y desplazar un poco más a la derecha
+            $html .= '<div class="sec" style="position:relative; margin-top:-120px;">
+                        <h3 style="margin:0 0 4px 0;">Firma Trabajador</h3>
+                        <div class="row" style="text-align:center;">
+                            <img src="' . htmlspecialchars($firma_digital_path) . '" style="max-width:120px; height:auto; margin-left:100px; display:inline-block;">
+                        </div>
+                      </div>';
         }
         $html .= '<div class="sec"><h3>Cláusulas</h3><div class="row">Este documento ha sido generado automáticamente por el sistema.</div></div>';
         $html .= '</body></html>';
