@@ -96,7 +96,14 @@
                             </div>
                             <div class="col-md-10">
                                 <div class="row">
-
+                                    <div class="col-md-3" hidden>
+                                        <div class="form-group">
+                                            <label class="control-label" for="f-id">Código del trabajador</label>
+                                            <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id']))
+                                                print ($data['id']); ?>" disabled>
+                                            <small class="help-block">Identificador único</small>
+                                        </div>
+                                    </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="control-label" for="f-nombre">Nombre </label>
@@ -550,7 +557,10 @@
                         <h3 class="panel-title">Documentos</h3>
                     </div>
                     <div class="panel-body">
-                        <table id="table-salarios"
+                        <div class="form-control">
+                            <button id="btn-add-new-doc" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Documento" title="Añadir Nuevo Documento"></button>
+                        </div>
+                        <table id="table-documentos"
                             data-toggle="table"
                             data-url="api-app.php?module=documentos&method=list-id&trabajador_id=<?php print($data['id']); ?>"
                             data-search="true"
@@ -567,7 +577,7 @@
                                     <th data-field="tipo" data-sortable="true">Tipo</th>
                                     <!--<th data-field="archivo"data-align="center" data-width="140">Archivo</th>-->
                                     <th data-field="fecha_upload" data-sortable="true">Fecha Subida</th>
-                                    <th data-field="archivo" data-formatter="pdfFormatter" data-align="center" data-width="140">Descargar</th>
+                                    <th data-field="archivo" data-formatter="pdfFormatter2" data-align="center" data-width="140">Descargar</th>
 
                                 </tr>
                             </thead>
@@ -595,21 +605,7 @@
     <!-- END BASIC FORM ELEMENTS -->
 </div>
 
-<div class="modal fade" id="trabajadorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <!-- <h5 class="modal-title" id="modalLabel">Detalles del Trabajador</h5> -->
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Aquí se insertan los datos -->
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Modal para agregar documento -->
 
 <!-- Modal para detalles del recurso -->
 <div class="modal fade" id="recursoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -627,3 +623,7 @@
         </div>
     </div>
 </div>
+<!-- llamar a add-doc.php -->
+<?php include 'add-doc.php'; ?>
+
+<!-- Modal para detalles del recurso -->
