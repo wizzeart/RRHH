@@ -41,7 +41,7 @@ $(document).ready(function () {
 
 
 function formatoNombreCompleto(value, row) {
-    return row.nombre + ' ' + row.apellidos + '<br><small class="text-muted">CI: ' + row.carnet_identidad + '</small>';
+    return row.nombre + ' ' + row.apellidos ;//+ '<br><small class="text-muted">CI: ' + row.carnet_identidad + '</small>';
 }
 
 // Formateador para la columna de ausencia

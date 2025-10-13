@@ -165,12 +165,12 @@ $(document).ready(function () {
                 success: function(response) {
                     $('#documentoModal').modal('hide');
                     notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
+                    $('#table-documentos').bootstrapTable('refresh');
                 },
                 error: function(xhr, status, error) {
                     notify('danger', 'Error', 'Hubo un error al agregar el documento');
                 }
             });
-            $('#table-documentos').bootstrapTable('refresh');
         });
         
         $('#documentoModal').modal('show');
@@ -620,6 +620,29 @@ $(document).ready(function () {
         $('#modalBody2').html(html);
         $('#recursoModal').modal('show');
     });
+
+    // Event listener para eliminar documento
+    $('body').on('click', '.delete-document', function() {
+        var idRecurso = $(this).data('id');
+        var formData = new FormData();
+        formData.append('module', 'documentos');
+        formData.append('method', 'del');
+        formData.append('id', idRecurso);
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+            notify('success', 'Éxito', 'Se eliminó el documento con éxito');
+            $('#table-documentos').bootstrapTable('refresh');
+            },
+            error: function(xhr, status, error) {
+                notify('warning', 'Error', 'No se pudo eliminar el documento: ' + error);
+            }
+        });
+    });
 });
 
 function formatoPedido(value, row) {
@@ -712,39 +735,7 @@ function pdfFormatter(value, row, index) {
            '</div>';
 }
 
-    // Event listener para eliminar documento
-    $('body').on('click', '.delete-document', function() {
-        var idRecurso = $(this).data('id');
-        var rutaArchivo = '/docs/actas_guardadas/acta_entrega_' + idRecurso + '.pdf';
 
-        $.ajax({
-            url: 'api-app.php',
-            method: 'POST',
-            data: {
-                module: 'documentos',
-                method: 'del',
-                id: idRecurso
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    notify('success', 'Éxito', 'Se eliminó el documento con éxito');
-                    // Refrescar la tabla
-                    $('#table-documentos').bootstrapTable('refresh', {
-                        url: 'api-app.php',
-                        method: 'POST',
-                        data: {
-                            module: 'documentos',
-                            method: 'list-id',
-                            trabajador_id: $('#f-id').val()
-                        }
-                    });
-                } else {
-                    notify('warning', 'Error', 'No se pudo eliminar el documento');
-                }
-            }
-        });
-    });
 
 
 function pdfFormatter2(value, row, index) {

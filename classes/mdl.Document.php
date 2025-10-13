@@ -102,8 +102,16 @@ class Document
     private function _del($param)
     {
         try {
-            $this->app->db->delete('documentos_trabajador', array('id' => $param['id']));
+
+            $doc = $this->app->db->fetchAll('SELECT * FROM documentos_trabajador WHERE id=:id', array('id' => $param['id']));
+            if (!empty($doc[0]['archivo'])) {
+                unlink($doc[0]['archivo']);
+            }
+
+            $this->app->db->del('documentos_trabajador', array('id' => $param['id']));
+            echo json_encode(['status' => 'success']);  
         } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 }

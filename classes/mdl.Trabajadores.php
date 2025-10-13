@@ -455,8 +455,48 @@ class Trabajador {
                             error_log('Error al mover el archivo subido (sin UUID): ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
                         }
                     }
+                }///
+
+                
+                // Verificar que el carnet de identidad tenga un formato válido
+                $carnet_identidad = $param['carnet_identidad'];
+                if (preg_match('/^[0-9]{11}$/', $carnet_identidad)) {
+                    $ano = substr($carnet_identidad, 0, 2);
+                    $mes = substr($carnet_identidad, 2, 2);
+                    $dia = substr($carnet_identidad, 4, 2);
+                    
+                    // Verificar que la fecha sea válida
+                    if (checkdate($mes, $dia, $ano)) {
+                        // Todo bien, la fecha es válida
+                    } else {
+                        $data['status'] = 0;
+                        $data['msg'] = 'El carnet de identidad no tiene un formato válido';
+                        print(json_encode($data));
+                        return;
+                    }
+                } else {
+                    $data['status'] = 0;
+                    $data['msg'] = 'El carnet de identidad no tiene un formato válido';
+                    print(json_encode($data));
+                    return;
                 }
                 
+                
+                // // Calcular la edad a partir de la fecha de nacimiento
+                // $fecha_nacimiento = $ano . '-' . $mes . '-' . $dia;
+                // $fecha_actual = date('Y-m-d');
+                
+                
+                // // Calcular la diferencia de fechas
+                // $diferencia = date_diff(date_create($fecha_nacimiento), date_create($fecha_actual));
+                // $edad = $diferencia->y;
+                
+                
+                
+                // $insert_filtered['edad'] = $edad;
+                
+                
+            
                 // Insertar trabajador con datos validados
                 
                 // Insertar el trabajador
@@ -784,7 +824,11 @@ class Trabajador {
     private function _list_filter($param){
         try {
             $data = array();
-            $where = ["t.trabajador_eliminado = '0'"];
+            if (!empty($param['trabajador_eliminado'])) {
+                $where = ["t.trabajador_eliminado = '1'"];
+            } else {
+                $where = ["t.trabajador_eliminado = '0'"];
+            }
             $params = [];
 
             // Filtro por cargo
@@ -807,6 +851,8 @@ class Trabajador {
                     t.sexo,
                     t.edad,
                     t.estatus,
+                    t.fecha_contratacion,
+                    t.fecha_baja,
                     c.nombre as cargo_nombre,
                     d.nombre as departamento_nombre,
                     CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo

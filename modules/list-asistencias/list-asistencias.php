@@ -32,10 +32,34 @@
                       <input type="date" class="form-control" id="fecha-hasta" value="<?php echo date('Y-m-d'); ?>">
                     </div>
                   </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>Estado</label>
+                      <select class="form-control" id="filtro-estado">
+                        <option value="">Todos</option>
+                        <option value="1">Presente</option>
+                        <option value="2">Ausente</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Tipo de ausencia -->
+                  <div class="col-md-2" id="filtro-tipo-ausencia-container">
+                    <div class="form-group">
+                      <label>Tipo de Ausencia</label>
+                      <select class="form-control" id="filtro-tipo-ausencia">
+                        <option value="">Todos los tipos</option>
+                        <option value="RRHH">RRHH</option>
+                        <option value="Justificada">Justificada</option>
+                        <option value="Enfermedad">Enfermedad</option>
+                        <option value="Vacaciones">Vacaciones</option>
+                        <option value="Licencia de Maternidad">Licencia de Maternidad</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- Buscador de Trabajador -->
-              <div class="col-md-3">
+              <!-- <div class="col-md-3">
                 <div class="form-group">
                   <label>Buscar Trabajador</label>
                   <div class="input-group">
@@ -49,32 +73,8 @@
                   </div>
                   <div id="resultados-busqueda" class="suggestions-dropdown" style="display: none; position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px;"></div>
                 </div>
-              </div>
+              </div> -->
               <!-- Estado de asistencia -->
-              <div class="col-md-2">
-                <div class="form-group">
-                  <label>Estado</label>
-                  <select class="form-control" id="filtro-estado">
-                    <option value="">Todos</option>
-                    <option value="1">Presente</option>
-                    <option value="2">Ausente</option>
-                  </select>
-                </div>
-              </div>
-              <!-- Tipo de ausencia -->
-              <div class="col-md-2" id="filtro-tipo-ausencia-container">
-                <div class="form-group">
-                  <label>Tipo de Ausencia</label>
-                  <select class="form-control" id="filtro-tipo-ausencia">
-                    <option value="">Todos los tipos</option>
-                    <option value="RRHH">RRHH</option>
-                    <option value="Justificada">Justificada</option>
-                    <option value="Enfermedad">Enfermedad</option>
-                    <option value="Vacaciones">Vacaciones</option>
-                    <option value="Licencia de Maternidad">Licencia de Maternidad</option>
-                  </select>
-                </div>
-              </div>
             </div>
           </div>
           <div class="col-sm-2">
@@ -105,28 +105,34 @@
       <thead>
         <tr class="bg-primary">
           <th data-field="fecha" data-sortable="true" data-width="100">
-            <i class="fa fa-calendar"></i> Fecha
+            Fecha
           </th>
-          <th data-field="nombre_completo" data-sortable="true" data-formatter="formatoNombreCompleto">
-            <i class="fa fa-user"></i> Trabajador
+          <th data-field="carnet_identidad" data-sortable="true">
+            CI
+          </th>
+          <th data-field="nombre" data-sortable="true" >
+            Nombre
+          </th>
+          <th data-field="apellidos" data-sortable="true">
+            Apellidos
           </th>
           <th data-field="cargo_nombre" data-sortable="true">
-            <i class="fa fa-briefcase"></i> Cargo
+            Cargo
           </th>
           <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120">
-            <i class="fa fa-sign-in"></i> Entrada
+            Entrada
           </th>
           <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
-            <i class="fa fa-sign-out"></i> Salida
+            Salida
           </th>
           <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
-            <i class="fa fa-times-circle"></i> Ausencia
+            Ausencia
           </th>
           <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
             Tipo Ausencia
           </th>
           <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="100">
-            <i class="fa fa-cog"></i> Acciones
+            Acciones
           </th>
         </tr>
       </thead>
