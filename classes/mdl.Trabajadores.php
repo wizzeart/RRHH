@@ -314,7 +314,7 @@ class Trabajador {
                 'apellidos_segundos' => 'Segundo Apellido',
                 'sexo' => 'Sexo',
                 'carnet_identidad' => 'Carnet de Identidad',
-                'edad' => 'Edad',
+                
                 'direccion' => 'Dirección',
                 'provincia_id' => 'Provincia',
                 'municipio_id' => 'Municipio',
@@ -495,8 +495,49 @@ class Trabajador {
                             error_log('Error al mover el archivo subido (sin UUID): ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
                         }
                     }
+                }///
+
+                
+                // Verificar que el carnet de identidad tenga un formato válido
+                $carnet_identidad = $param['carnet_identidad'];
+                if (preg_match('/^[0-9]{11}$/', $carnet_identidad)) {
+                    $ano = substr($carnet_identidad, 0, 2);
+                    $mes = substr($carnet_identidad, 2, 2);
+                    $dia = substr($carnet_identidad, 4, 2);
+                    
+
+                    // Si el año tiene 2 dígitos, convertirlo a un año completo
+                    if (strlen($ano) == 2) {
+                        // Si el siglo es 19, el año es del siglo XX
+                        if ($ano > substr(date('Y'), 2, 2)) {
+                            $ano = '19' . $ano;
+                        } else {
+                            // Si el siglo es 20, el año es del siglo XXI
+                            $ano = '20' . $ano;
+                        }
+                    }
+                    
+                    // Verificar que la fecha sea válida
+                    if (checkdate($mes, $dia, $ano)) {
+                        $insert_filtered['fecha_nacimiento'] = $ano . '-' . $mes . '-' . $dia;
+                        // Todo bien, la fecha es válida
+                    } else {
+                        $data['status'] = 0;
+                        $data['msg'] = 'El carnet de identidad no tiene un formato válido';
+                        print(json_encode($data));
+                        return;
+                    }
+                } else {
+                    $data['status'] = 0;
+                    $data['msg'] = 'El carnet de identidad no tiene un formato válido';
+                    print(json_encode($data));
+                    return;
                 }
                 
+                
+                
+                
+            
                 // Insertar trabajador con datos validados
                 
                 // Insertar el trabajador
@@ -844,7 +885,11 @@ class Trabajador {
     private function _list_filter($param){
         try {
             $data = array();
-            $where = ["t.trabajador_eliminado = '0'"];
+            if (!empty($param['trabajador_eliminado'])) {
+                $where = ["t.trabajador_eliminado = '1'"];
+            } else {
+                $where = ["t.trabajador_eliminado = '0'"];
+            }
             $params = [];
 
             // Filtro por cargo
@@ -867,6 +912,8 @@ class Trabajador {
                     t.sexo,
                     t.edad,
                     t.estatus,
+                    t.fecha_contratacion,
+                    t.fecha_baja,
                     c.nombre as cargo_nombre,
                     d.nombre as departamento_nombre,
                     CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo

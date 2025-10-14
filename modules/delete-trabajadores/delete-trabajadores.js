@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    var $table = $('#table-panel');
     // Delegar el clic sobre el botón con data-id (independiente del ícono)
     $('#table-panel').on('click', 'button[data-id], .fa.fa-trash, .fa.fa-ban', function () {
         var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
@@ -12,6 +13,43 @@ $(document).ready(function () {
         $('#confirm-delete-help').hide();
         $('#confirmDeleteModal').modal('show');
     });
+
+    function applyFilters() {
+        var cargoId = $('#filterCargo').val();
+        var deptoId = $('#filterDepartamento').val();
+        
+        // Build the URL with filters
+        var url = 'api-app.php?module=trabajadores&method=list-filter';
+        if (cargoId) url += '&cargo_id=' + cargoId;
+        if (deptoId) url += '&departamento_id=' + deptoId;
+        
+        // Reload table with new URL
+        $table.bootstrapTable('refresh', {
+            url: url,
+            silent: true
+        });
+    }
+    
+    // Filter button click handler
+    $('#btn-filter').on('click', function() {
+        applyFilters();
+    });
+    
+    // Reset button click handler
+    $('#btn-reset').on('click', function() {
+        // Clear all filters
+        $('#filterCargo, #filterDepartamento').val('');
+        $('#buscar-trabajador').val('');
+        $('#resultados-busqueda').hide().empty();
+        
+        // Reset the table to show all records
+        $table.bootstrapTable('filterBy', {});
+        $table.bootstrapTable('refresh', {
+            url: 'api-app.php?module=trabajadores&method=list',
+            silent: true
+        });
+    });
+    
 
     // Confirmar eliminación desde el modal
     $('#btn-confirm-delete').on('click', function () {

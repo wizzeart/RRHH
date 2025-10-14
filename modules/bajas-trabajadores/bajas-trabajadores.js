@@ -1,4 +1,39 @@
 $(document).ready(function () {
+    var $table = $('#table-panel');
+    function applyFilters() {
+        var cargoId = $('#filterCargo').val();
+        var deptoId = $('#filterDepartamento').val();
+        
+        // Build the URL with filters
+        var url = 'api-app.php?module=trabajadores&method=list-filter';
+        if (cargoId) url += '&cargo_id=' + cargoId;
+        if (deptoId) url += '&departamento_id=' + deptoId;
+        url += '&trabajador_eliminado=true';
+        
+        // Reload table with new URL
+        $table.bootstrapTable('refresh', {
+            url: url,
+            silent: true
+        });
+    }
+    
+    // Filter button click handler
+    $('#btn-filter').on('click', function() {
+        applyFilters();
+    });
+    
+    // Reset button click handler
+    $('#btn-reset').on('click', function() {
+        // Clear all filters
+        $('#filterCargo, #filterDepartamento').val('');
+        $('#buscar-trabajador').val('');
+        $('#resultados-busqueda').hide().empty();
+        
+        // Reset the table to show all records
+        $table.bootstrapTable('filterBy', {});
+        $table.bootstrapTable('refresh');
+    });
+    
     // Handler for worker details (eye icon)
     $('#table-panel').on('click', '.fa.fa-eye', function () {
         // Try to get the row index from the DOM (bootstrap-table sets data-index on <tr>)

@@ -130,6 +130,53 @@ $(document).ready(function () {
         // hacerle submit al formulario
         document.getElementById(formId).submit();
     });
+       
+
+    $('#btn-add-new-doc').on('click', function() {
+
+        $('#docForm').on('submit', function(e) {
+            e.preventDefault();
+            var tipo_doc = $('#tipo_doc').val();
+            var archivo = $('#file_doc')[0].files[0];
+            
+            
+            if (!archivo) {
+                notify('danger', 'Error', 'Debe seleccionar un archivo');
+                return;
+            }
+            
+            if (!tipo_doc) {
+                notify('danger', 'Error', 'Debe escribir un tipo de documento');
+                return;
+            }
+            var formData = new FormData();
+            formData.append('trabajador_id', $('#f-id').val());
+            formData.append('tipo_doc', tipo_doc);
+            formData.append('archivo', archivo);
+            
+            formData.append('module', 'documentos');
+            formData.append('method', 'save');
+            $.ajax({
+                url: 'api-app.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#documentoModal').modal('hide');
+                    notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
+                    $('#table-documentos').bootstrapTable('refresh');
+                },
+                error: function(xhr, status, error) {
+                    notify('danger', 'Error', 'Hubo un error al agregar el documento');
+                }
+            });
+        });
+        
+        $('#documentoModal').modal('show');
+        
+    });
+
     // Manejador para el botón de descargar
     $('#table-recursos').on('click', '.download-recurso', function () {
         var $tr = $(this).closest('tr');
@@ -573,6 +620,29 @@ $(document).ready(function () {
         $('#modalBody2').html(html);
         $('#recursoModal').modal('show');
     });
+
+    // Event listener para eliminar documento
+    $('body').on('click', '.delete-document', function() {
+        var idRecurso = $(this).data('id');
+        var formData = new FormData();
+        formData.append('module', 'documentos');
+        formData.append('method', 'del');
+        formData.append('id', idRecurso);
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+            notify('success', 'Éxito', 'Se eliminó el documento con éxito');
+            $('#table-documentos').bootstrapTable('refresh');
+            },
+            error: function(xhr, status, error) {
+                notify('warning', 'Error', 'No se pudo eliminar el documento: ' + error);
+            }
+        });
+    });
 });
 
 function formatoPedido(value, row) {
@@ -662,6 +732,34 @@ function pdfFormatter(value, row, index) {
     return '<div class="btn-group">' +
     '<a href="' + url + '" target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
            '<a href="' + url + '" download="' + filename + '" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
+           '</div>';
+}
+
+
+
+
+function pdfFormatter2(value, row, index) {
+    var url = value || row.archivo || row.archivo_contrato;
+    var filename = (function(u){ 
+        try { 
+            var p = u.split('?')[0]; 
+            var parts = p.split('/'); 
+            var parts2 = p.split('\\');
+            return parts2[parts2.length-1] || 'contrato.pdf'; 
+        } catch(e){ 
+            return 'contrato.pdf'; 
+        } 
+    })(url);
+    
+    // Verificar si es una URL válida
+    if (!url) {
+        return '<span class="text-muted">No disponible</span>';
+    }
+    
+    return '<div class="btn-group">' +
+    '<a href="' + url + '" target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
+           '<a href="' + url + '" download="' + filename + '" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
+           '<button data-id="' + row.id + '" class="btn btn-danger btn-sm delete-document" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></button>' +
            '</div>';
 }
 

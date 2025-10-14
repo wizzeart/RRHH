@@ -197,7 +197,7 @@ $(document).ready(function () {
         });
     });
 
-    $('#table-panel').on('click', '.fa.fa-edit', function () {
+    $('#table-panel').on('click', '#btn-editar', function () {
         location.href = 'index.php?module=trabajadores&id=' + $(this).data('id');
     });
 
@@ -293,7 +293,7 @@ $(document).ready(function () {
     });
 
     // Handler for worker details (eye icon)
-    $('#table-panel').on('click', '.fa.fa-eye', function () {
+    $('#table-panel').on('click', '#btn-ver-ficha', function () {
         // Try to get the row index from the DOM (bootstrap-table sets data-index on <tr>)
 //         var $tr = $(this).closest('tr');
 //         var idx = $tr.data('index');
@@ -405,8 +405,8 @@ function formatoActivo(value, row) {
 // Sample Format for Tracking Number Column.
 // =================================================================
 function formatoToolbar(value, row) {
-    var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar trabajador"> Editar</button>\n\
-                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ficha Trabajador"> Ficha Trabajador</button>';
+    var s = '<button id="btn-editar" data-id="' + row.id + '" class="btn btn-info btn-icon" title="Editar trabajador"><span class="fa fa-edit"></span> Editar</button>\n\
+                <button id="btn-ver-ficha" data-id="' + row.id + '" class="btn btn-success btn-icon" title="Ficha Trabajador"><span class="fa fa-eye"></span> Ver Ficha</button>';
 
     return s;
 }

@@ -15,11 +15,9 @@
     </div>
     <div class="panel-body">
         <div class="tab-content">
-            <div class="tab-pane fade active in" id="tab-listado">
-                <div class="panel">
-                    <div class="form-inline" style="margin-bottom: 15px;">
+            <div class="form-inline" style="margin-bottom: 15px;">
                         <!-- Search Box -->
-                        <div class="form-group" style="margin-right: 10px; width: 300px; position: relative;">
+                        <!-- <div class="form-group" style="margin-right: 10px; width: 300px; position: relative;">
                             <div class="input-group">
                                 <input type="text" class="form-control" id="buscar-trabajador" placeholder="Buscar por nombre, apellido o CI...">
                                 <div class="input-group-append">
@@ -27,7 +25,7 @@
                                 </div>
                             </div>
                             <div id="resultados-busqueda" class="list-group" style="position: absolute; z-index: 1000; width: 100%; display: none; max-height: 300px; overflow-y: auto;"></div>
-                        </div>
+                        </div> -->
                         
                         <!-- Cargo Filter -->
                         <div class="form-group" style="margin-right: 10px;">
@@ -59,6 +57,9 @@
                         <button id="btn-reset" class="btn btn-default" style="margin-left: 5px;">Limpiar</button>
                         <button id="btn-add-new" class="btn btn-mint btn-icon  pull-right" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador"><span class="icon-lg fa fa-plus"></span>  Añadir Nuevo Trabajador</button>
                     </div>
+            <div class="tab-pane fade active in" id="tab-listado">
+                <div class="panel">
+                    
                 </div>
                 <table
                     id="table-panel"
