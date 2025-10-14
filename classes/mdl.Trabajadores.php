@@ -384,7 +384,7 @@ class Trabajador {
 
         // Crear array de datos sin incluir campos de control
         $insert = array();
-        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'provincia_id', 'municipio_id', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'provincia_id', 'municipio_id', 'telefono', 'email', 'licencia_conduccion', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
         
         foreach ($allowed_fields as $field) {
             if (isset($param[$field])) {
@@ -494,6 +494,7 @@ class Trabajador {
                     'municipio_id',
                     'telefono',
                     'email',
+                    'licencia_conduccion',
                     'usuario_id',
                     'nivel_educacional',
                     'fecha_contratacion',
@@ -590,15 +591,24 @@ class Trabajador {
                 try {
                     $result = $this->db->insert('trabajadores', $insert_filtered);
                 } catch (Exception $ex) {
-                    if (strpos($ex->getMessage(), "Unknown column 'email'") !== false || strpos($ex->getMessage(), 'Unknown column \"email\"') !== false) {
-                        // Reintentar sin el campo email si la columna no existe
+                    $msg = $ex->getMessage();
+                    $retry = false;
+                    if (strpos($msg, "Unknown column 'email'") !== false || strpos($msg, 'Unknown column \"email\"') !== false) {
                         if (isset($insert_filtered['email'])) {
                             unset($insert_filtered['email']);
                             error_log('Aviso: columna "email" no existe en trabajadores; reintentando insert sin email.');
-                            $result = $this->db->insert('trabajadores', $insert_filtered);
-                        } else {
-                            throw $ex;
+                            $retry = true;
                         }
+                    }
+                    if (strpos($msg, "Unknown column 'licencia_conduccion'") !== false || strpos($msg, 'Unknown column \"licencia_conduccion\"') !== false) {
+                        if (isset($insert_filtered['licencia_conduccion'])) {
+                            unset($insert_filtered['licencia_conduccion']);
+                            error_log('Aviso: columna "licencia_conduccion" no existe en trabajadores; reintentando insert sin licencia_conduccion.');
+                            $retry = true;
+                        }
+                    }
+                    if ($retry) {
+                        $result = $this->db->insert('trabajadores', $insert_filtered);
                     } else {
                         throw $ex;
                     }
@@ -656,7 +666,7 @@ class Trabajador {
                         $history = array(
                             'xentity' => 'TRABAJADOR',
                             'xaction' => 'INSERT-TRABAJADOR',
-                            'xobs' => 'TRABAJADOR: ' . $lastId . ' ' . $insert['nombre']
+                            'xobs' => 'INSERT TRABAJADOR ID: ' . $lastId . ' - ' . trim(($insert['nombre'] ?? '') . ' ' . ($insert['apellidos'] ?? '') . ' ' . ($insert['apellidos_segundos'] ?? ''))
                         );
                         $this->app->add_history($history);
                     } else {
@@ -715,6 +725,13 @@ class Trabajador {
                     if ($existing) {
                         $data['status'] = 0;
                         $data['msg'] = 'Ya existe otro trabajador con este Carnet de Identidad';
+                        print(json_encode($data));
+                        return;
+                    }
+                    // Validar formato: solo 11 dígitos
+                    if (!preg_match('/^\d{11}$/', $param['carnet_identidad'])) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'El carnet de identidad debe tener exactamente 11 dígitos';
                         print(json_encode($data));
                         return;
                     }
@@ -799,6 +816,8 @@ class Trabajador {
                     'provincia_id',
                     'municipio_id',
                     'telefono',
+                    'email',
+                    'licencia_conduccion',
                     'nivel_educacional',
                     'fecha_contratacion',
                     'fecha_baja',
@@ -875,14 +894,25 @@ class Trabajador {
                     $data['id'] = $id;
                     $data['date'] = date('d-m-Y H:i:s');
 
-                    // Registrar en historial
-                    $history = array(
+                    // Registrar en historial (UPDATE)
+                    $nombreCompletoUpd = '';
+                    try {
+                        $rowUpd = $this->db->fetchRow(
+                            "SELECT nombre, apellidos, apellidos_segundos FROM trabajadores WHERE id = :id",
+                            array('id' => $id)
+                        );
+                        if ($rowUpd) {
+                            $nombreCompletoUpd = trim(($rowUpd['nombre'] ?? '') . ' ' . ($rowUpd['apellidos'] ?? '') . ' ' . ($rowUpd['apellidos_segundos'] ?? ''));
+                        }
+                    } catch (Exception $e) { /* ignore */ }
+
+                    $historyUpd = array(
                         'xentity' => 'TRABAJADOR',
                         'xaction' => 'UPDATE-TRABAJADOR',
                         'xid' => $id,
-                        'xobs' => 'TRABAJADOR: ' . $id . ' ' . $insert['nombre']
+                        'xobs' => 'UPDATE TRABAJADOR ID: ' . $id . ($nombreCompletoUpd ? (' - ' . $nombreCompletoUpd) : '')
                     );
-                    $this->app->add_history($history);
+                    $this->app->add_history($historyUpd);
                 } else {
                     $data['status'] = 0;
                     $data['msg_title'] = 'Error';
