@@ -64,6 +64,17 @@ $(document).ready(function () {
     function esEmailValido(c) {
         return /^[a-z0-9._%-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(c);
     }
+    function soloLetrasYEspacios(s) {
+        s = (s || '');
+        s = s.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+        s = s.replace(/\s{2,}/g, ' ');
+        return s.trimStart();
+    }
+    $('#f-nombre, #f-apellidos, #f-apellidos-segundos').on('input', function(){
+        var val = $(this).val();
+        var filtrado = soloLetrasYEspacios(val);
+        if (val !== filtrado) $(this).val(filtrado);
+    });
     $('#f-email').on('input', function(){
         var norm = normalizarCorreoJs($(this).val());
         if (norm !== $(this).val()) {
@@ -182,6 +193,18 @@ $(document).ready(function () {
         if ($('#f-apellidos').val() == '') {
             status = 0;
             msg += '<div>El campo Apellidos del Trabajador es obligatorio.</div>';
+        }
+        if ($('#f-nombre').val() && !/^([\p{L}\s])+$/u.test($('#f-nombre').val())) {
+            status = 0;
+            msg += '<div>El campo Nombre solo debe contener letras.</div>';
+        }
+        if ($('#f-apellidos').val() && !/^([\p{L}\s])+$/u.test($('#f-apellidos').val())) {
+            status = 0;
+            msg += '<div>El campo Apellidos solo debe contener letras.</div>';
+        }
+        if ($('#f-apellidos-segundos').val() && !/^([\p{L}\s])+$/u.test($('#f-apellidos-segundos').val())) {
+            status = 0;
+            msg += '<div>El campo Segundo Apellido solo debe contener letras.</div>';
         }
         if ($('#f-apellidos-segundos').val() == '') {
             status = 0;

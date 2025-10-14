@@ -294,6 +294,23 @@ class Trabajador {
                 }
             }
 
+            // Validar que nombre, apellidos y segundo apellido solo contengan letras y espacios (insert)
+            $campos_alfabeticos = array(
+                'nombre' => 'Nombre',
+                'apellidos' => 'Apellidos',
+                'apellidos_segundos' => 'Segundo Apellido'
+            );
+            foreach ($campos_alfabeticos as $campo => $label) {
+                if (isset($param[$campo]) && trim($param[$campo]) !== '') {
+                    if (!preg_match('/^[\p{L}\s]+$/u', $param[$campo])) {
+                        $data['status'] = 0;
+                        $data['msg'] = "El campo {$label} solo debe contener letras";
+                        print(json_encode($data));
+                        return;
+                    }
+                }
+            }
+
             // Verificar si el nombre completo ya existe (insert)
             if ($data['action'] == 'insert' && isset($param['nombre']) && isset($param['apellidos'])) {
                 $sql = "SELECT id FROM trabajadores WHERE LOWER(nombre) = LOWER(:nombre) AND LOWER(apellidos) = LOWER(:apellidos) AND trabajador_eliminado = '0'";
@@ -693,6 +710,22 @@ class Trabajador {
                         if ($existing) {
                             $data['status'] = 0;
                             $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
+                            print(json_encode($data));
+                            return;
+                        }
+                    }
+                }
+                // Validar que nombre, apellidos y segundo apellido solo contengan letras y espacios (update)
+                $campos_alfabeticos_upd = array(
+                    'nombre' => 'Nombre',
+                    'apellidos' => 'Apellidos',
+                    'apellidos_segundos' => 'Segundo Apellido'
+                );
+                foreach ($campos_alfabeticos_upd as $campo => $label) {
+                    if (isset($param[$campo]) && trim($param[$campo]) !== '') {
+                        if (!preg_match('/^[\p{L}\s]+$/u', $param[$campo])) {
+                            $data['status'] = 0;
+                            $data['msg'] = "El campo {$label} solo debe contener letras";
                             print(json_encode($data));
                             return;
                         }
