@@ -174,9 +174,11 @@ class Trabajador {
                     $val = array(
                         'id' => $param['id']
                     );
-                    $sql = "select *"
-                            . " from " . 'trabajadores'
-                            . " where id=:id";
+                    $sql = "SELECT t.*, u.xemail as email, c.nombre as cargo_nombre, m.nombre as municipio_nombre FROM trabajadores t
+                            LEFT JOIN usuarios u ON u.xusuario_id = t.usuario_id
+                            LEFT JOIN cargos c ON c.id = t.cargos_id
+                            LEFT JOIN municipio m ON m.id = t.municipio_id
+                            WHERE t.id=:id";
                     $row = $this->db->fetchRow($sql, $val);
                     if ($row) {
                         // Cargar datos bancarios del trabajador
