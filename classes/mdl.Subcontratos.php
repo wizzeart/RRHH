@@ -33,6 +33,14 @@ class Subcontrato {
             case 'save':
                 $this->_save($param);
                 break;
+            case 'list-provincias':
+                $data = $this->_get_list_provincias();
+                print(json_encode($data));
+                break;
+            case 'get-municipios':
+                $data = $this->_get_municipios_by_provincia($param);
+                print(json_encode($data));
+                break;
         }
     }
 
@@ -305,5 +313,31 @@ class Subcontrato {
         
         $data = $this->db->fetchAll($sql);
         return $data;
+    }
+
+    /**
+     * Listar provincias (id, nombre)
+     */
+    private function _get_list_provincias() {
+        $sql = "SELECT id, nombre FROM provincia ORDER BY nombre ASC";
+        try {
+            return $this->db->fetchAll($sql);
+        } catch (Exception $e) {
+            return array();
+        }
+    }
+
+    /**
+     * Listar municipios por provincia
+     */
+    private function _get_municipios_by_provincia($param) {
+        $provincia_id = isset($param['provincia_id']) ? intval($param['provincia_id']) : 0;
+        if ($provincia_id <= 0) { return array(); }
+        $sql = "SELECT id, nombre, provincia_id FROM municipio WHERE provincia_id = :provincia_id ORDER BY nombre ASC";
+        try {
+            return $this->db->fetchAll($sql, array('provincia_id' => $provincia_id));
+        } catch (Exception $e) {
+            return array();
+        }
     }
 }

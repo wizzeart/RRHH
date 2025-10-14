@@ -17,6 +17,36 @@ class Trabajador {
         $action = 'insert';
     }
 
+    private function normalizarCorreo($correo) {
+        $correo = strtolower(trim($correo));
+        $map = [
+            'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a', 'ã' => 'a',
+            'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+            'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+            'ñ' => 'n', 'ç' => 'c'
+        ];
+        $correo = strtr($correo, $map);
+        $correo = preg_replace('/[^a-z0-9@._-]/', '', $correo);
+        return $correo;
+    }
+
+    private function slugUser($texto) {
+        $texto = strtolower(trim($texto));
+        $map = [
+            'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a', 'ã' => 'a',
+            'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+            'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+            'ñ' => 'n', 'ç' => 'c'
+        ];
+        $texto = strtr($texto, $map);
+        $texto = preg_replace('/[^a-z0-9._-]/', '', $texto);
+        return $texto;
+    }
+
     public function api($param) {
         switch ($param['method']) {
             case 'list':
@@ -243,18 +273,26 @@ class Trabajador {
                 }
             }
 
-            // // Verificar si el email ya existe (insert)
-            // if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
-            //     $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
-            //     $val = array('email' => $param['email']);
-            //     $existing = $this->db->fetchRow($sql, $val);
-            //     if ($existing) {
-            //         $data['status'] = 0;
-            //         $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
-            //         print(json_encode($data));
-            //         return;
-            //     }
-            // }
+            if (isset($param['email'])) {
+                $param['email'] = $this->normalizarCorreo($param['email']);
+                if ($param['email'] !== '' && !filter_var($param['email'], FILTER_VALIDATE_EMAIL)) {
+                    $data['status'] = 0;
+                    $data['msg'] = 'Correo electrónico inválido';
+                    print(json_encode($data));
+                    return;
+                }
+            }
+            if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
+                $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
+                $val = array('email' => $param['email']);
+                $existing = $this->db->fetchRow($sql, $val);
+                if ($existing) {
+                    $data['status'] = 0;
+                    $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
+                    print(json_encode($data));
+                    return;
+                }
+            }
 
             // Verificar si el nombre completo ya existe (insert)
             if ($data['action'] == 'insert' && isset($param['nombre']) && isset($param['apellidos'])) {
@@ -301,7 +339,7 @@ class Trabajador {
 
         // Crear array de datos sin incluir campos de control
         $insert = array();
-        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'provincia_id', 'municipio_id', 'telefono', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
+        $allowed_fields = ['usuario_id', 'nombre', 'apellidos', 'apellidos_segundos', 'sexo', 'carnet_identidad', 'edad', 'direccion', 'provincia_id', 'municipio_id', 'telefono', 'email', 'nivel_educacional', 'departamento_id', 'cargos_id', 'fecha_contratacion', 'fecha_baja', 'estatus', 'bolsa_empleo_id', 'foto'];
         
         foreach ($allowed_fields as $field) {
             if (isset($param[$field])) {
@@ -354,7 +392,8 @@ class Trabajador {
             
             try {
                 // Primero insertar en la tabla usuarios
-                $email = strtolower($insert['nombre'] . substr($insert['apellidos'], 0, 3) . '@allnovu.net');
+                $emailLocalGen = $this->slugUser($insert['nombre'] . '.' . $insert['apellidos']);
+                $email = $this->normalizarCorreo($emailLocalGen . '@allnovu.net');
                 
                 // Crear instancia de la clase Usuario
                 require_once 'mdl.Usuarios.php';
@@ -409,6 +448,7 @@ class Trabajador {
                     'provincia_id',
                     'municipio_id',
                     'telefono',
+                    'email',
                     'usuario_id',
                     'nivel_educacional',
                     'fecha_contratacion',
@@ -597,6 +637,26 @@ class Trabajador {
                     }
                 }
                 
+                if (isset($param['email'])) {
+                    $param['email'] = $this->normalizarCorreo($param['email']);
+                    if ($param['email'] !== '' && !filter_var($param['email'], FILTER_VALIDATE_EMAIL)) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Correo electrónico inválido';
+                        print(json_encode($data));
+                        return;
+                    }
+                    if ($param['email'] !== '') {
+                        $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
+                        $val = array('email' => $param['email'], 'id' => $id);
+                        $existing = $this->db->fetchRow($sql, $val);
+                        if ($existing) {
+                            $data['status'] = 0;
+                            $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
+                            print(json_encode($data));
+                            return;
+                        }
+                    }
+                }
                 // Filtrar campos válidos para actualización
                 $campos_validos = [
                     'cargos_id',

@@ -428,12 +428,32 @@
     document.getElementById('f-apellidos-segundos').addEventListener('input', generarEmail);
 
     function generarEmail() {
-        const nombre = document.getElementById('f-nombre').value.trim().toLowerCase().replace(/\s+/g, '');
-        const apellidos = document.getElementById('f-apellidos').value.trim().toLowerCase().replace(/\s+/g, '');
-        const apellidosSegundos = document.getElementById('f-apellidos-segundos').value.trim().toLowerCase().replace(/\s+/g, '');
+        function normalizarLocal(s) {
+            s = (s || '').toLowerCase();
+            var mapa = {'á':'a','à':'a','ä':'a','â':'a','ã':'a','é':'e','è':'e','ë':'e','ê':'e','í':'i','ì':'i','ï':'i','î':'i','ó':'o','ò':'o','ö':'o','ô':'o','õ':'o','ú':'u','ù':'u','ü':'u','û':'u','ñ':'n','ç':'c'};
+            s = s.replace(/[áàäâãéèëêíìïîóòöôõúùüûñç]/g, function(ch){ return mapa[ch] || ch; });
+            s = s.replace(/\s+/g, '');
+            s = s.replace(/[^a-z0-9._-]/g, '');
+            return s;
+        }
+        function normalizarCorreoCompleto(c) {
+            c = (c || '').toLowerCase();
+            try { c = c.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e) {}
+            c = c.replace(/ñ/g, 'n');
+            c = c.replace(/ç/g, 'c');
+            c = c.replace(/[^a-z0-9@._-]/g, '');
+            return c;
+        }
+        const nombreRaw = document.getElementById('f-nombre').value.trim();
+        const apellidosRaw = document.getElementById('f-apellidos').value.trim();
+        const apellidosSegundosRaw = document.getElementById('f-apellidos-segundos').value.trim();
+        const nombre = normalizarLocal(nombreRaw);
+        const apellidos = normalizarLocal(apellidosRaw);
+        const apellidosSegundos = normalizarLocal(apellidosSegundosRaw);
 
         if (nombre && apellidos) {
-            const email = `${nombre}${apellidos.substring(0, 3)}@allnovu.net`;
+            var email = nombre + apellidos.substring(0, 3) + '@allnovu.net';
+            email = normalizarCorreoCompleto(email);
             document.getElementById('f-email').value = email;
         }
     }

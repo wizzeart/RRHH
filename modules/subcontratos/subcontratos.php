@@ -11,7 +11,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="control-label" for="f-nombre">Nombre de la Persona <span class="text-danger">*</span></label>
+                        <label class="control-label" for="f-nombre">Nombre de la Persona /Entidad   <span class="text-danger">*</span></label>
                         <input type="text" id="f-nombre" name="persona_nombre" class="form-control" placeholder="Nombre completo de la persona" value="<?php if (isset($data['persona_nombre'])) print($data['persona_nombre']); ?>">
                     </div>
                 </div>
@@ -48,6 +48,32 @@
                         <label class="control-label" for="f-areas">Áreas de Acceso</label>
                         <input type="text" id="f-areas" name="areas_acceso" class="form-control" placeholder="Áreas permitidas para acceso" value="<?php if (isset($data['areas_acceso'])) print($data['areas_acceso']); ?>">
                         <small class="help-block">Separar múltiples áreas con comas</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nueva fila: Dirección, Provincia y Municipio -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="f-direccion">Dirección</label>
+                        <input type="text" id="f-direccion" name="direccion" class="form-control" placeholder="Calle y número, entre calles (opcional)">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="control-label" for="f-provincia">Provincia</label>
+                        <select id="f-provincia" name="provincia_id" class="form-control">
+                            <option value="">Seleccione provincia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="control-label" for="f-municipio">Municipio</label>
+                        <select id="f-municipio" name="municipio_id" class="form-control" disabled>
+                            <option value="">Seleccione municipio</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -106,6 +132,27 @@
                 <i class="fa fa-plus"></i>
                 Nuevo
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Vista previa del subcontrato en tiempo real -->
+<div class="panel" style="margin-top:20px;">
+    <div class="panel-heading">
+        <div class="row" style="display:flex; align-items:center;">
+            <div class="col-xs-8 col-sm-9">
+                <h4 class="panel-title" style="margin:0;">Vista Previa del Subcontrato</h4>
+            </div>
+            <div class="col-xs-4 col-sm-3 text-right">
+                <button id="btn-preview-fullscreen-subcontrato" type="button" class="btn btn-default btn-sm" title="Ver a pantalla completa">
+                    <i class="fa fa-arrows-alt"></i> Ver grande
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div id="subcontrato-preview" style="border:1px solid #e1e1e1; height:90vh; overflow:hidden; background:#fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
+            <p class="text-muted text-center">Complete los campos del formulario para ver la vista previa del subcontrato</p>
         </div>
     </div>
 </div>

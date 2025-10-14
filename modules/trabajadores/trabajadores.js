@@ -54,6 +54,31 @@ $(document).ready(function () {
     
     // Quitado el manejo de fecha de baja del formulario
 
+    function normalizarCorreoJs(c) {
+        c = (c || '').toLowerCase().trim();
+        var mapa = {'á':'a','à':'a','ä':'a','â':'a','ã':'a','é':'e','è':'e','ë':'e','ê':'e','í':'i','ì':'i','ï':'i','î':'i','ó':'o','ò':'o','ö':'o','ô':'o','õ':'o','ú':'u','ù':'u','ü':'u','û':'u','ñ':'n','ç':'c'};
+        c = c.replace(/[áàäâãéèëêíìïîóòöôõúùüûñç]/g, function(ch){ return mapa[ch] || ch; });
+        c = c.replace(/[^a-z0-9@._-]/g, '');
+        return c;
+    }
+    function esEmailValido(c) {
+        return /^[a-z0-9._%-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(c);
+    }
+    $('#f-email').on('input', function(){
+        var norm = normalizarCorreoJs($(this).val());
+        if (norm !== $(this).val()) {
+            $(this).val(norm);
+        }
+    });
+    $('#f-email').on('blur', function(){
+        var norm = normalizarCorreoJs($(this).val());
+        $(this).val(norm);
+        if (norm && !esEmailValido(norm)) {
+            notify('warning', 'Correo inválido', 'Por favor ingrese un correo electrónico válido.', 3000);
+            $(this).focus();
+        }
+    });
+
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
         cmd_params=cmd;
@@ -87,7 +112,6 @@ $(document).ready(function () {
     $('#btn-back').click(function () {
         location.href = 'index.php?module=list-trabajadores';
     });
-    // Función para manejar la previsualización de imágenes
     function readURL(input, previewId) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -99,46 +123,38 @@ $(document).ready(function () {
         }
     }
 
-    // Validación y previsualización de foto (solo imágenes reales)
     $('#f-foto').change(function() {
         var $input = $(this);
         var file = this.files && this.files[0] ? this.files[0] : null;
 
-        // Reset estado previo
         fotoEsValida = true;
 
-        // Crear contenedor de preview si no existe
         if ($input.next('.preview-container').length === 0) {
             $input.after('<div class="preview-container mt-2" style="display:none"><img src="" style="max-width: 100px; height: auto;"></div>');
         }
         var $img = $input.next('.preview-container').find('img');
 
         if (!file) {
-            // Sin archivo: ocultar preview
             $img.attr('src', '');
             $input.next('.preview-container').hide();
             return;
         }
 
-        // Validar por MIME type
         if (!file.type || !file.type.startsWith('image/')) {
             fotoEsValida = false;
             $img.attr('src', '');
-            $input.val(''); // limpiar input
+            $input.val('');
             $input.next('.preview-container').hide();
             notify('danger', 'Archivo inválido', 'Solo se permiten archivos en formato imagen (JPEG, PNG, GIF, etc.).', 4000);
             return;
         }
 
-        // Validar que realmente carga como imagen creando un objeto Image
         try {
             var objectUrl = URL.createObjectURL(file);
             var img = new Image();
             img.onload = function() {
-                // Es una imagen válida: mostrar preview
                 $img.attr('src', objectUrl);
                 $input.next('.preview-container').show();
-                // Liberar URL cuando la imagen en el DOM termine de cargar
                 $img.on('load', function() { URL.revokeObjectURL(objectUrl); });
                 fotoEsValida = true;
             };
@@ -152,7 +168,6 @@ $(document).ready(function () {
             };
             img.src = objectUrl;
         } catch (e) {
-            // Fallback si falla la validación por algún motivo
             fotoEsValida = false;
             $img.attr('src', '');
             $input.val('');
@@ -201,12 +216,13 @@ $(document).ready(function () {
                 msg += '<div>El teléfono debe contener solo números, espacios, guiones, paréntesis o el signo +.</div>';
             }
         }
+        var emailNorm = normalizarCorreoJs($('#f-email').val());
+        $('#f-email').val(emailNorm);
          if ($('#f-email').val() == '') {
             status = 0;
             msg += '<div>El campo Correo del Trabajador es obligatorio.</div>';
         } else {
-            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailPattern.test($('#f-email').val())) {
+            if (!esEmailValido($('#f-email').val())) {
                 status = 0;
                 msg += '<div>Por favor ingrese un correo electrónico válido.</div>';
             }
@@ -246,9 +262,6 @@ $(document).ready(function () {
             msg += '<div>El campo Bolsa de Empleo es obligatorio.</div>';
         }
 
-        // Validación de fecha de baja eliminada
-
-        // Validar foto antes de enviar (si se seleccionó)
         var archivoFoto = $('#f-foto')[0].files ? $('#f-foto')[0].files[0] : null;
         if (archivoFoto) {
             if (!archivoFoto.type || !archivoFoto.type.startsWith('image/')) {
@@ -267,16 +280,12 @@ $(document).ready(function () {
             $('#img-loading').removeClass('hidden');
             setTimeout(function() {
                 $('#img-loading').addClass('hidden');
-            }, 2000); // 2000 milisegundos = 2 segundos
+            }, 2000);
             
-
-
             $('#btn-save').attr('disabled', true);
 
-            // Crear FormData para el envío del formulario
             var formDataObj = new FormData();
 
-            // Agregar campos obligatorios
             var campos = {
                 'module': 'trabajadores',
                 'method': 'save',
@@ -301,29 +310,23 @@ $(document).ready(function () {
                 'estatus': $('#f-estatus').val() || 'activo'
             };
 
-            // Agregar cada campo al FormData
             for (var key in campos) {
                 formDataObj.append(key, campos[key]);
             }
 
-            // Fecha de baja eliminada del envío
             if ($('#f-bolsa').val()) formDataObj.append('bolsa_empleo_id', $('#f-bolsa').val());
             
-            // Agregar foto si se seleccionó
             if ($('#f-foto')[0].files[0]) {
                 formDataObj.append('foto', $('#f-foto')[0].files[0]);
             }
             
-            // Agregar parámetros de control
             formDataObj.append('module', 'trabajadores');
             formDataObj.append('method', 'save');
             formDataObj.append('action', action);
 
-            // Agregar ID si es una actualización
             if (action === 'update') {
                 formDataObj.append('id', $('#f-id').val());
             }
-            // Debug: mostrar datos que se van a enviar
             console.log('Enviando datos:');
             for (var pair of formDataObj.entries()) {
                 console.log(pair[0] + ': ' + pair[1]);
@@ -344,7 +347,6 @@ $(document).ready(function () {
                         if (d.action == 'insert') {
                             action = 'update';
                             $('#f-id').val(d.id);
-                            // Mostrar mensaje de éxito y redirigir después de 1.5 segundos
                             notify(
                                 'success',
                                 '¡Éxito!',
@@ -355,7 +357,6 @@ $(document).ready(function () {
                                 window.location.href = '?module=list-trabajadores';
                             }, 1500);
                         } else {
-                            // Para actualizaciones, solo mostrar el mensaje sin redirigir
                             notify(
                                 'success',
                                 '¡Éxito!',

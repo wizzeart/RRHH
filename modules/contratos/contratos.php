@@ -178,11 +178,7 @@
                         <small class="text-muted">Se reflejará como (X) en el contrato.</small>
                     </div>
                 </div>
-            </div>
-
-            <!-- Fila 4: Modalidad de Trabajo -->
-            <div class="row">
-                <div class="col-md-6">
+                   <div class="col-md-4">
                     <div class="form-group">
                         <label class="control-label" for="f-modalidad-trabajo">Modalidad de Trabajo <span class="text-danger">*</span></label>
                         <select id="f-modalidad-trabajo" name="modalidad_trabajo" class="form-control">
@@ -192,14 +188,20 @@
                             <option value="3" <?php echo (isset($data['modalidad_trabajo']) && $data['modalidad_trabajo'] == '3') ? 'selected' : ''; ?>>Teletrabajo</option>
                         </select>
                     </div>
-                </div>
-                <div class="col-md-6">
+                </div>             
+
+            </div>
+
+            <!-- Fila 4: Modalidad de Trabajo -->
+            <div class="row">
+                
+                <!-- <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="f-firma">Firma Trabajador</label>
                         <input type="file" id="f-firma" name="firma_digital" class="form-control" accept=".png,.jpg,.jpeg,.pdf">
                         <?php if (!empty($data['firma_digital'])) { echo '<small><a href="' . htmlspecialchars($data['firma_digital'], ENT_QUOTES, 'UTF-8') . '" target="_blank">Ver firma actual</a></small>'; } ?>
                     </div>
-                </div>
+                </div> -->
             </div>
         </form>
 

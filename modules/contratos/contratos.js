@@ -434,9 +434,9 @@ $(document).ready(function () {
 </head>
 <body>
   <div class="toolbar">
-    <button id="btn-full-generate">Generar PDF</button>
-    <button id="btn-full-print">Imprimir</button>
-    <button id="btn-full-sign">Firmar</button>
+     <button id="btn-full-print">Imprimir</button>
+    <button id="btn-full-sign">Firmar Trabajador</button>
+    <button id="btn-full-sign-admin">Firmar Administrador</button>
     <span class="status" id="status-msg"></span>
   </div>
   <div class="content"><iframe id="docFrame"></iframe></div>
@@ -466,6 +466,7 @@ $(document).ready(function () {
   <script>
     (function(){
       var contratoId = ${JSON.stringify(contratoId)};
+      var currentSignTarget = 'trabajador';
       var iframe = document.getElementById('docFrame');
       var statusEl = document.getElementById('status-msg');
       // Cargar contenido del contrato en el iframe
@@ -482,7 +483,8 @@ $(document).ready(function () {
         } catch(e){ window.print(); }
       });
 
-      document.getElementById('btn-full-generate').addEventListener('click', function(){
+      var genBtn = document.getElementById('btn-full-generate');
+      if (genBtn) genBtn.addEventListener('click', function(){
         if (!contratoId) { alert('Primero guarde el contrato para poder generar el PDF.'); return; }
         setStatus('Generando PDF...');
         var htmlActual = '';
@@ -525,8 +527,9 @@ $(document).ready(function () {
         }).catch(function(err){ setStatus(''); alert('Error al generar PDF'); });
       });
 
-      // Abrir modal de firma
+      // Abrir modal de firma - Trabajador
       document.getElementById('btn-full-sign').addEventListener('click', function(){
+        currentSignTarget = 'trabajador';
         var modal = document.getElementById('signModal');
         if (!modal) { alert('No se encontró el modal de firma. Recargue la vista grande.'); return; }
         modal.style.display = 'block';
@@ -542,6 +545,33 @@ $(document).ready(function () {
             var rect = canvas.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) {
               // forzar un tamaño por defecto si el layout aún no calculó
+              canvas.style.width = '800px';
+              canvas.style.height = '360px';
+              rect = canvas.getBoundingClientRect();
+            }
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+            var ctx = canvas.getContext('2d', { alpha: true });
+            if (ctx) { ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr); }
+          } catch(e) { /* ignore */ }
+        }, 0);
+      });
+
+      // Abrir modal de firma - Administrador
+      document.getElementById('btn-full-sign-admin').addEventListener('click', function(){
+        currentSignTarget = 'administrador';
+        var modal = document.getElementById('signModal');
+        if (!modal) { alert('No se encontró el modal de firma. Recargue la vista grande.'); return; }
+        modal.style.display = 'block';
+        setTimeout(function(){
+          try {
+            var canvas = document.getElementById('drawCanvas');
+            if (!canvas) return;
+            if (!canvas.style.width) { canvas.style.width = '100%'; }
+            if (!canvas.style.height) { canvas.style.height = '360px'; }
+            var dpr = window.devicePixelRatio || 1;
+            var rect = canvas.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) {
               canvas.style.width = '800px';
               canvas.style.height = '360px';
               rect = canvas.getBoundingClientRect();
@@ -653,26 +683,49 @@ $(document).ready(function () {
               var ifw = document.getElementById('docFrame').contentWindow;
               var doc = ifw && ifw.document;
               if (!doc) throw new Error('No se pudo acceder al documento.');
-              // Insertar UNA sola firma: si ya existe, reemplazar imagen; si no, crear contenedor
-              var existing = doc.getElementById('firma-digital-container');
-              if (existing) {
-                // Reemplazar la imagen y asegurar estilos (doblemente más arriba y a la derecha)
-                existing.setAttribute('style','page-break-inside:avoid; text-align:center; margin-top:-120px;');
-                // Ajustar título si existe
-                var titleEl = existing.querySelector('.firma-title');
-                if (titleEl) { titleEl.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;'); }
-                var sigImg = existing.querySelector('img');
-                if (!sigImg) { sigImg = doc.createElement('img'); existing.appendChild(sigImg); }
-                sigImg.src = dataUrl; sigImg.alt = 'Firma'; sigImg.style.maxWidth = '120px'; sigImg.style.height = 'auto'; sigImg.style.marginLeft = '100px'; sigImg.style.display = 'inline-block';
+
+              // Asegurar wrapper de firmas (lado a lado con espacio)
+              var wrapper = doc.getElementById('firmas-wrapper');
+              if (!wrapper) {
+                wrapper = doc.createElement('div');
+                wrapper.id = 'firmas-wrapper';
+                wrapper.setAttribute('style','page-break-inside:avoid; display:flex; justify-content:center; gap:90px; margin-top:60px; padding:0 40px; align-items:flex-start;');
+                (doc.body || doc.documentElement).appendChild(wrapper);
               } else {
-                var container = doc.createElement('div');
-                container.id = 'firma-digital-container';
-                container.setAttribute('style','page-break-inside:avoid; text-align:center; margin-top:-120px;');
-                var title = doc.createElement('div'); title.className = 'firma-title'; title.textContent = 'Firma Trabajador'; title.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;');
-                var img = doc.createElement('img'); img.src = dataUrl; img.alt = 'Firma'; img.style.maxWidth = '120px'; img.style.height = 'auto'; img.style.marginLeft = '100px'; img.style.display = 'inline-block';
-                container.appendChild(title); container.appendChild(img);
-                (doc.body || doc.documentElement).appendChild(container);
+                // asegurar que la posición se actualice si ya existía
+                wrapper.setAttribute('style','page-break-inside:avoid; display:flex; justify-content:center; gap:90px; margin-top:60px; padding:0 40px; align-items:flex-start;');
               }
+
+              var targetId = (currentSignTarget === 'administrador') ? 'firma-admin' : 'firma-trabajador';
+              var targetTitle = (currentSignTarget === 'administrador') ? 'Firma Administrador' : 'Firma Trabajador';
+
+              var container = doc.getElementById(targetId);
+              if (!container) {
+                container = doc.createElement('div');
+                container.id = targetId;
+                container.setAttribute('style','text-align:center;');
+                var title = doc.createElement('div');
+                title.className = 'firma-title';
+                title.textContent = targetTitle;
+                title.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;');
+                var placeholder = doc.createElement('div');
+                placeholder.setAttribute('style','border-top:1px solid #000; width:200px; height:0; margin: 46px auto 0 auto;');
+                var img = doc.createElement('img');
+                img.style.maxWidth = '120px'; img.style.height = 'auto'; img.style.display = 'block'; img.style.margin = '6px auto 0 auto';
+                container.appendChild(title);
+                container.appendChild(img);
+                // container.appendChild(placeholder);
+                wrapper.appendChild(container);
+              }
+
+              // Reemplazar/colocar la imagen en el contenedor destino
+              var imgEl = container.querySelector('img');
+              if (!imgEl) { imgEl = doc.createElement('img'); container.appendChild(imgEl); }
+              imgEl.src = dataUrl; imgEl.alt = 'Firma'; imgEl.style.maxWidth = '120px'; imgEl.style.height = 'auto'; imgEl.style.display = 'block'; imgEl.style.margin = '6px auto 0 auto';
+              // Asegurar título correcto
+              var titleEl = container.querySelector('.firma-title');
+              if (titleEl) { titleEl.textContent = targetTitle; titleEl.setAttribute('style','margin:0 0 4px 0; font-style:italic; color:#555;'); }
+            
               // Actualizar srcdoc con DOM actual para conservar la firma en futuras acciones
               try { var htmlNow = '<!doctype html>'+ doc.documentElement.outerHTML; document.getElementById('docFrame').srcdoc = htmlNow; } catch(e){}
               document.getElementById('signModal').style.display = 'none';
