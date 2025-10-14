@@ -465,7 +465,7 @@ class Trabajador {
                 }
                 
                 // Obtener el ID del usuario recién creado
-                $usuarioId = $this->db->last_id();
+                $usuarioId = $param['usuario_id'];
                 
                 if (!$usuarioId) {
                     throw new Exception('No se pudo obtener el ID del usuario creado');
