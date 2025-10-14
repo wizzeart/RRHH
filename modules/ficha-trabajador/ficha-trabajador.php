@@ -148,7 +148,15 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="control-label" for="f-edad">Edad </label>
-                                            <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad actual" value="<?php if (isset($data['edad'])) print($data['edad']); ?>" readonly>
+                                            <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad actual" value="<?php 
+                                                if (isset($data['fecha_nacimiento'])) {
+                                                    $fecha_nacimiento = $data['fecha_nacimiento'];
+                                                    $fecha_actual = date('Y-m-d');
+                                                    $diferencia = date_diff(date_create($fecha_nacimiento), date_create($fecha_actual));
+                                                    $edad = $diferencia->y;
+                                                    print($edad);
+                                                }
+                                            ?>" readonly>
                                             <!-- <small class="help-block">Edad actual</small> -->
                                         </div>
                                     </div>

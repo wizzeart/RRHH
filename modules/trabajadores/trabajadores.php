@@ -91,23 +91,22 @@
                             <!-- <small class="help-block">Documento de identidad</small> -->
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label" for="f-edad">Edad <span class="text-danger">*</span></label>
                             <input type="number" id="f-edad" name="edad" class="form-control" placeholder="Edad actual"
                                 value="<?php if (isset($data['edad']))
                                     print ($data['edad']); ?>">
-                            <!-- <small class="help-block">Edad actual</small> -->
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label" for="f-direccion">Dirección <span
                                     class="text-danger">*</span></label>
-                            <input type="text" id="f-direccion" name="direccion" class="form-control"
+                            <textarea id="f-direccion" name="direccion" class="form-control" rows="2"
                                 placeholder="Dirección del trabajador"
                                 value="<?php if (isset($data['direccion']))
-                                    print ($data['direccion']); ?>">
+                                    print ($data['direccion']); ?>"></textarea>
                             <!-- <small class="help-block">Dirección del trabajador</small> -->
                         </div>
                     </div>

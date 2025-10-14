@@ -276,7 +276,7 @@ class Trabajador {
                 'apellidos_segundos' => 'Segundo Apellido',
                 'sexo' => 'Sexo',
                 'carnet_identidad' => 'Carnet de Identidad',
-                'edad' => 'Edad',
+                
                 'direccion' => 'Dirección',
                 'provincia_id' => 'Provincia',
                 'municipio_id' => 'Municipio',
@@ -465,8 +465,21 @@ class Trabajador {
                     $mes = substr($carnet_identidad, 2, 2);
                     $dia = substr($carnet_identidad, 4, 2);
                     
+
+                    // Si el año tiene 2 dígitos, convertirlo a un año completo
+                    if (strlen($ano) == 2) {
+                        // Si el siglo es 19, el año es del siglo XX
+                        if ($ano > substr(date('Y'), 2, 2)) {
+                            $ano = '19' . $ano;
+                        } else {
+                            // Si el siglo es 20, el año es del siglo XXI
+                            $ano = '20' . $ano;
+                        }
+                    }
+                    
                     // Verificar que la fecha sea válida
                     if (checkdate($mes, $dia, $ano)) {
+                        $insert_filtered['fecha_nacimiento'] = $ano . '-' . $mes . '-' . $dia;
                         // Todo bien, la fecha es válida
                     } else {
                         $data['status'] = 0;
@@ -482,18 +495,6 @@ class Trabajador {
                 }
                 
                 
-                // // Calcular la edad a partir de la fecha de nacimiento
-                // $fecha_nacimiento = $ano . '-' . $mes . '-' . $dia;
-                // $fecha_actual = date('Y-m-d');
-                
-                
-                // // Calcular la diferencia de fechas
-                // $diferencia = date_diff(date_create($fecha_nacimiento), date_create($fecha_actual));
-                // $edad = $diferencia->y;
-                
-                
-                
-                // $insert_filtered['edad'] = $edad;
                 
                 
             
