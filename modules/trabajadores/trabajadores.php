@@ -84,7 +84,7 @@
                         <div class="form-group">
                             <label class="control-label" for="f-ci">Carnet de Identidad <span
                                     class="text-danger">*</span></label>
-                            <input type="text" id="f-ci" name="carnet_identidad" class="form-control"
+                            <input type="text" id="f-ci" name="carnet_identidad" class="form-control" inputmode="numeric" pattern="[0-9]*" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)"
                                 placeholder="Carnet de Identidad del trabajador"
                                 value="<?php if (isset($data['carnet_identidad']))
                                     print ($data['carnet_identidad']); ?>">
@@ -261,6 +261,37 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Licencia de Conducción (select simple) -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label" for="f-licencia">Licencia de Conducción</label>
+                            <?php
+                            $licencia_val = 'N/A';
+                            if (isset($data['licencia_conduccion']) && !empty($data['licencia_conduccion'])) {
+                                // Si viene con múltiples valores (separados por espacio), tomar el primero
+                                $parts = array_map('trim', explode(' ', $data['licencia_conduccion']));
+                                $licencia_val = !empty($parts[0]) ? $parts[0] : 'N/A';
+                            }
+                            ?>
+                            <select id="f-licencia" name="licencia_conduccion" class="form-control">
+                                <option value="N/A" <?php echo ($licencia_val === 'N/A') ? 'selected' : ''; ?>>N/A - No posee licencia</option>
+                                <option value="A1" <?php echo ($licencia_val === 'A1') ? 'selected' : ''; ?>>A1 - Ciclomotor</option>
+                                <option value="A" <?php echo ($licencia_val === 'A') ? 'selected' : ''; ?>>A - Motocicleta</option>
+                                <option value="B" <?php echo ($licencia_val === 'B') ? 'selected' : ''; ?>>B - Automóvil</option>
+                                <option value="C1" <?php echo ($licencia_val === 'C1') ? 'selected' : ''; ?>>C1 - Camión ligero</option>
+                                <option value="C" <?php echo ($licencia_val === 'C') ? 'selected' : ''; ?>>C - Camión pesado</option>
+                                <option value="D1" <?php echo ($licencia_val === 'D1') ? 'selected' : ''; ?>>D1 - Microbús</option>
+                                <option value="D" <?php echo ($licencia_val === 'D') ? 'selected' : ''; ?>>D - Omnibus</option>
+                                <option value="E" <?php echo ($licencia_val === 'E') ? 'selected' : ''; ?>>E - Articulado</option>
+                                <option value="F" <?php echo ($licencia_val === 'F') ? 'selected' : ''; ?>>F - Agroindustrial y de construcción</option>
+                                <option value="FE" <?php echo ($licencia_val === 'FE') ? 'selected' : ''; ?>>FE - Tractor con remolque</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sección de foto -->
                 <div class="row">
                     <div class="col-md-12">

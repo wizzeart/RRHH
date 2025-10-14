@@ -123,6 +123,10 @@ $(document).ready(function () {
             $(this).focus();
         }
     });
+    $('#f-ci').on('input', function(){
+        var v = $(this).val().replace(/\D/g, '').slice(0, 11);
+        if (v !== $(this).val()) $(this).val(v);
+    });
 
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
@@ -251,9 +255,9 @@ $(document).ready(function () {
         if ($('#f-ci').val() == '') {
             status = 0;
             msg += '<div>El campo CI del Trabajador es obligatorio.</div>';
-        } else if ($('#f-ci').val().length !== 11) {
+        } else if (!/^\d{11}$/.test($('#f-ci').val())) {
             status = 0;
-            msg += '<div>El Carnet de Identidad debe tener exactamente 11 caracteres.</div>';
+            msg += '<div>El Carnet de Identidad debe tener exactamente 11 dígitos.</div>';
         }
         if ($('#f-edad').val() == '') {
             status = 0;
@@ -343,6 +347,10 @@ $(document).ready(function () {
 
             var formDataObj = new FormData();
 
+            // Formatear licencia de conducción para select simple
+            var licSel = $('#f-licencia').val(); // string o null
+            var licenciaStr = (typeof licSel === 'string' && licSel.trim() !== '') ? licSel.trim() : 'N/A';
+
             var campos = {
                 'module': 'trabajadores',
                 'method': 'save',
@@ -357,6 +365,7 @@ $(document).ready(function () {
                 'provincia_id': $('#f-provincia').val(),
                 'municipio_id': $('#f-municipio').val(),
                 'telefono': $('#f-telefono').val(),
+                'licencia_conduccion': licenciaStr,
                 'tarjeta_salario': $('#f-tarjeta_salario').val(),
                 'cuenta_estandar': $('#f-cuenta_estandar').val(),
                 'email': $('#f-email').val(),
