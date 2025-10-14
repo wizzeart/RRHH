@@ -31,6 +31,18 @@ $(document).ready(function () {
     // Aplicar la funcionalidad a todos los campos de fecha
     makeDateFieldClickable('#f-fecha-registro');
 
+    function soloLetrasYEspacios(s) {
+        s = (s || '');
+        s = s.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+        s = s.replace(/\s{2,}/g, ' ');
+        return s.trimStart();
+    }
+    $('#f-nombre, #f-apellidos, #f-apellidos-segundos').on('input', function(){
+        var val = $(this).val();
+        var filtrado = soloLetrasYEspacios(val);
+        if (val !== filtrado) $(this).val(filtrado);
+    });
+
     $('#btn-test').click(function () {
         var cmd = 'module=tools&method=test';
         cmd_params=cmd;
@@ -97,6 +109,18 @@ $(document).ready(function () {
         if ($('#f-apellidos').val() == '') {
             status = 0;
             msg += '<div>El campo Apellidos del Postulante es obligatorio.</div>';
+        }
+        if ($('#f-nombre').val() && !/^[\p{L}\s]+$/u.test($('#f-nombre').val())) {
+            status = 0;
+            msg += '<div>El campo Nombre solo debe contener letras.</div>';
+        }
+        if ($('#f-apellidos').val() && !/^[\p{L}\s]+$/u.test($('#f-apellidos').val())) {
+            status = 0;
+            msg += '<div>El campo Apellidos solo debe contener letras.</div>';
+        }
+        if ($('#f-apellidos-segundos').val() && !/^[\p{L}\s]+$/u.test($('#f-apellidos-segundos').val())) {
+            status = 0;
+            msg += '<div>El campo Segundo Apellido solo debe contener letras.</div>';
         }
 
         if ($('#f-telefono').val() == '') {
@@ -166,6 +190,7 @@ $(document).ready(function () {
             // Agregar todos los campos del formulario
             formDataObj.append('nombre', $('#f-nombre').val());
             formDataObj.append('apellidos', $('#f-apellidos').val());
+            formDataObj.append('segundos_apellidos', $('#f-apellidos-segundos').val());
             formDataObj.append('telefono', $('#f-telefono').val());
             formDataObj.append('email', $('#f-email').val());
             formDataObj.append('cargo_postulado_id', $('#f-cargo').val());

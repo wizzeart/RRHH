@@ -51,6 +51,40 @@ $(document).ready(function () {
 
     // Aplicar la funcionalidad a todos los campos de fecha
     makeDateFieldClickable('#f-contratacion');
+    // Prefill desde bolsa_empleo si viene por querystring
+    var prefillBolsa = {};
+    try {
+        var usp = new URLSearchParams(window.location.search);
+        if (usp.get('b_nombre') || usp.get('b_apellidos') || usp.get('b_ci')) {
+            prefillBolsa = {
+                id: usp.get('b_id') || '',
+                nombre: usp.get('b_nombre') || '',
+                apellidos: usp.get('b_apellidos') || '',
+                segundos_apellidos: usp.get('b_segundos_apellidos') || '',
+                ci: usp.get('b_ci') || '',
+                curriculum: usp.get('b_curriculum') || '',
+                cargo_postulado_id: usp.get('b_cargo_postulado_id') || '',
+                telefono: usp.get('b_telefono') || '',
+                email: usp.get('b_email') || '',
+                fecha_registro: usp.get('b_fecha_registro') || '',
+                estatus: usp.get('b_estatus') || ''
+            };
+            if (prefillBolsa.nombre) $('#f-nombre').val(prefillBolsa.nombre).trigger('input');
+            if (prefillBolsa.apellidos) $('#f-apellidos').val(prefillBolsa.apellidos).trigger('input');
+            if (prefillBolsa.segundos_apellidos) $('#f-apellidos-segundos').val(prefillBolsa.segundos_apellidos).trigger('input');
+            if (prefillBolsa.ci) $('#f-ci').val(prefillBolsa.ci);
+            if (prefillBolsa.telefono) $('#f-telefono').val(prefillBolsa.telefono);
+            // No prellenar el email desde bolsa_empleo según solicitud
+            if (prefillBolsa.cargo_postulado_id) $('#f-cargo').val(prefillBolsa.cargo_postulado_id);
+            if ($('#f-bolsa').length && prefillBolsa.id) $('#f-bolsa').val(prefillBolsa.id);
+            if (!$('#f-contratacion').val()) {
+                $('#f-contratacion').val(new Date().toISOString().split('T')[0]);
+            }
+            if (!$('#f-estatus').val()) {
+                $('#f-estatus').val('activo');
+            }
+        }
+    } catch(e) { console.warn('Prefill bolsa_empleo falló', e); }
     
     // Quitado el manejo de fecha de baja del formulario
 
@@ -337,7 +371,11 @@ $(document).ready(function () {
                 formDataObj.append(key, campos[key]);
             }
 
-            if ($('#f-bolsa').val()) formDataObj.append('bolsa_empleo_id', $('#f-bolsa').val());
+            if ($('#f-bolsa').length && $('#f-bolsa').val()) {
+                formDataObj.append('bolsa_empleo_id', $('#f-bolsa').val());
+            } else if (prefillBolsa && prefillBolsa.id) {
+                formDataObj.append('bolsa_empleo_id', prefillBolsa.id);
+            }
             
             if ($('#f-foto')[0].files[0]) {
                 formDataObj.append('foto', $('#f-foto')[0].files[0]);

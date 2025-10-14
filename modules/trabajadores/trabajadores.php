@@ -247,19 +247,7 @@
                             <!-- <small class="help-block">Estado actual</small> -->
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="f-bolsa">Bolsa de Empleo <span
-                                    class="text-danger">*</span></label>
-                            <select id="f-bolsa" name="bolsa_empleo_id" class="form-control">
-                                <option value="">Seleccione bolsa de empleo</option>
-                                <?php foreach ($data_form['bolsas'] as $k => $v) { ?>
-                                    <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
-                                <?php } ?>
-                            </select>
-                            <!-- <small class="help-block">Bolsa de empleo asociada</small> -->
-                        </div>
-                    </div>
+                   
                     <div class="col-md-3">
                         <div class="form-group">
                             <label class="control-label" for="f-cargo">Cargo <span class="text-danger">*</span></label>

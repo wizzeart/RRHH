@@ -147,7 +147,7 @@ class Trabajador {
 
                 $data = array();
                 $page['title'] = 'Nuevo trabajador';
-                $page['subtitle'] = 'Ficha de Trabajador';
+                $page['subtitle'] = 'Registro de Trabajador';
 
                 
                 $data_form['cargos'] = $this->app->get_list_cargos();
@@ -220,6 +220,7 @@ class Trabajador {
             'xentity' => 'TRABAJADOR',
             'xaction' => 'BAJA-TRABAJADOR',
             'xid' => $param['id'],
+            'xobs' => 'BAJA TRABAJADOR ID: ' . $param['id'],
         );
         $this->app->add_history($history);
 

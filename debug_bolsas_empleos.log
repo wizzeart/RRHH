@@ -304,3 +304,323 @@ Array
     [estatus] => pendiente
 )
 
+2025-10-14 16:54:26 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Carlos 
+    [apellidos] => Armando
+    [segundos_apellidos] => Rodriguez
+    [telefono] => 43535353
+    [email] => carlosarmando@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (2).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4BA8.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 16:54:26 - Intentando insertar:
+Array
+(
+    [nombre] => Carlos 
+    [apellidos] => Armando
+    [segundos_apellidos] => Rodriguez
+    [curriculum] => uploads/curriculos/cv_68ee642249aaa_cv_68cdb1d10ee51_pruebaCV (1) (2).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 43535353
+    [email] => carlosarmando@allnovu.net
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+2025-10-14 16:54:26 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '15' for key 'PRIMARY'
+2025-10-14 16:54:31 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Carlos 
+    [apellidos] => Armando
+    [segundos_apellidos] => Rodriguez
+    [telefono] => 43535353
+    [email] => carlosarmando@allnovu.net
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (2).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php5FAE.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 16:54:31 - Intentando insertar:
+Array
+(
+    [nombre] => Carlos 
+    [apellidos] => Armando
+    [segundos_apellidos] => Rodriguez
+    [curriculum] => uploads/curriculos/cv_68ee64276609f_cv_68cdb1d10ee51_pruebaCV (1) (2).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 43535353
+    [email] => carlosarmando@allnovu.net
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+2025-10-14 16:54:31 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '16' for key 'PRIMARY'
+2025-10-14 16:57:18 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Alexander
+    [apellidos] => Malleta
+    [segundos_apellidos] => Gonzalez
+    [telefono] => 72082678
+    [email] => melleta@gmail.com
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\phpEACE.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 16:57:18 - Intentando insertar:
+Array
+(
+    [nombre] => Alexander
+    [apellidos] => Malleta
+    [segundos_apellidos] => Gonzalez
+    [curriculum] => uploads/curriculos/cv_68ee64ce145cd_cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 72082678
+    [email] => melleta@gmail.com
+    [fecha_registro] => 2025-10-15
+    [estatus] => pendiente
+)
+
+2025-10-14 16:57:18 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '17' for key 'PRIMARY'
+2025-10-14 17:01:53 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Daniel 
+    [apellidos] => Rodriguez 
+    [segundos_apellidos] => Jackson
+    [telefono] => 58052728
+    [email] => danielrodri@gmail.com
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-14
+    [estatus] => en_revision
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php2072.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 17:01:53 - Intentando insertar:
+Array
+(
+    [nombre] => Daniel 
+    [apellidos] => Rodriguez 
+    [segundos_apellidos] => Jackson
+    [curriculum] => uploads/curriculos/cv_68ee65e1e5a92_cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 58052728
+    [email] => danielrodri@gmail.com
+    [fecha_registro] => 2025-10-14
+    [estatus] => en_revision
+)
+
+2025-10-14 17:01:53 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '18' for key 'PRIMARY'
+2025-10-14 17:01:58 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Daniel 
+    [apellidos] => Rodriguez 
+    [segundos_apellidos] => Jackson
+    [telefono] => 58052728
+    [email] => danielrodri@gmail.com
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-14
+    [estatus] => en_revision
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php32C3.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 17:01:58 - Intentando insertar:
+Array
+(
+    [nombre] => Daniel 
+    [apellidos] => Rodriguez 
+    [segundos_apellidos] => Jackson
+    [curriculum] => uploads/curriculos/cv_68ee65e69ff35_cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 58052728
+    [email] => danielrodri@gmail.com
+    [fecha_registro] => 2025-10-14
+    [estatus] => en_revision
+)
+
+2025-10-14 17:01:58 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '19' for key 'PRIMARY'
+2025-10-14 17:16:11 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Kolambo
+    [apellidos] => Josefo
+    [segundos_apellidos] => Fedez
+    [telefono] => 534532321
+    [email] => kolambojosefo@gmail.com
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-14
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php34D8.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 17:16:11 - Intentando insertar:
+Array
+(
+    [nombre] => Kolambo
+    [apellidos] => Josefo
+    [segundos_apellidos] => Fedez
+    [curriculum] => uploads/curriculos/cv_68ee693b20bc3_cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 534532321
+    [email] => kolambojosefo@gmail.com
+    [fecha_registro] => 2025-10-14
+    [estatus] => pendiente
+)
+
+2025-10-14 17:16:11 - Error al insertar:
+SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '20' for key 'PRIMARY'
+2025-10-14 17:23:03 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Sergio 
+    [apellidos] => Rodriguez
+    [segundos_apellidos] => Pineiro
+    [telefono] => 89898989
+    [email] => sergio@gmail.com
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-14
+    [estatus] => pendiente
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php800E.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-14 17:23:03 - Intentando insertar:
+Array
+(
+    [nombre] => Sergio 
+    [apellidos] => Rodriguez
+    [segundos_apellidos] => Pineiro
+    [curriculum] => uploads/curriculos/cv_68ee6ad7928b0_cv_68cdb1d10ee51_pruebaCV (1) (6).docx
+    [cargo_postulado_id] => 1
+    [telefono] => 89898989
+    [email] => sergio@gmail.com
+    [fecha_registro] => 2025-10-14
+    [estatus] => pendiente
+)
+

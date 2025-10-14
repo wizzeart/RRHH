@@ -138,6 +138,22 @@ class Bolsas_empleos {
             'cargo_postulado_id' => 'Cargo al que postula',
             'estatus' => 'Estatus'
         );
+        // Validación de solo letras en nombre/apellidos/segundos_apellidos si se proveen
+        $soloLetras = array(
+            'nombre' => 'Nombre',
+            'apellidos' => 'Apellidos',
+            'segundos_apellidos' => 'Segundo Apellido'
+        );
+        foreach ($soloLetras as $f => $label) {
+            if (isset($param[$f]) && trim($param[$f]) !== '') {
+                if (!preg_match('/^[\p{L}\s]+$/u', $param[$f])) {
+                    $data['status'] = 0;
+                    $data['msg'] = "El campo {$label} solo debe contener letras";
+                    print(json_encode($data));
+                    return;
+                }
+            }
+        }
         
         // Validar email si está presente
         if (isset($param['email']) && !empty($param['email'])) {
@@ -161,6 +177,7 @@ class Bolsas_empleos {
         $insert = array(
             'nombre' => $param['nombre'],
             'apellidos' => $param['apellidos'],
+            'segundos_apellidos' => isset($param['segundos_apellidos']) ? $param['segundos_apellidos'] : '',
             'curriculum' => isset($param['curriculum']) ? $param['curriculum'] : '',
             'cargo_postulado_id' => intval($param['cargo_postulado_id']),
             'telefono' => $param['telefono'],
@@ -175,12 +192,14 @@ class Bolsas_empleos {
         unset($insert['module']);
         unset($insert['method']);
         unset($insert['action']);
+        unset($insert['id']);
 
         if ($data['action'] == 'insert') {
             // Asegurar que solo se insertan los campos que existen en la tabla
             $campos_validos = [
                 'nombre',
                 'apellidos',
+                'segundos_apellidos',
                 'curriculum',
                 'cargo_postulado_id',
                 'telefono',
@@ -216,10 +235,15 @@ class Bolsas_empleos {
                         $history = array(
                             'xentity' => 'BOLSA_EMPLEO',
                             'xaction' => 'INSERT-POSTULACION',
-                            'id' => $lastId,
+                            'xid' => $lastId,
                             'xobs' => 'POSTULACION: ' . $lastId . ' ' . $insert['nombre'] . ' ' . $insert['apellidos']
                         );
-                        $this->app->add_history($history);
+                        try {
+                            $this->app->add_history($history);
+                        } catch (Exception $eHist) {
+                            // No romper el flujo si el historial falla
+                            error_log('Historial bolsas_empleos insert falló: ' . $eHist->getMessage());
+                        }
                     } else {
                         $data['status'] = 0;
                         $data['msg_title'] = 'Error';
@@ -257,6 +281,7 @@ class Bolsas_empleos {
                 $campos_validos = [
                     'nombre',
                     'apellidos',
+                    'segundos_apellidos',
                     'curriculum',
                     'cargo_postulado_id',
                     'telefono',
@@ -288,7 +313,7 @@ class Bolsas_empleos {
                     $history = array(
                         'xentity' => 'BOLSA_EMPLEO',
                         'xaction' => 'UPDATE-POSTULACION',
-                        'id' => $id,
+                        'xid' => $id,
                         'xobs' => 'POSTULACION: ' . $id . ' ' . $insert['nombre'] . ' ' . $insert['apellidos']
                     );
                     $this->app->add_history($history);
@@ -315,7 +340,7 @@ class Bolsas_empleos {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT id, nombre, apellidos, curriculum, cargo_postulado_id, telefono, email, fecha_registro, estatus"
+        $sql = "SELECT id, nombre, apellidos, segundos_apellidos, ci_bolsa_empleo, curriculum, cargo_postulado_id, telefono, email, fecha_registro, estatus"
                 . " FROM bolsa_empleo"
                 . " ORDER BY id DESC";
         

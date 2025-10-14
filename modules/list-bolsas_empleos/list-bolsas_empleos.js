@@ -49,7 +49,39 @@ $(document).ready(function () {
         window.open(rowData.curriculum, '_blank');
     });
 
-
+    // Handler for contratar button -> redirect to trabajadores with prefilled params
+    $('#table-panel').on('click', '.btn-contratar', function () {
+        var $tr = $(this).closest('tr');
+        var idx = $tr.data('index');
+        var allData = $('#table-panel').bootstrapTable('getData');
+        var rowData;
+        if (typeof idx !== 'undefined' && allData && allData[idx]) {
+            rowData = allData[idx];
+        } else {
+            var id = $(this).data('id');
+            if (allData && allData.length) {
+                rowData = allData.find(function (r) { return r.id == id; });
+            }
+        }
+        if (!rowData) {
+            alert('No se pudo obtener los datos de la postulación.');
+            return;
+        }
+        var params = new URLSearchParams();
+        params.set('module', 'trabajadores');
+        params.set('b_id', rowData.id || '');
+        params.set('b_nombre', rowData.nombre || '');
+        params.set('b_apellidos', rowData.apellidos || '');
+        params.set('b_segundos_apellidos', rowData.segundos_apellidos || '');
+        params.set('b_ci', rowData.ci_bolsa_empleo || '');
+        params.set('b_curriculum', rowData.curriculum || '');
+        params.set('b_cargo_postulado_id', rowData.cargo_postulado_id || '');
+        params.set('b_telefono', rowData.telefono || '');
+        params.set('b_email', rowData.email || '');
+        params.set('b_fecha_registro', rowData.fecha_registro || '');
+        params.set('b_estatus', rowData.estatus || '');
+        window.location.href = 'index.php?' + params.toString();
+    });
 
 });
 
@@ -78,9 +110,11 @@ function formatoToolbar(value, row) {
     var btnClass = curriculumAvailable ? 'btn-primary' : 'btn-secondary';
     var btnDisabled = curriculumAvailable ? '' : 'disabled';
     var title = curriculumAvailable ? 'Descargar/Ver Currículum' : 'Sin currículum';
-    
-    var s = '<button data-id="' + row.id + '" class="btn ' + btnClass + ' btn-icon icon-sm fa fa-download" ' + btnDisabled + ' title="' + title + '"></button>';
-    
+
+    var s = '';
+    s += '<button data-id="' + row.id + '" class="btn ' + btnClass + ' btn-icon icon-sm fa fa-download" ' + btnDisabled + ' title="' + title + '"></button> ';
+    s += '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-briefcase btn-contratar" title="Contratar"></button>';
+
     return s;
 }
 

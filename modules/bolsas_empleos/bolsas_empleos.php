@@ -44,7 +44,17 @@
                 <small class="help-block">Apellidos del postulante</small>
             </div>
         </div>
-       
+    </div>
+
+    <!-- Fila adicional: Segundo Apellido -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label" for="f-apellidos-segundos">Segundo Apellido</label>
+                <input type="text" id="f-apellidos-segundos" name="segundos_apellidos" class="form-control" placeholder="Segundo Apellido" value="<?php if (isset($data['segundos_apellidos'])) print($data['segundos_apellidos']); ?>">
+                <small class="help-block">Segundo apellido del postulante</small>
+            </div>
+        </div>
     </div>
 
     <!-- Segunda fila -->
