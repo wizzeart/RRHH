@@ -215,12 +215,23 @@ class Trabajador {
         // Ejecutar baja lógica del trabajador
         $this->db->update('trabajadores', $update, $where);
 
-        // Registrar en historial
+        // Registrar en historial (incluyendo nombre del trabajador)
+        $nombreCompleto = '';
+        try {
+            $rowNombre = $this->db->fetchRow(
+                "SELECT nombre, apellidos, apellidos_segundos FROM trabajadores WHERE id = :id",
+                array('id' => $param['id'])
+            );
+            if ($rowNombre) {
+                $nombreCompleto = trim(($rowNombre['nombre'] ?? '') . ' ' . ($rowNombre['apellidos'] ?? '') . ' ' . ($rowNombre['apellidos_segundos'] ?? ''));
+            }
+        } catch (Exception $e) { /* ignore */ }
+
         $history = array(
             'xentity' => 'TRABAJADOR',
             'xaction' => 'BAJA-TRABAJADOR',
             'xid' => $param['id'],
-            'xobs' => 'BAJA TRABAJADOR ID: ' . $param['id'],
+            'xobs' => 'BAJA TRABAJADOR ID: ' . $param['id'] . ($nombreCompleto ? (' - ' . $nombreCompleto) : ''),
         );
         $this->app->add_history($history);
 
