@@ -646,6 +646,9 @@ $(document).ready(function() {
                 console.error('Error cargando municipios para provincia:', provinciaId);
             }
         });
+
+        
+
     }
     
     // Event listener para cambio de provincia
@@ -656,10 +659,12 @@ $(document).ready(function() {
         // Puedes cambiar entre filterMunicipios() y loadMunicipiosAjax()
         loadMunicipiosAjax(provinciaId);
     });
+
+    // Si estoy en editar, seleccionar el municipio inicial
     
     // Inicializar filtrado al cargar la página si hay una provincia preseleccionada
     var initialProvincia = $('#f-provincia').val();
     if (initialProvincia && initialProvincia !== '') {
-        loadMunicipiosAjax(initialProvincia);
+       // loadMunicipiosAjax(initialProvincia);
     }
 });

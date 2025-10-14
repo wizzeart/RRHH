@@ -1,6 +1,7 @@
 <script>
     var action = '<?php print ($action) ?>';
     var rol = '<?php print ($app->rol) ?>';
+    //var provincia_id_ = '<?php print ($data['provincia_id']) ?>';
 </script>
 <div class="panel">
     <div class="panel-heading">
@@ -81,11 +82,14 @@
                         </div>
                     </div>
                     <div class="col-md-3">
+
+
                         <div class="form-group">
                             <label class="control-label" for="f-ci">Carnet de Identidad <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="f-ci" name="carnet_identidad" class="form-control" inputmode="numeric" pattern="[0-9]*" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)"
                                 placeholder="Carnet de Identidad del trabajador"
+                                maxlength="11"
                                 value="<?php if (isset($data['carnet_identidad']))
                                     print ($data['carnet_identidad']); ?>">
                             <!-- <small class="help-block">Documento de identidad</small> -->
@@ -105,8 +109,8 @@
                                     class="text-danger">*</span></label>
                             <textarea id="f-direccion" name="direccion" class="form-control" rows="2"
                                 placeholder="Dirección del trabajador"
-                                value="<?php if (isset($data['direccion']))
-                                    print ($data['direccion']); ?>"></textarea>
+                                ><?php if (isset($data['direccion']))
+                                    echo ($data['direccion']);?></textarea>
                             <!-- <small class="help-block">Dirección del trabajador</small> -->
                         </div>
                     </div>
@@ -254,8 +258,8 @@
                             <select id="f-cargo" name="cargos_id" class="form-control">
                                 <option value="">Seleccione cargo</option>
                                 <?php foreach ($data_form['cargos'] as $k => $v) { ?>
-                                    <option value="<?php print ($v['id']) ?>"><?php print ($v['nombre']) ?></option>
-                                <?php } ?>
+                              <option value="<?php print($v['id']) ?>" <?php if (isset($data['cargos_id']) && $data['cargos_id'] == $v['id']) print('selected'); ?>><?php print($v['nombre']) ?></option>
+                                        <?php } ?>
                             </select>
                             <!-- <small class="help-block">Cargo asignado</small> -->
                         </div>
