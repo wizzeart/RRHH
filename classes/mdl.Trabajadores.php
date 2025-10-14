@@ -272,6 +272,11 @@ class Trabajador {
             // Generar UUID para el nuevo trabajador
             $param['uuid'] = $this->generarUuidV4();
         }
+        else {
+            $query = "SELECT usuario_id FROM trabajadores WHERE id = :id";
+            $result = $this->db->fetchAll($query, array('id' => $param['id']));
+            $param['usuario_id'] = $result[0]['usuario_id'];
+        }
 
             // Verificar si el carnet de identidad ya existe
             if ($data['action'] == 'insert' && isset($param['carnet_identidad'])) {
@@ -794,7 +799,6 @@ class Trabajador {
                     'provincia_id',
                     'municipio_id',
                     'telefono',
-                    'email',
                     'nivel_educacional',
                     'fecha_contratacion',
                     'fecha_baja',
@@ -812,6 +816,11 @@ class Trabajador {
                 $where = array('id' => $id);
                 $result = $this->db->update('trabajadores', $update_filtered, $where);
 
+                //actualizar el usuario
+                $where = array('xusuario_id' => $param['usuario_id']);
+                $email = $param['email'];
+                $update_filtered_user = array('xemail' => $email);
+                $result = $this->db->update('usuarios', $update_filtered_user, $where);
                 if ($result) {
                     // Guardar o actualizar información bancaria si se proporcionó
                     if (isset($param['tarjeta_salario']) || isset($param['cuenta_estandar'])) {
