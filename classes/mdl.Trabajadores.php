@@ -284,14 +284,23 @@ class Trabajador {
                 }
             }
             if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
-                $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
-                $val = array('email' => $param['email']);
-                $existing = $this->db->fetchRow($sql, $val);
-                if ($existing) {
-                    $data['status'] = 0;
-                    $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
-                    print(json_encode($data));
-                    return;
+                try {
+                    $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
+                    $val = array('email' => $param['email']);
+                    $existing = $this->db->fetchRow($sql, $val);
+                    if ($existing) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
+                        print(json_encode($data));
+                        return;
+                    }
+                } catch (Exception $ex) {
+                    // Si la columna 'email' no existe todavía, omitir verificación de unicidad
+                    if (strpos($ex->getMessage(), 'Unknown column') === false) {
+                        throw $ex;
+                    } else {
+                        error_log('Aviso: columna "email" no existe en trabajadores; se omite verificación de unicidad (insert).');
+                    }
                 }
             }
 
@@ -558,9 +567,25 @@ class Trabajador {
             
                 // Insertar trabajador con datos validados
                 
-                // Insertar el trabajador
-                $result = $this->db->insert('trabajadores', $insert_filtered);
-                
+                // Insertar el trabajador con tolerancia a columnas ausentes (email)
+                $result = false;
+                try {
+                    $result = $this->db->insert('trabajadores', $insert_filtered);
+                } catch (Exception $ex) {
+                    if (strpos($ex->getMessage(), "Unknown column 'email'") !== false || strpos($ex->getMessage(), 'Unknown column \"email\"') !== false) {
+                        // Reintentar sin el campo email si la columna no existe
+                        if (isset($insert_filtered['email'])) {
+                            unset($insert_filtered['email']);
+                            error_log('Aviso: columna "email" no existe en trabajadores; reintentando insert sin email.');
+                            $result = $this->db->insert('trabajadores', $insert_filtered);
+                        } else {
+                            throw $ex;
+                        }
+                    } else {
+                        throw $ex;
+                    }
+                }
+
                 if ($result) {
                     // Obtener el ID del trabajador insertado
                     $lastId = $this->db->last_id();
@@ -705,14 +730,23 @@ class Trabajador {
                         return;
                     }
                     if ($param['email'] !== '') {
-                        $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
-                        $val = array('email' => $param['email'], 'id' => $id);
-                        $existing = $this->db->fetchRow($sql, $val);
-                        if ($existing) {
-                            $data['status'] = 0;
-                            $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
-                            print(json_encode($data));
-                            return;
+                        try {
+                            $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
+                            $val = array('email' => $param['email'], 'id' => $id);
+                            $existing = $this->db->fetchRow($sql, $val);
+                            if ($existing) {
+                                $data['status'] = 0;
+                                $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
+                                print(json_encode($data));
+                                return;
+                            }
+                        } catch (Exception $ex) {
+                            // Si la columna 'email' no existe todavía, omitir verificación de unicidad
+                            if (strpos($ex->getMessage(), 'Unknown column') === false) {
+                                throw $ex;
+                            } else {
+                                error_log('Aviso: columna "email" no existe en trabajadores; se omite verificación de unicidad (update).');
+                            }
                         }
                     }
                 }

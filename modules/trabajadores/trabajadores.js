@@ -433,7 +433,23 @@ $(document).ready(function () {
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $('#img-loading').addClass('hidden');
                     $('#btn-save').attr('disabled', false);
-                    notify('danger', 'Error al guardar', response, 5000);
+                    var serverMsg = '';
+                    try {
+                        if (XMLHttpRequest && XMLHttpRequest.responseJSON) {
+                            serverMsg = XMLHttpRequest.responseJSON.msg || JSON.stringify(XMLHttpRequest.responseJSON);
+                        } else if (XMLHttpRequest && typeof XMLHttpRequest.responseText === 'string') {
+                            serverMsg = XMLHttpRequest.responseText;
+                        }
+                    } catch (e) { serverMsg = ''; }
+                    var finalMsg = serverMsg || errorThrown || textStatus || 'Error al comunicarse con el servidor.';
+                    notify('danger', 'Error al guardar', finalMsg, 5000);
+                    console.error('Error en la petición:', {
+                        status: XMLHttpRequest && XMLHttpRequest.status,
+                        statusText: XMLHttpRequest && XMLHttpRequest.statusText,
+                        responseText: XMLHttpRequest && XMLHttpRequest.responseText,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
                 }
             });
         } else {
