@@ -303,12 +303,12 @@ class Trabajador {
             }
             if ($data['action'] == 'insert' && isset($param['email']) && trim($param['email']) !== '') {
                 try {
-                    $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND trabajador_eliminado = '0'";
+                    $sql = "SELECT xusuario_id FROM usuarios WHERE LOWER(xemail) = LOWER(:email)";
                     $val = array('email' => $param['email']);
                     $existing = $this->db->fetchRow($sql, $val);
                     if ($existing) {
                         $data['status'] = 0;
-                        $data['msg'] = 'Ya existe un trabajador con este correo electrónico';
+                        $data['msg'] = 'Ya existe un usuario con este correo electrónico';
                         print(json_encode($data));
                         return;
                     }
@@ -493,7 +493,6 @@ class Trabajador {
                     'provincia_id',
                     'municipio_id',
                     'telefono',
-                    'email',
                     'licencia_conduccion',
                     'usuario_id',
                     'nivel_educacional',
@@ -766,12 +765,12 @@ class Trabajador {
                     }
                     if ($param['email'] !== '') {
                         try {
-                            $sql = "SELECT id FROM trabajadores WHERE LOWER(email) = LOWER(:email) AND id != :id AND trabajador_eliminado = '0'";
-                            $val = array('email' => $param['email'], 'id' => $id);
+                            $sql = "SELECT xusuario_id FROM usuarios WHERE LOWER(xemail) = LOWER(:email) AND xusuario_id != :id";
+                            $val = array('email' => $param['email'], 'id' => $param['usuario_id']);
                             $existing = $this->db->fetchRow($sql, $val);
                             if ($existing) {
                                 $data['status'] = 0;
-                                $data['msg'] = 'Ya existe otro trabajador con este correo electrónico';
+                                $data['msg'] = 'Ya existe otro usuario con este correo electrónico';
                                 print(json_encode($data));
                                 return;
                             }
@@ -816,7 +815,6 @@ class Trabajador {
                     'provincia_id',
                     'municipio_id',
                     'telefono',
-                    'email',
                     'licencia_conduccion',
                     'nivel_educacional',
                     'fecha_contratacion',
