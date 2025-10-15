@@ -1,7 +1,6 @@
 <script>
     var action = '<?php print ($action) ?>';
     var rol = '<?php print ($app->rol) ?>';
-    //var provincia_id_ = '<?php print ($data['provincia_id']) ?>';
 </script>
 <div class="panel">
     <div class="panel-heading">
