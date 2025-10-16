@@ -60,7 +60,7 @@ class Asistencia
             } else {
                 $param['ausencia'] = 0;
             }
-            if ($param['tipo_ausencia'] != 'RRHH' && $param['ausencia'] == 1) {
+            if ($param['tipo_ausencia'] != 'Injustificada' && $param['ausencia'] == 1) {
                 $param['ausencia'] = 0;
             }
             //remove module and method from array

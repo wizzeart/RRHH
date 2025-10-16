@@ -126,6 +126,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Contrato($app);
         $mdl->api($_REQUEST);
         break;
+    case 'tarjetas-snc':
+        include_once(BASE_CLASS . '/mdl.TarjetasSNC.php');
+        $mdl = new TarjetasSNC($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'asistencias':
         include_once(BASE_CLASS . '/mdl.Asistencias.php');
         $mdl = new Asistencia($app);

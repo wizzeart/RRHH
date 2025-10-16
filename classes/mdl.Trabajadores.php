@@ -217,6 +217,40 @@ class Trabajador {
         // Ejecutar baja lógica del trabajador
         $this->db->update('trabajadores', $update, $where);
 
+        try {
+            $trabId = $param['id'];
+            $hoy = date('Y-m-d');
+            $anioActual = (int)date('Y');
+            $mesActual = (int)date('n');
+
+            $rowSNC = $this->db->fetchRow("SELECT id, fecha_inicio FROM tarjetas_snc225 WHERE trabajador_id = :tid ORDER BY id DESC LIMIT 1", array('tid' => $trabId));
+            $fechaInicioVal = $rowSNC && isset($rowSNC['fecha_inicio']) ? trim((string)$rowSNC['fecha_inicio']) : '';
+
+            $anioInicio = null;
+            $mesInicio = null;
+            if ($fechaInicioVal !== '') {
+                $tsIni = strtotime($fechaInicioVal);
+                if ($tsIni !== false) {
+                    $anioInicio = (int)date('Y', $tsIni);
+                    $mesInicio = (int)date('n', $tsIni);
+                }
+            }
+
+            $meses = null;
+            if ($anioInicio !== null && $mesInicio !== null) {
+                $meses = ($anioActual - $anioInicio) * 12 + ($mesActual - $mesInicio);
+                if ($meses < 0) { $meses = 0; }
+            }
+
+            if ($rowSNC && isset($rowSNC['id'])) {
+                $updateSNC = array('fecha_cierre' => $hoy);
+                if ($meses !== null) {
+                    $updateSNC['tiempo_trabajo'] = $meses;
+                }
+                $this->db->update('tarjetas_snc225', $updateSNC, array('id' => $rowSNC['id']));
+            }
+        } catch (Exception $e) { }
+
         // Registrar en historial (incluyendo nombre del trabajador)
         $nombreCompleto = '';
         try {
@@ -654,6 +688,19 @@ class Trabajador {
                                 error_log('Error al guardar información bancaria: ' . $e->getMessage());
                             }
                         }
+
+                        try {
+                            // fecha_inicio toma la fecha de contratación del trabajador
+                            $fechaInicio = isset($insert_filtered['fecha_contratacion']) && !empty($insert_filtered['fecha_contratacion'])
+                                ? $insert_filtered['fecha_contratacion']
+                                : date('Y-m-d');
+                            // periodo debe ser la misma fecha exacta de creación
+                            $this->db->insert('tarjetas_snc225', array(
+                                'trabajador_id' => $lastId,
+                                'periodo' => $fechaInicio,
+                                'fecha_inicio' => $fechaInicio
+                            ));
+                        } catch (Exception $e) { }
 
                         // Preparar respuesta exitosa
                         $data['msg_title'] = 'Operación exitosa';

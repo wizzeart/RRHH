@@ -95,6 +95,17 @@
 <!--NEW MENU CUENTAS BANCARIAS-->
 
 
+<!--NEW MENU TARJETA SNC -->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-tarjetas-snc'))) print('active-link') ?>">
+    <a href="?module=list-tarjetas-snc">
+        <i class="fa fa-id-card"></i>
+        <span class="menu-title">
+            <strong>Tarjeta SNC</strong>
+        </span>
+    </a>
+</li>
+
 <!--NEW MENU SUBCONTRATOS-->
 <li class="list-divider"></li>
 <li class="<?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos', 'delete-subcontratos', 'bajas-subcontratos'))) print('active-link') ?>">

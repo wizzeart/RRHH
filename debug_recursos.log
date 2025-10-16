@@ -1,0 +1,72 @@
+2025-10-16 16:25:15 - Parámetros recibidos:
+POST: Array
+(
+    [module] => gestion-recursos
+    [method] => save
+    [action] => insert
+    [trabajador_id] => 59
+    [fecha_entrega_a_t] => 2025-10-16
+    [nombre] =>  Maleta de Herramientas
+    [marca] =>  
+    [modelo] =>  
+    [color] =>  negro
+    [otros_recursos] =>  
+)
+
+FILES: Array
+(
+)
+
+Action: insert
+2025-10-16 16:25:19 - Parámetros recibidos:
+POST: Array
+(
+    [module] => gestion-recursos
+    [method] => save
+    [action] => insert
+    [trabajador_id] => 59
+    [fecha_entrega_a_t] => 2025-10-16
+    [nombre] =>  Maleta de Herramientas
+    [marca] =>  asd
+    [modelo] =>  
+    [color] =>  negro
+    [otros_recursos] =>  asd
+)
+
+FILES: Array
+(
+)
+
+Action: insert
+2025-10-16 16:25:23 - Parámetros recibidos:
+POST: Array
+(
+    [module] => gestion-recursos
+    [method] => save
+    [action] => insert
+    [trabajador_id] => 59
+    [fecha_entrega_a_t] => 2025-10-16
+    [nombre] =>  Maleta de Herramientas
+    [marca] =>  asd
+    [modelo] =>  asd
+    [color] =>  negro
+    [otros_recursos] =>  asd
+)
+
+FILES: Array
+(
+)
+
+Action: insert
+2025-10-16 16:25:23 - Intentando insertar:
+Array
+(
+    [trabajador_id] => 59
+    [fecha_entrega_a_t] => 2025-10-16
+    [nombre] =>  Maleta de Herramientas
+    [marca] =>  asd
+    [modelo] =>  asd
+    [color] =>  negro
+    [otros_recursos] =>  asd
+)
+

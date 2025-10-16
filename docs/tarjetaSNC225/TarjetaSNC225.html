@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tabla SNC225 - Carta Landscape</title>
+<style>
+  /* Página / impresión en Carta apaisada */
+  @page { size: Letter landscape; margin: 18mm; }
+  html, body { height: 100%; margin: 0; padding: 0; }
+
+  /* Contenedor */
+  .sheet {
+    box-sizing: border-box;
+    width: 11in;               /* Carta landscape width */
+    max-width: 100%;
+    margin: 8mm auto;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12px;
+    color: #000;
+  }
+
+  table.snc {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  table.snc th,
+  table.snc td {
+    border: 1px solid #000;
+    padding: 5px 8px;
+    vertical-align: middle;
+    word-wrap: break-word;
+  }
+
+  /* Encabezados */
+  table.snc thead th {
+    text-align: center;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .center { text-align: center; }
+  .left { text-align: left; }
+  .bold { font-weight: 700; }
+
+  .mes { font-weight: 700; width: 9%; white-space: nowrap; }
+
+  .empty-row td { height: 24px; }
+
+  .firma td { height: 36px; }
+
+  /* Ajuste de anchos relativos para Carta */
+  td:nth-child(1) { width: 10%; }
+  td:nth-child(2), td:nth-child(3), td:nth-child(4) { width: 8.5%; }
+  td:nth-child(5), td:nth-child(6) { width: 8.5%; }
+  td:nth-child(7), td:nth-child(8) { width: 8.5%; }
+  td:nth-child(9), td:nth-child(10), td:nth-child(11), td:nth-child(12) { width: auto; }
+
+  th, td { vertical-align: middle; }
+
+  @media print {
+    .sheet { width: 100%; margin: 0; }
+    table.snc th, table.snc td { font-size: 11px; padding: 4px 6px; }
+  }
+
+  /* Pequeño ajuste para que textos largos no reduzcan demasiado la altura */
+  .nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <table class="snc" role="table" aria-label="Tabla SNC225">
+      <thead>
+        <tr>
+          <th colspan="4">COMTE ESTATAL DE FINANZAS SISTEMA NACIONAL DE CONTABILIDAD DATOS DEL TRABAJADOR</th>
+          <th colspan="5">REGISTRO DE SALARIOS Y TIEMPO DE SERVICIOS</th>
+          <th colspan="4">No</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td class="center bold">PRIMER APELLIDO</td>
+          <td colspan="3" class="center bold">SEGUNDO APELLIDO</td>
+          <td colspan="2" class="center bold">NOMBRES</td>
+          <td colspan="3" class="center bold">EXP LABORAL No</td>
+          <td colspan="4" class="center bold">C IDENTIDAD No</td>
+        </tr>
+
+        <tr>
+          <td rowspan="2" class="center bold">ORGANISMO</td>
+          <td colspan="3" rowspan="2" class="center bold">EMPRESA</td>
+          <td colspan="2" rowspan="2" class="center bold">CÓDIGO</td>
+          <td colspan="3" rowspan="2" class="center bold">DIRECCIÓN</td>
+          <td colspan="4" class="center bold">FECHA DE</td>
+        </tr>
+
+        <tr>
+          <td colspan="3" class="center bold">ALTA</td>
+          <td class="center bold">BAJA</td>
+        </tr>
+
+        <tr>
+          <td rowspan="3"></td>
+          <td colspan="12" class="center bold">A Ñ O S</td>
+        </tr>
+
+        <tr>
+          <td colspan="2" align="center">2025</td>
+          <td colspan="2" align="center">2026</td>
+          <td colspan="2" align="center">2027</td>
+          <td colspan="2" align="center">2028</td>
+          <td colspan="2" align="center">2029</td>
+          <td colspan="2" align="center">2030</td>
+        </tr>
+
+        <tr>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+          <td class="center">Dias Trab</td>
+          <td class="center">Salario Devengado</td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Enero</td>
+          <td id="DT_enero_2025"></td><td id="SD_enero_2025"></td><td id="DT_enero_2026"></td><td id="SD_enero_2026"></td><td id="DT_enero_2027"></td><td id="SD_enero_2027"></td><td id="DT_enero_2028"></td><td id="SD_enero_2028"></td><td id="DT_enero_2029"></td><td id="SD_enero_2029"></td><td id="DT_enero_2030"></td><td id="SD_enero_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Febrero</td>
+          <td id="DT_febrero_2025"></td><td id="SD_febrero_2025"></td><td id="DT_febrero_2026"></td><td id="SD_febrero_2026"></td><td id="DT_febrero_2027"></td><td id="SD_febrero_2027"></td><td id="DT_febrero_2028"></td><td id="SD_febrero_2028"></td><td id="DT_febrero_2029"></td><td id="SD_febrero_2029"></td><td id="DT_febrero_2030"></td><td id="SD_febrero_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Marzo</td>
+          <td id="DT_marzo_2025"></td><td id="SD_marzo_2025"></td><td id="DT_marzo_2026"></td><td id="SD_marzo_2026"></td><td id="DT_marzo_2027"></td><td id="SD_marzo_2027"></td><td id="DT_marzo_2028"></td><td id="SD_marzo_2028"></td><td id="DT_marzo_2029"></td><td id="SD_marzo_2029"></td><td id="DT_marzo_2030"></td><td id="SD_marzo_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Abril</td>
+          <td id="DT_abril_2025"></td><td id="SD_abril_2025"></td><td id="DT_abril_2026"></td><td id="SD_abril_2026"></td><td id="DT_abril_2027"></td><td id="SD_abril_2027"></td><td id="DT_abril_2028"></td><td id="SD_abril_2028"></td><td id="DT_abril_2029"></td><td id="SD_abril_2029"></td><td id="DT_abril_2030"></td><td id="SD_abril_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Mayo</td>
+          <td id="DT_mayo_2025"></td><td id="SD_mayo_2025"></td><td id="DT_mayo_2026"></td><td id="SD_mayo_2026"></td><td id="DT_mayo_2027"></td><td id="SD_mayo_2027"></td><td id="DT_mayo_2028"></td><td id="SD_mayo_2028"></td><td id="DT_mayo_2029"></td><td id="SD_mayo_2029"></td><td id="DT_mayo_2030"></td><td id="SD_mayo_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Junio</td>
+          <td id="DT_junio_2025"></td><td id="SD_junio_2025"></td><td id="DT_junio_2026"></td><td id="SD_junio_2026"></td><td id="DT_junio_2027"></td><td id="SD_junio_2027"></td><td id="DT_junio_2028"></td><td id="SD_junio_2028"></td><td id="DT_junio_2029"></td><td id="SD_junio_2029"></td><td id="DT_junio_2030"></td><td id="SD_junio_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Julio</td>
+          <td id="DT_julio_2025"></td><td id="SD_julio_2025"></td><td id="DT_julio_2026"></td><td id="SD_julio_2026"></td><td id="DT_julio_2027"></td><td id="SD_julio_2027"></td><td id="DT_julio_2028"></td><td id="SD_julio_2028"></td><td id="DT_julio_2029"></td><td id="SD_julio_2029"></td><td id="DT_julio_2030"></td><td id="SD_julio_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Agosto</td>
+          <td id="DT_agosto_2025"></td><td id="SD_agosto_2025"></td><td id="DT_agosto_2026"></td><td id="SD_agosto_2026"></td><td id="DT_agosto_2027"></td><td id="SD_agosto_2027"></td><td id="DT_agosto_2028"></td><td id="SD_agosto_2028"></td><td id="DT_agosto_2029"></td><td id="SD_agosto_2029"></td><td id="DT_agosto_2030"></td><td id="SD_agosto_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Septiembre</td>
+          <td id="DT_septiembre_2025"></td><td id="SD_septiembre_2025"></td><td id="DT_septiembre_2026"></td><td id="SD_septiembre_2026"></td><td id="DT_septiembre_2027"></td><td id="SD_septiembre_2027"></td><td id="DT_septiembre_2028"></td><td id="SD_septiembre_2028"></td><td id="DT_septiembre_2029"></td><td id="SD_septiembre_2029"></td><td id="DT_septiembre_2030"></td><td id="SD_septiembre_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Octubre</td>
+          <td id="DT_octubre_2025"></td><td id="SD_octubre_2025"></td><td id="DT_octubre_2026"></td><td id="SD_octubre_2026"></td><td id="DT_octubre_2027"></td><td id="SD_octubre_2027"></td><td id="DT_octubre_2028"></td><td id="SD_octubre_2028"></td><td id="DT_octubre_2029"></td><td id="SD_octubre_2029"></td><td id="DT_octubre_2030"></td><td id="SD_octubre_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Noviembre</td>
+          <td id="DT_noviembre_2025"></td><td id="SD_noviembre_2025"></td><td id="DT_noviembre_2026"></td><td id="SD_noviembre_2026"></td><td id="DT_noviembre_2027"></td><td id="SD_noviembre_2027"></td><td id="DT_noviembre_2028"></td><td id="SD_noviembre_2028"></td><td id="DT_noviembre_2029"></td><td id="SD_noviembre_2029"></td><td id="DT_noviembre_2030"></td><td id="SD_noviembre_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Diciembre</td>
+          <td id="DT_diciembre_2025"></td><td id="SD_diciembre_2025"></td><td id="DT_diciembre_2026"></td><td id="SD_diciembre_2026"></td><td id="DT_diciembre_2027"></td><td id="SD_diciembre_2027"></td><td id="DT_diciembre_2028"></td><td id="SD_diciembre_2028"></td><td id="DT_diciembre_2029"></td><td id="SD_diciembre_2029"></td><td id="DT_diciembre_2030"></td><td id="SD_diciembre_2030"></td>
+        </tr>
+
+        <tr class="empty-row">
+          <td class="mes">Total</td>
+          <td id="DT_total_2025"></td><td id="SD_total_2025"></td><td id="DT_total_2026"></td><td id="SD_total_2026"></td><td id="DT_total_2027"></td><td id="SD_total_2027"></td><td id="DT_total_2028"></td><td id="SD_total_2028"></td><td id="DT_total_2029"></td><td id="SD_total_2029"></td><td id="DT_total_2030"></td><td id="SD_total_2030"></td>
+        </tr>
+
+        <tr class="firma">
+          <td class="bold">Firma Trabajador</td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+        </tr>
+
+        <tr class="firma">
+          <td class="bold">Firma J´ Personal</td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+        </tr>
+
+      </tbody>
+    </table>
+    <hr>
+    <br>
+  </div>
+</body>
+</html>

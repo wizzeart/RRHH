@@ -48,7 +48,7 @@
                       <label>Tipo de Ausencia</label>
                       <select class="form-control" id="filtro-tipo-ausencia">
                         <option value="">Todos los tipos</option>
-                        <option value="RRHH">RRHH</option>
+                        <option value="Injustificada">Injustificada</option>
                         <option value="Justificada">Justificada</option>
                         <option value="Enfermedad">Enfermedad</option>
                         <option value="Vacaciones">Vacaciones</option>
@@ -188,7 +188,7 @@
             <label for="tipo_ausencia">Tipo de Ausencia</label>
             <select class="form-control" id="tipo_ausencia" name="tipo_ausencia">
               <option value="">Seleccione un tipo</option>
-              <option value="RRHH">RRHH</option>
+              <option value="Injustificada">Injustificada</option>
               <option value="Justificada">Justificada</option>
               <option value="Enfermedad">Enfermedad</option>
               <option value="Vacaciones">Vacaciones</option>
