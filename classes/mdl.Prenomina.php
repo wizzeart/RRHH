@@ -232,9 +232,25 @@ class Prenomina {
             foreach ($rows as $r) {
                 $trabajador_id = isset($r['trabajador_id']) ? intval($r['trabajador_id']) : 0;
                 $horas = isset($r['horas']) ? floatval($r['horas']) : 0.0;
-        
+
                 if ($trabajador_id <= 0) {
                     $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'trabajador_id inválido'];
+                    continue;
+                }
+
+                // Regla solicitada: si el trabajador no existe en tarjetas_snc225, descartar sin insertar nada
+                try {
+                    $existsSnc = $this->db->fetchRow(
+                        "SELECT id FROM tarjetas_snc225 WHERE trabajador_id = :tid LIMIT 1",
+                        ['tid' => $trabajador_id]
+                    );
+                    if (!$existsSnc || !isset($existsSnc['id'])) {
+                        // Descartar este trabajador: no insertar prenomina ni tarjetas
+                        $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'Descartado: trabajador no existe en tarjetas_snc225'];
+                        continue;
+                    }
+                } catch (Exception $e) {
+                    $resp['errors'][] = ['trabajador_id' => $trabajador_id, 'msg' => 'Error verificando tarjetas_snc225: ' . $e->getMessage()];
                     continue;
                 }
         
@@ -345,7 +361,7 @@ class Prenomina {
                         }
                     } catch (Exception $e) { /* ignore */ }
 
-                    // Upsert en tarjetas_snc225: salarios_devengados y (si existe) tiempo_trabajo (días) para el periodo YYYY-MM-01
+                    // Actualizar en tarjetas_snc225 (no insertar nuevos): salarios_devengados y (si existe) tiempo_trabajo (días) para el periodo YYYY-MM-01
                     try {
                         $periodo = sprintf('%04d-%02d-01', $year, $month);
                         $valSD = round((float)$salario_pagar, 2);
@@ -363,19 +379,7 @@ class Prenomina {
                             if ($includeCorrect) { $upd['tiempo_trabajo'] = $diasTrab; }
                             $this->db->update('tarjetas_snc225', $upd, ['id' => $snc['id']]);
                         } else {
-                            // Insertar nuevo registro; si conocemos una fecha_inicio unificada, setearla
-                            $fiRow2 = $this->db->fetchRow(
-                                "SELECT fecha_inicio FROM tarjetas_snc225 WHERE trabajador_id = :tid AND fecha_inicio IS NOT NULL AND fecha_inicio <> '' AND fecha_inicio <> '0000-00-00' ORDER BY fecha_inicio ASC LIMIT 1",
-                                ['tid' => $trabajador_id]
-                            );
-                            $ins = [
-                                'trabajador_id' => $trabajador_id,
-                                'periodo' => $periodo,
-                                'salarios_devengados' => $valSD,
-                            ];
-                            if ($includeCorrect) { $ins['tiempo_trabajo'] = $diasTrab; }
-                            if ($fiRow2 && !empty($fiRow2['fecha_inicio'])) { $ins['fecha_inicio'] = $fiRow2['fecha_inicio']; }
-                            $this->db->insert('tarjetas_snc225', $ins);
+                            // No crear nuevos registros en tarjetas_snc225; descartar
                         }
                     } catch (Exception $e) { /* ignore */ }
         
