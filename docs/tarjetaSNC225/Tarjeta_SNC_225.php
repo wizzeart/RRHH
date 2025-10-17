@@ -208,7 +208,7 @@ if ($trabajadorId > 0) {
                 <table class="date-table">
                     <tr><td colspan="2" class="text-center header-small uppercase" style="border-bottom: 1px solid black;">FECHA DE</td></tr>
                     <tr>
-                        <td class="text-center header-small uppercase" style="border-right: 1px solid black;">ALTA<br><span class="nowrap"><?php echo htmlspecialchars($fechaAlta); ?></span></td>
+                        <td class="text-center header-small uppercase" style="border-right: 1px solid black;">ALTA<br><span class="nowrap"><?php echo htmlspecialchars($empresaNombre); ?></span></td>
                         <td class="text-center header-small uppercase">BAJA<br><span class="nowrap"><?php echo htmlspecialchars($fechaBaja); ?></span></td>
                     </tr>
                 </table>
@@ -245,22 +245,21 @@ if ($trabajadorId > 0) {
         </thead>
         <tbody>
             <!-- Months -->
-            <tr><td class="mes">Enero</td><td id="DT_enero_2025"></td><td id="SD_enero_2025"></td><td id="DT_enero_2026"></td><td id="SD_enero_2026"></td><td id="DT_enero_2027"></td><td id="SD_enero_2027"></td><td id="DT_enero_2028"></td><td id="SD_enero_2028"></td><td id="DT_enero_2029"></td><td id="SD_enero_2029"></td></tr>
-            <tr><td class="mes">Febrero</td><td id="DT_febrero_2025"></td><td id="SD_febrero_2025"></td><td id="DT_febrero_2026"></td><td id="SD_febrero_2026"></td><td id="DT_febrero_2027"></td><td id="SD_febrero_2027"></td><td id="DT_febrero_2028"></td><td id="SD_febrero_2028"></td><td id="DT_febrero_2029"></td><td id="SD_febrero_2029"></td></tr>
-            <tr><td class="mes">Marzo</td><td id="DT_marzo_2025"></td><td id="SD_marzo_2025"></td><td id="DT_marzo_2026"></td><td id="SD_marzo_2026"></td><td id="DT_marzo_2027"></td><td id="SD_marzo_2027"></td><td id="DT_marzo_2028"></td><td id="SD_marzo_2028"></td><td id="DT_marzo_2029"></td><td id="SD_marzo_2029"></td></tr>
-            <tr><td class="mes">Abril</td><td id="DT_abril_2025"></td><td id="SD_abril_2025"></td><td id="DT_abril_2026"></td><td id="SD_abril_2026"></td><td id="DT_abril_2027"></td><td id="SD_abril_2027"></td><td id="DT_abril_2028"></td><td id="SD_abril_2028"></td><td id="DT_abril_2029"></td><td id="SD_abril_2029"></td></tr>
-            <tr><td class="mes">Mayo</td><td id="DT_mayo_2025"></td><td id="SD_mayo_2025"></td><td id="DT_mayo_2026"></td><td id="SD_mayo_2026"></td><td id="DT_mayo_2027"></td><td id="SD_mayo_2027"></td><td id="DT_mayo_2028"></td><td id="SD_mayo_2028"></td><td id="DT_mayo_2029"></td><td id="SD_mayo_2029"></td></tr>
-            <tr><td class="mes">Junio</td><td id="DT_junio_2025"></td><td id="SD_junio_2025"></td><td id="DT_junio_2026"></td><td id="SD_junio_2026"></td><td id="DT_junio_2027"></td><td id="SD_junio_2027"></td><td id="DT_junio_2028"></td><td id="SD_junio_2028"></td><td id="DT_junio_2029"></td><td id="SD_junio_2029"></td></tr>
-            <tr><td class="mes">Julio</td><td id="DT_julio_2025"></td><td id="SD_julio_2025"></td><td id="DT_julio_2026"></td><td id="SD_julio_2026"></td><td id="DT_julio_2027"></td><td id="SD_julio_2027"></td><td id="DT_julio_2028"></td><td id="SD_julio_2028"></td><td id="DT_julio_2029"></td><td id="SD_julio_2029"></td></tr>
-            <tr><td class="mes">Agosto</td><td id="DT_agosto_2025"></td><td id="SD_agosto_2025"></td><td id="DT_agosto_2026"></td><td id="SD_agosto_2026"></td><td id="DT_agosto_2027"></td><td id="SD_agosto_2027"></td><td id="DT_agosto_2028"></td><td id="SD_agosto_2028"></td><td id="DT_agosto_2029"></td><td id="SD_agosto_2029"></td></tr>
-            <tr><td class="mes">Septiembre</td><td id="DT_septiembre_2025"></td><td id="SD_septiembre_2025"></td><td id="DT_septiembre_2026"></td><td id="SD_septiembre_2026"></td><td id="DT_septiembre_2027"></td><td id="SD_septiembre_2027"></td><td id="DT_septiembre_2028"></td><td id="SD_septiembre_2028"></td><td id="DT_septiembre_2029"></td><td id="SD_septiembre_2029"></td></tr>
-            <tr><td class="mes">Octubre</td><td id="DT_octubre_2025"></td><td id="SD_octubre_2025"></td><td id="DT_octubre_2026"></td><td id="SD_octubre_2026"></td><td id="DT_octubre_2027"></td><td id="SD_octubre_2027"></td><td id="DT_octubre_2028"></td><td id="SD_octubre_2028"></td><td id="DT_octubre_2029"></td><td id="SD_octubre_2029"></td></tr>
-            <tr><td class="mes">Noviembre</td><td id="DT_noviembre_2025"></td><td id="SD_noviembre_2025"></td><td id="DT_noviembre_2026"></td><td id="SD_noviembre_2026"></td><td id="DT_noviembre_2027"></td><td id="SD_noviembre_2027"></td><td id="DT_noviembre_2028"></td><td id="SD_noviembre_2028"></td><td id="DT_noviembre_2029"></td><td id="SD_noviembre_2029"></td></tr>
-            <tr><td class="mes">Diciembre</td><td id="DT_diciembre_2025"></td><td id="SD_diciembre_2025"></td><td id="DT_diciembre_2026"></td><td id="SD_diciembre_2026"></td><td id="DT_diciembre_2027"></td><td id="SD_diciembre_2027"></td><td id="DT_diciembre_2028"></td><td id="SD_diciembre_2028"></td><td id="DT_diciembre_2029"></td><td id="SD_diciembre_2029"></td></tr>
+            <tr><td class="mes">Enero</td><td id="DT_enero_2025"></td><td id="SD_enero_2025"></td><td id="DT_enero_2026"></td><td id="SD_enero_2026"></td><td id="DT_enero_2027"></td><td id="SD_enero_2027"></td><td id="DT_enero_2028"></td><td id="SD_enero_2028"></td><td id="DT_enero_2029"></td><td id="SD_enero_2029"></td><td id="DT_enero_2030"></td><td id="SD_enero_2030"></td></tr>
+            <tr><td class="mes">Febrero</td><td id="DT_febrero_2025"></td><td id="SD_febrero_2025"></td><td id="DT_febrero_2026"></td><td id="SD_febrero_2026"></td><td id="DT_febrero_2027"></td><td id="SD_febrero_2027"></td><td id="DT_febrero_2028"></td><td id="SD_febrero_2028"></td><td id="DT_febrero_2029"></td><td id="SD_febrero_2029"></td><td id="DT_febrero_2030"></td><td id="SD_febrero_2030"></td></tr>
+            <tr><td class="mes">Marzo</td><td id="DT_marzo_2025"></td><td id="SD_marzo_2025"></td><td id="DT_marzo_2026"></td><td id="SD_marzo_2026"></td><td id="DT_marzo_2027"></td><td id="SD_marzo_2027"></td><td id="DT_marzo_2028"></td><td id="SD_marzo_2028"></td><td id="DT_marzo_2029"></td><td id="SD_marzo_2029"></td><td id="DT_marzo_2030"></td><td id="SD_marzo_2030"></td></tr>
+            <tr><td class="mes">Abril</td><td id="DT_abril_2025"></td><td id="SD_abril_2025"></td><td id="DT_abril_2026"></td><td id="SD_abril_2026"></td><td id="DT_abril_2027"></td><td id="SD_abril_2027"></td><td id="DT_abril_2028"></td><td id="SD_abril_2028"></td><td id="DT_abril_2029"></td><td id="SD_abril_2029"></td><td id="DT_abril_2030"></td><td id="SD_abril_2030"></td></tr>
+            <tr><td class="mes">Mayo</td><td id="DT_mayo_2025"></td><td id="SD_mayo_2025"></td><td id="DT_mayo_2026"></td><td id="SD_mayo_2026"></td><td id="DT_mayo_2027"></td><td id="SD_mayo_2027"></td><td id="DT_mayo_2028"></td><td id="SD_mayo_2028"></td><td id="DT_mayo_2029"></td><td id="SD_mayo_2029"></td><td id="DT_mayo_2030"></td><td id="SD_mayo_2030"></td></tr>
+            <tr><td class="mes">Junio</td><td id="DT_junio_2025"></td><td id="SD_junio_2025"></td><td id="DT_junio_2026"></td><td id="SD_junio_2026"></td><td id="DT_junio_2027"></td><td id="SD_junio_2027"></td><td id="DT_junio_2028"></td><td id="SD_junio_2028"></td><td id="DT_junio_2029"></td><td id="SD_junio_2029"></td><td id="DT_junio_2030"></td><td id="SD_junio_2030"></td></tr>
+            <tr><td class="mes">Julio</td><td id="DT_julio_2025"></td><td id="SD_julio_2025"></td><td id="DT_julio_2026"></td><td id="SD_julio_2026"></td><td id="DT_julio_2027"></td><td id="SD_julio_2027"></td><td id="DT_julio_2028"></td><td id="SD_julio_2028"></td><td id="DT_julio_2029"></td><td id="SD_julio_2029"></td><td id="DT_julio_2030"></td><td id="SD_julio_2030"></td></tr>
+            <tr><td class="mes">Agosto</td><td id="DT_agosto_2025"></td><td id="SD_agosto_2025"></td><td id="DT_agosto_2026"></td><td id="SD_agosto_2026"></td><td id="DT_agosto_2027"></td><td id="SD_agosto_2027"></td><td id="DT_agosto_2028"></td><td id="SD_agosto_2028"></td><td id="DT_agosto_2029"></td><td id="SD_agosto_2029"></td><td id="DT_agosto_2030"></td><td id="SD_agosto_2030"></td></tr>
+            <tr><td class="mes">Septiembre</td><td id="DT_septiembre_2025"></td><td id="SD_septiembre_2025"></td><td id="DT_septiembre_2026"></td><td id="SD_septiembre_2026"></td><td id="DT_septiembre_2027"></td><td id="SD_septiembre_2027"></td><td id="DT_septiembre_2028"></td><td id="SD_septiembre_2028"></td><td id="DT_septiembre_2029"></td><td id="SD_septiembre_2029"></td><td id="DT_septiembre_2030"></td><td id="SD_septiembre_2030"></td></tr>
+            <tr><td class="mes">Octubre</td><td id="DT_octubre_2025"></td><td id="SD_octubre_2025"></td><td id="DT_octubre_2026"></td><td id="SD_octubre_2026"></td><td id="DT_octubre_2027"></td><td id="SD_octubre_2027"></td><td id="DT_octubre_2028"></td><td id="SD_octubre_2028"></td><td id="DT_octubre_2029"></td><td id="SD_octubre_2029"></td><td id="DT_octubre_2030"></td><td id="SD_octubre_2030"></td></tr>
+            <tr><td class="mes">Noviembre</td><td id="DT_noviembre_2025"></td><td id="SD_noviembre_2025"></td><td id="DT_noviembre_2026"></td><td id="SD_noviembre_2026"></td><td id="DT_noviembre_2027"></td><td id="SD_noviembre_2027"></td><td id="DT_noviembre_2028"></td><td id="SD_noviembre_2028"></td><td id="DT_noviembre_2029"></td><td id="SD_noviembre_2029"></td><td id="DT_noviembre_2030"></td><td id="SD_noviembre_2030"></td></tr>
             <!-- Totals and Signatures -->
             <tr><td class="bold">Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>Firma<br>Trabajador</td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr>
-            <tr><td>Firma J'<br>Personal</td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr>
+            <tr><td>Firma<br>Trabajador</td><td colspan="10"></td></tr>
+            <tr><td>Firma J'<br>Personal</td><td colspan="10"></td></tr>
         </tbody>
     </table>
 
@@ -306,8 +305,8 @@ if ($trabajadorId > 0) {
             <tr><td>Diciembre</td><td id="DT_diciembre_2030"></td><td id="SD_diciembre_2030"></td><td id="DT_diciembre_2031"></td><td id="SD_diciembre_2031"></td><td id="DT_diciembre_2032"></td><td id="SD_diciembre_2032"></td><td id="DT_diciembre_2033"></td><td id="SD_diciembre_2033"></td><td id="DT_diciembre_2034"></td><td id="SD_diciembre_2034"></td></tr>
             <!-- Totals and Signatures -->
             <tr><td class="bold">Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td>Firma<br>Trabajador</td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr>
-            <tr><td>Firma J'<br>Personal</td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr>
+            <tr><td>Firma<br>Trabajador</td><td colspan="10"></td></tr>
+            <tr><td>Firma J'<br>Personal</td><td colspan="10"></td></tr>
         </tbody>
     </table>
 
@@ -348,11 +347,6 @@ if ($trabajadorId > 0) {
           try {
             var sdCells = document.querySelectorAll('[id^="SD_"]');
             sdCells.forEach(function(c){ c.textContent = ''; });
-          } catch(_){}/**/
-          // Vaciar todas las celdas DT_ (días) antes de poblar
-          try {
-            var dtCells = document.querySelectorAll('[id^="DT_"]');
-            dtCells.forEach(function(c){ c.textContent = ''; });
           } catch(_){}
 
           // Agregar por mes/año en caso de múltiples registros del mismo período
