@@ -62,7 +62,7 @@
     </a>
 </li>
 <li class="list-divider"></li>
-<li>
+<li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-th"></i>
         <span class="menu-title">
@@ -72,13 +72,20 @@
     </a>
 
     <!--Submenus-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
             <a href="?module=list-usuarios">Usuarios</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
+            <a href="?module=list-departamentos">Departamentos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
+            <a href="?module=list-cargos">Cargos</a>
         </li>
         <li class="<?php if (in_array($_GET['module'], array('historial'))) print('active-link') ?>">
             <a href="?module=historial">Historial</a>
         </li>
+        
     </ul>
 </li>
 <!--NEW MENU TRABAJADORES-->
@@ -92,97 +99,13 @@
     </a>
 </li>
 
-<!--NEW MENU CUENTAS BANCARIAS-->
-
-
-<!--NEW MENU SUBCONTRATOS-->
-<li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos', 'delete-subcontratos', 'bajas-subcontratos'))) print('active-link') ?>">
-    <a href="?module=list-subcontratos">
-        <i class="fa fa-street-view" aria-hidden="true"></i>
-        <span class="menu-title">
-            <strong>Subcontratos</strong>
-        </span>
-    </a>
-</li>
-<!--NEW MENU CONTRATOS-->
-<li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-contratos', 'contratos'))) print('active-link') ?>">
-    <a href="?module=list-contratos">
-        <i class="fa fa-file-text-o"></i>
-        <span class="menu-title">
-            <strong>Contratos</strong>
-        </span>
-    </a>
-</li>
-
-<li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-asistencias', 'asistencias'))) print('active-link') ?>">
-    <a href="?module=list-asistencias">
-        <i class="fa fa-calendar"></i>
-        <span class="menu-title">
-            <strong>Asistencias</strong>
-        </span>
-    </a>
-</li>
-
-<!--NEW MENU PROGRAMAS CAPACITACION-->
-<li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-        <i class="fa fa-graduation-cap"></i>
-        <span class="menu-title">
-            <strong>Capacitación</strong>
-        </span>
-        <i class="arrow"></i>
-    </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion', 'delete-programas-capacitacion', 'finalizados-programas-capacitacion'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=list-programas-capacitacion">Lista de Programas</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=programas-capacitacion">Registrar Programa</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('delete-programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=delete-programas-capacitacion">Finalizar Programas</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('finalizados-programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=finalizados-programas-capacitacion">Programas Finalizados</a>
-        </li>
-    </ul>
-</li>
-
-<!--NEW MENU OTROS-->
-<li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
-        <i class="fa fa-ellipsis-h"></i>
-        <span class="menu-title">
-            <strong>Otros</strong>
-        </span>
-        <i class="arrow"></i>
-    </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
-            <a href="?module=list-departamentos">Departamentos</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
-            <a href="?module=list-cargos">Cargos</a>
-        </li>
-    </ul>
-</li>
-
 <!--NEW MENU SALDOS-->
 <li class="list-divider"></li>
-<li>
+<li class="<?php if (in_array($_GET['module'], array('list-saldos', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-money"></i>
         <span class="menu-title">
-            <strong>Saldos</strong>
+            <strong>Contabilidad</strong>
         </span>
         <i class="arrow"></i>
     </a>
@@ -203,28 +126,74 @@
         </li>
     </ul>
 </li>
+<!--NEW MENU CUENTAS BANCARIAS-->
 
-<!--NEW MENU BOLSAS EMPLEO-->
+<!--NEW MENU CONTRATOS-->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-contratos', 'contratos'))) print('active-link') ?>">
+    <a href="?module=list-contratos">
+        <i class="fa fa-file-text-o"></i>
+        <span class="menu-title">
+            <strong>Contratos</strong>
+        </span>
+    </a>
+</li>
+
+<!--NEW MENU SUBCONTRATOS-->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-subcontratos', 'subcontratos', 'delete-subcontratos', 'bajas-subcontratos'))) print('active-link') ?>">
+    <a href="?module=list-subcontratos">
+        <i class="fa fa-street-view" aria-hidden="true"></i>
+        <span class="menu-title">
+            <strong>Subcontratación</strong>
+        </span>
+    </a>
+</li>
+
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-asistencias', 'asistencias'))) print('active-link') ?>">
+    <a href="?module=list-asistencias">
+        <i class="fa fa-calendar"></i>
+        <span class="menu-title">
+            <strong>Registro de Asistencias</strong>
+        </span>
+    </a>
+</li>
+
+<!--NEW MENU PROGRAMAS CAPACITACION-->
 <li class="list-divider"></li>
 <li>
     <a href="javascript:void(0);">
-        <i class="fa fa-database"></i>
+        <i class="fa fa-graduation-cap"></i>
         <span class="menu-title">
-            <strong>Reclutamiento</strong>
+            <strong>Capacitación</strong>
         </span>
         <i class="arrow"></i>
     </a>
 
     <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
-            <a href="?module=list-bolsas_empleos">Bolsa de Empleos</a>    
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion', 'delete-programas-capacitacion', 'finalizados-programas-capacitacion'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion'))) print('active-link') ?>">
+            <a href="?module=list-programas-capacitacion">Lista de Programas</a>
         </li>
-        <li e>
-        <li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
-            <a href="?module=bolsas_empleos">Postulación a Empleo</a>
+        <li class="<?php if (in_array($_GET['module'], array('finalizados-programas-capacitacion'))) print('active-link') ?>">
+            <a href="?module=finalizados-programas-capacitacion">Programas Finalizados</a>
         </li>
     </ul>
+</li>
+
+
+
+
+<!--NEW MENU BOLSAS EMPLEO-->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-bolsas_empleos', 'bolsas_empleos'))) print('active-link') ?>">
+    <a href="?module=list-bolsas_empleos">
+        <i class="fa fa-database"></i>
+        <span class="menu-title">
+            <strong>Bolsa de Empleo</strong>
+        </span>
+    </a>
 </li>
 
 <!--NEW MENU ENTREGA DE RECURSOS-->
@@ -233,7 +202,7 @@
     <a href="?module=list-recursos">
         <i class="fa fa-cube"></i>
         <span class="menu-title">
-            <strong>Entrega de Recursos</strong>
+            <strong>Asignación de Recursos</strong>
         </span>
     </a>
 </li>

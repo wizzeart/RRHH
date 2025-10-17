@@ -10,6 +10,11 @@
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="panel">
+                    <div class="form-control">
+                        <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Agregar a la bolsa" title="Agregar a la bolsa"><span class="icon-lg fa fa-plus"></span> Agregar a la bolsa</button>
+                    </div>
+                </div>
         <table 
             id="table-panel"
             data-toggle="table"

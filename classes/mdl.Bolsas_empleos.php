@@ -41,8 +41,8 @@ class Bolsas_empleos {
         switch ($param['module']) {
             case 'list-bolsas_empleos':
                 $data = array();
-                $page['title'] = 'Bolsas de Empleos';
-                $page['subtitle'] = 'Listado Bolsas de Empleos';
+                $page['title'] = 'Bolsa de Empleo';
+                $page['subtitle'] = 'Listado Bolsa de Empleo';
 
                 $data_form = array();
                 //$data_form['almacenes'] = $this->app->get_list_almacenes($filtro);
