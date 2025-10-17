@@ -4,6 +4,8 @@ class Prenomina {
 
     var $app;
     var $db;
+    // Flag to cache existence of tarjetas_snc225.tiempo_trabajo (current) during this request
+    private $_ttCorrectExists = null;  // tiempo_trabajo (current)
 
     public function __construct($app) {
         $this->app = $app;
@@ -189,6 +191,15 @@ class Prenomina {
                     echo json_encode(['status' => 0, 'msg' => 'Error: El campo ausencias_costo no existe en la tabla prenomina']);
                     exit;
                 }
+                
+                // Detectar columna correcta en tarjetas_snc225
+                $ttCorrect = false;       // tiempo_trabajo (current)
+                try {
+                    $col2 = $this->db->fetchAll("SHOW COLUMNS FROM tarjetas_snc225 LIKE 'tiempo_trabajo'");
+                    $ttCorrect = !empty($col2);
+                } catch (Exception $e) { $ttCorrect = false; }
+                // Guardar flag
+                $this->_ttCorrectExists = $ttCorrect;
             } catch (Exception $e) {
                 echo json_encode(['status' => 0, 'msg' => 'Error verificando tabla: ' . $e->getMessage()]);
                 exit;
@@ -321,22 +332,28 @@ class Prenomina {
                         $this->db->insert('prenomina', $ins);
                     }
 
-                    // Upsert en tarjetas_snc225: salarios_devengados para el periodo YYYY-MM-01
+                    // Upsert en tarjetas_snc225: salarios_devengados y (si existe) tiempo_trabajo (días) para el periodo YYYY-MM-01
                     try {
                         $periodo = sprintf('%04d-%02d-01', $year, $month);
                         $valSD = round((float)$salario_pagar, 2);
+                        $diasTrab = (int)round($horas / 8);
                         $snc = $this->db->fetchRow(
                             "SELECT id FROM tarjetas_snc225 WHERE trabajador_id = :tid AND periodo = :p LIMIT 1",
                             ['tid' => $trabajador_id, 'p' => $periodo]
                         );
+                        $includeCorrect = (isset($this->_ttCorrectExists) && $this->_ttCorrectExists === true);
                         if ($snc && isset($snc['id'])) {
-                            $this->db->update('tarjetas_snc225', ['salarios_devengados' => $valSD], ['id' => $snc['id']]);
+                            $upd = [ 'salarios_devengados' => $valSD ];
+                            if ($includeCorrect) { $upd['tiempo_trabajo'] = $diasTrab; }
+                            $this->db->update('tarjetas_snc225', $upd, ['id' => $snc['id']]);
                         } else {
-                            $this->db->insert('tarjetas_snc225', [
+                            $ins = [
                                 'trabajador_id' => $trabajador_id,
                                 'periodo' => $periodo,
-                                'salarios_devengados' => $valSD
-                            ]);
+                                'salarios_devengados' => $valSD,
+                            ];
+                            if ($includeCorrect) { $ins['tiempo_trabajo'] = $diasTrab; }
+                            $this->db->insert('tarjetas_snc225', $ins);
                         }
                     } catch (Exception $e) { /* ignore */ }
         

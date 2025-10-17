@@ -42,6 +42,7 @@ $tarjetaNo      = $tarjeta['id'] ?? '';
 
 // Registros de tarjetas por periodo para poblar SD_mes_anio
 $sncRegs = [];
+$prenRegs = [];
 if ($trabajadorId > 0) {
     try {
         $sncRegs = $db->fetchAll(
@@ -50,6 +51,15 @@ if ($trabajadorId > 0) {
         );
     } catch (Exception $e) {
         $sncRegs = [];
+    }
+    // Prenómina: horas por mes/año del trabajador
+    try {
+        $prenRegs = $db->fetchAll(
+            "SELECT `year`, `month`, `horas` FROM prenomina WHERE trabajador_id = :tid ORDER BY `year` ASC, `month` ASC",
+            ['tid' => $trabajadorId]
+        );
+    } catch (Exception $e) {
+        $prenRegs = [];
     }
 }
 ?>
@@ -292,18 +302,18 @@ if ($trabajadorId > 0) {
         </thead>
         <tbody>
             <!-- Months -->
-            <tr><td>Enero</td><td id="DT_enero_2030"></td><td id="SD_enero_2030"></td><td id="DT_enero_2031"></td><td id="SD_enero_2031"></td><td id="DT_enero_2032"></td><td id="SD_enero_2032"></td><td id="DT_enero_2033"></td><td id="SD_enero_2033"></td><td id="DT_enero_2034"></td><td id="SD_enero_2034"></td></tr>
-            <tr><td>Febrero</td><td id="DT_febrero_2030"></td><td id="SD_febrero_2030"></td><td id="DT_febrero_2031"></td><td id="SD_febrero_2031"></td><td id="DT_febrero_2032"></td><td id="SD_febrero_2032"></td><td id="DT_febrero_2033"></td><td id="SD_febrero_2033"></td><td id="DT_febrero_2034"></td><td id="SD_febrero_2034"></td></tr>
-            <tr><td>Marzo</td><td id="DT_marzo_2030"></td><td id="SD_marzo_2030"></td><td id="DT_marzo_2031"></td><td id="SD_marzo_2031"></td><td id="DT_marzo_2032"></td><td id="SD_marzo_2032"></td><td id="DT_marzo_2033"></td><td id="SD_marzo_2033"></td><td id="DT_marzo_2034"></td><td id="SD_marzo_2034"></td></tr>
-            <tr><td>Abril</td><td id="DT_abril_2030"></td><td id="SD_abril_2030"></td><td id="DT_abril_2031"></td><td id="SD_abril_2031"></td><td id="DT_abril_2032"></td><td id="SD_abril_2032"></td><td id="DT_abril_2033"></td><td id="SD_abril_2033"></td><td id="DT_abril_2034"></td><td id="SD_abril_2034"></td></tr>
-            <tr><td>Mayo</td><td id="DT_mayo_2030"></td><td id="SD_mayo_2030"></td><td id="DT_mayo_2031"></td><td id="SD_mayo_2031"></td><td id="DT_mayo_2032"></td><td id="SD_mayo_2032"></td><td id="DT_mayo_2033"></td><td id="SD_mayo_2033"></td><td id="DT_mayo_2034"></td><td id="SD_mayo_2034"></td></tr>
-            <tr><td>Junio</td><td id="DT_junio_2030"></td><td id="SD_junio_2030"></td><td id="DT_junio_2031"></td><td id="SD_junio_2031"></td><td id="DT_junio_2032"></td><td id="SD_junio_2032"></td><td id="DT_junio_2033"></td><td id="SD_junio_2033"></td><td id="DT_junio_2034"></td><td id="SD_junio_2034"></td></tr>
-            <tr><td>Julio</td><td id="DT_julio_2030"></td><td id="SD_julio_2030"></td><td id="DT_julio_2031"></td><td id="SD_julio_2031"></td><td id="DT_julio_2032"></td><td id="SD_julio_2032"></td><td id="DT_julio_2033"></td><td id="SD_julio_2033"></td><td id="DT_julio_2034"></td><td id="SD_julio_2034"></td></tr>
-            <tr><td>Agosto</td><td id="DT_agosto_2030"></td><td id="SD_agosto_2030"></td><td id="DT_agosto_2031"></td><td id="SD_agosto_2031"></td><td id="DT_agosto_2032"></td><td id="SD_agosto_2032"></td><td id="DT_agosto_2033"></td><td id="SD_agosto_2033"></td><td id="DT_agosto_2034"></td><td id="SD_agosto_2034"></td></tr>
-            <tr><td>Septiembre</td><td id="DT_septiembre_2030"></td><td id="SD_septiembre_2030"></td><td id="DT_septiembre_2031"></td><td id="SD_septiembre_2031"></td><td id="DT_septiembre_2032"></td><td id="SD_septiembre_2032"></td><td id="DT_septiembre_2033"></td><td id="SD_septiembre_2033"></td><td id="DT_septiembre_2034"></td><td id="SD_septiembre_2034"></td></tr>
-            <tr><td>Octubre</td><td id="DT_octubre_2030"></td><td id="SD_octubre_2030"></td><td id="DT_octubre_2031"></td><td id="SD_octubre_2031"></td><td id="DT_octubre_2032"></td><td id="SD_octubre_2032"></td><td id="DT_octubre_2033"></td><td id="SD_octubre_2033"></td><td id="DT_octubre_2034"></td><td id="SD_octubre_2034"></td></tr>
-            <tr><td>Noviembre</td><td id="DT_noviembre_2030"></td><td id="SD_noviembre_2030"></td><td id="DT_noviembre_2031"></td><td id="SD_noviembre_2031"></td><td id="DT_noviembre_2032"></td><td id="SD_noviembre_2032"></td><td id="DT_noviembre_2033"></td><td id="SD_noviembre_2033"></td><td id="DT_noviembre_2034"></td><td id="SD_noviembre_2034"></td></tr>
-            <tr><td>Diciembre</td><td id="DT_diciembre_2030"></td><td id="SD_diciembre_2030"></td><td id="DT_diciembre_2031"></td><td id="SD_diciembre_2031"></td><td id="DT_diciembre_2032"></td><td id="SD_diciembre_2032"></td><td id="DT_diciembre_2033"></td><td id="SD_diciembre_2033"></td><td id="DT_diciembre_2034"></td><td id="SD_diciembre_2034"></td></tr>
+            <tr><td class="mes">Enero</td><td id="DT_enero_2030"></td><td id="SD_enero_2030"></td><td id="DT_enero_2031"></td><td id="SD_enero_2031"></td><td id="DT_enero_2032"></td><td id="SD_enero_2032"></td><td id="DT_enero_2033"></td><td id="SD_enero_2033"></td><td id="DT_enero_2034"></td><td id="SD_enero_2034"></td></tr>
+            <tr><td class="mes">Febrero</td><td id="DT_febrero_2030"></td><td id="SD_febrero_2030"></td><td id="DT_febrero_2031"></td><td id="SD_febrero_2031"></td><td id="DT_febrero_2032"></td><td id="SD_febrero_2032"></td><td id="DT_febrero_2033"></td><td id="SD_febrero_2033"></td><td id="DT_febrero_2034"></td><td id="SD_febrero_2034"></td></tr>
+            <tr><td class="mes">Marzo</td><td id="DT_marzo_2030"></td><td id="SD_marzo_2030"></td><td id="DT_marzo_2031"></td><td id="SD_marzo_2031"></td><td id="DT_marzo_2032"></td><td id="SD_marzo_2032"></td><td id="DT_marzo_2033"></td><td id="SD_marzo_2033"></td><td id="DT_marzo_2034"></td><td id="SD_marzo_2034"></td></tr>
+            <tr><td class="mes">Abril</td><td id="DT_abril_2030"></td><td id="SD_abril_2030"></td><td id="DT_abril_2031"></td><td id="SD_abril_2031"></td><td id="DT_abril_2032"></td><td id="SD_abril_2032"></td><td id="DT_abril_2033"></td><td id="SD_abril_2033"></td><td id="DT_abril_2034"></td><td id="SD_abril_2034"></td></tr>
+            <tr><td class="mes">Mayo</td><td id="DT_mayo_2030"></td><td id="SD_mayo_2030"></td><td id="DT_mayo_2031"></td><td id="SD_mayo_2031"></td><td id="DT_mayo_2032"></td><td id="SD_mayo_2032"></td><td id="DT_mayo_2033"></td><td id="SD_mayo_2033"></td><td id="DT_mayo_2034"></td><td id="SD_mayo_2034"></td></tr>
+            <tr><td class="mes">Junio</td><td id="DT_junio_2030"></td><td id="SD_junio_2030"></td><td id="DT_junio_2031"></td><td id="SD_junio_2031"></td><td id="DT_junio_2032"></td><td id="SD_junio_2032"></td><td id="DT_junio_2033"></td><td id="SD_junio_2033"></td><td id="DT_junio_2034"></td><td id="SD_junio_2034"></td></tr>
+            <tr><td class="mes">Julio</td><td id="DT_julio_2030"></td><td id="SD_julio_2030"></td><td id="DT_julio_2031"></td><td id="SD_julio_2031"></td><td id="DT_julio_2032"></td><td id="SD_julio_2032"></td><td id="DT_julio_2033"></td><td id="SD_julio_2033"></td><td id="DT_julio_2034"></td><td id="SD_julio_2034"></td></tr>
+            <tr><td class="mes">Agosto</td><td id="DT_agosto_2030"></td><td id="SD_agosto_2030"></td><td id="DT_agosto_2031"></td><td id="SD_agosto_2031"></td><td id="DT_agosto_2032"></td><td id="SD_agosto_2032"></td><td id="DT_agosto_2033"></td><td id="SD_agosto_2033"></td><td id="DT_agosto_2034"></td><td id="SD_agosto_2034"></td></tr>
+            <tr><td class="mes">Septiembre</td><td id="DT_septiembre_2030"></td><td id="SD_septiembre_2030"></td><td id="DT_septiembre_2031"></td><td id="SD_septiembre_2031"></td><td id="DT_septiembre_2032"></td><td id="SD_septiembre_2032"></td><td id="DT_septiembre_2033"></td><td id="SD_septiembre_2033"></td><td id="DT_septiembre_2034"></td><td id="SD_septiembre_2034"></td></tr>
+            <tr><td class="mes">Octubre</td><td id="DT_octubre_2030"></td><td id="SD_octubre_2030"></td><td id="DT_octubre_2031"></td><td id="SD_octubre_2031"></td><td id="DT_octubre_2032"></td><td id="SD_octubre_2032"></td><td id="DT_octubre_2033"></td><td id="SD_octubre_2033"></td><td id="DT_octubre_2034"></td><td id="SD_octubre_2034"></td></tr>
+            <tr><td class="mes">Noviembre</td><td id="DT_noviembre_2030"></td><td id="SD_noviembre_2030"></td><td id="DT_noviembre_2031"></td><td id="SD_noviembre_2031"></td><td id="DT_noviembre_2032"></td><td id="SD_noviembre_2032"></td><td id="DT_noviembre_2033"></td><td id="SD_noviembre_2033"></td><td id="DT_noviembre_2034"></td><td id="SD_noviembre_2034"></td></tr>
+            <tr><td class="mes">Diciembre</td><td id="DT_diciembre_2030"></td><td id="SD_diciembre_2030"></td><td id="DT_diciembre_2031"></td><td id="SD_diciembre_2031"></td><td id="DT_diciembre_2032"></td><td id="SD_diciembre_2032"></td><td id="DT_diciembre_2033"></td><td id="SD_diciembre_2033"></td><td id="DT_diciembre_2034"></td><td id="SD_diciembre_2034"></td></tr>
             <!-- Totals and Signatures -->
             <tr><td class="bold">Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
             <tr><td>Firma<br>Trabajador</td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td><td colspan="2"></td></tr>
@@ -328,6 +338,8 @@ if ($trabajadorId > 0) {
         try {
           var data = <?php echo json_encode($sncRegs, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES); ?>;
           if (!Array.isArray(data)) data = [];
+          var pren = <?php echo json_encode($prenRegs, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES); ?>;
+          if (!Array.isArray(pren)) pren = [];
 
           var monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
@@ -343,6 +355,11 @@ if ($trabajadorId > 0) {
             if (n === null || n === undefined || isNaN(n)) return '';
             return Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           }
+          function daysfmt(n){
+            if (n === null || n === undefined || isNaN(n)) return '';
+            var v = Number(n);
+            return Number.isInteger(v) ? String(v) : v.toFixed(2);
+          }
 
           // Vaciar todas las celdas SD_ (salarios) antes de poblar
           try {
@@ -356,8 +373,7 @@ if ($trabajadorId > 0) {
           } catch(_){}
 
           // Agregar por mes/año en caso de múltiples registros del mismo período
-          var sums = Object.create(null);      // salarios por mes/año
-          var daySums = Object.create(null);  // días trabajados por mes/año (meses*26)
+          var sums = Object.create(null);      // salarios por mes/año (desde tarjetas_snc225)
           data.forEach(function(r){
             if (!r || !r.periodo) return;
             var d = new Date(r.periodo);
@@ -369,13 +385,19 @@ if ($trabajadorId > 0) {
             var valSD = Number(r.salarios_devengados);
             if (!isFinite(valSD)) valSD = 0;
             sums[keySD] = (sums[keySD] || 0) + valSD;
+          });
 
-            // Cálculo de meses transcurridos (ignorando días) disponible si se requiere mostrar
-            var meses = monthsDiff(y, m, ty, tm);
-            // Conversión a días trabajados según regla: días = meses * 26
-            var dias = meses * 26;
-            var keyDT = 'DT_' + mesName + '_' + y; // celda de "Días Trab"
-            daySums[keyDT] = (daySums[keyDT] || 0) + dias;
+          // Días trabajados por mes/año a partir de prenomina: dias = round(total_horas_mes/8)
+          var hoursMap = Object.create(null);
+          pren.forEach(function(p){
+            if (!p) return;
+            var y = Number(p.year);
+            var m = Number(p.month);
+            var horas = Number(p.horas);
+            if (!y || !m || !isFinite(horas) || m < 1 || m > 12) return;
+            var mesName = monthNames[m-1];
+            var keyDT = 'DT_' + mesName + '_' + y;
+            hoursMap[keyDT] = (hoursMap[keyDT] || 0) + horas;
           });
 
           // Escribir salarios en celdas SD_mes_año
@@ -384,10 +406,14 @@ if ($trabajadorId > 0) {
             if (el) el.textContent = numfmt(sums[cellId]);
           });
 
-          // Escribir días trabajados en celdas DT_mes_año
-          Object.keys(daySums).forEach(function(cellId){
+          // Escribir días trabajados en celdas DT_mes_año (redondeando a entero por defecto)
+          Object.keys(hoursMap).forEach(function(cellId){
             var el = document.getElementById(cellId);
-            if (el) el.textContent = String(daySums[cellId]);
+            if (el) {
+              var totalHoras = hoursMap[cellId] || 0;
+              var dias = Math.round(totalHoras / 8);
+              el.textContent = String(dias);
+            }
           });
         } catch (e) { /* silencioso */ }
       })();
