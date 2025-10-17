@@ -1,15 +1,15 @@
 <div class="panel">
+                <div class="form-control">
+                    <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo contrato" title="Añadir Nuevo contrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Contrato</button>
+                </div>
+            </div>
+    
+<div class="panel">
 <div class="panel-heading">
         <h3 class="panel-title">Listado de contratos</h3>
     </div>
 
     <div class="panel-body">
-    <div class="panel">
-                    <div class="form-control">
-                        <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo contrato" title="Añadir Nuevo contrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Contrato</button>
-                    </div>
-                </div>
-        
         <table 
             id="table-panel"
             data-toggle="table"

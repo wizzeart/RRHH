@@ -134,9 +134,8 @@ class Bolsas_empleos {
             'nombre' => 'Nombre',
             'apellidos' => 'Apellidos',
             'telefono' => 'Teléfono',
-            'email' => 'Email',
+            'segundos_apellidos' => 'Segundo Apellido',
             'cargo_postulado_id' => 'Cargo al que postula',
-            'estatus' => 'Estatus'
         );
         // Validación de solo letras en nombre/apellidos/segundos_apellidos si se proveen
         $soloLetras = array(
@@ -155,15 +154,7 @@ class Bolsas_empleos {
             }
         }
         
-        // Validar email si está presente
-        if (isset($param['email']) && !empty($param['email'])) {
-            if (!filter_var($param['email'], FILTER_VALIDATE_EMAIL)) {
-                $data['status'] = 0;
-                $data['msg'] = 'El formato del email no es válido';
-                print(json_encode($data));
-                return;
-            }
-        }
+        
         
         foreach ($required_fields as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
@@ -181,9 +172,7 @@ class Bolsas_empleos {
             'curriculum' => isset($param['curriculum']) ? $param['curriculum'] : '',
             'cargo_postulado_id' => intval($param['cargo_postulado_id']),
             'telefono' => $param['telefono'],
-            'email' => $param['email'],
             'fecha_registro' => isset($param['fecha_registro']) && !empty($param['fecha_registro']) ? $param['fecha_registro'] : date('Y-m-d'),
-            'estatus' => $param['estatus']
         );
 
         $data['action'] = $param['action'];
@@ -203,9 +192,7 @@ class Bolsas_empleos {
                 'curriculum',
                 'cargo_postulado_id',
                 'telefono',
-                'email',
                 'fecha_registro',
-                'estatus'
             ];
             
             // Filtrar solo los campos válidos
@@ -285,9 +272,7 @@ class Bolsas_empleos {
                     'curriculum',
                     'cargo_postulado_id',
                     'telefono',
-                    'email',
                     'fecha_registro',
-                    'estatus'
                 ];
                 
                 // Filtrar solo los campos válidos
@@ -340,9 +325,10 @@ class Bolsas_empleos {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT id, nombre, apellidos, segundos_apellidos, ci_bolsa_empleo, curriculum, cargo_postulado_id, telefono, email, fecha_registro, estatus"
-                . " FROM bolsa_empleo"
-                . " ORDER BY id DESC";
+        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.estatus
+                 FROM bolsa_empleo b
+                 LEFT JOIN cargos c ON b.cargo_postulado_id = c.id
+                 ORDER BY b.id DESC";
         
         $data = $this->db->fetchAll($sql);
         return $data;

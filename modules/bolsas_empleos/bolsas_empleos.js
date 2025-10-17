@@ -37,9 +37,22 @@ $(document).ready(function () {
         s = s.replace(/\s{2,}/g, ' ');
         return s.trimStart();
     }
+    // Función para validar solo números
+    function soloNumeros(valor) {
+        return valor.replace(/[^0-9]/g, '');
+    }
+
+    // Aplicar validación a campos de texto para solo letras
     $('#f-nombre, #f-apellidos, #f-apellidos-segundos').on('input', function(){
         var val = $(this).val();
         var filtrado = soloLetrasYEspacios(val);
+        if (val !== filtrado) $(this).val(filtrado);
+    });
+
+    // Aplicar validación a campo de teléfono para solo números
+    $('#f-telefono').on('input', function(){
+        var val = $(this).val();
+        var filtrado = soloNumeros(val);
         if (val !== filtrado) $(this).val(filtrado);
     });
 
@@ -123,21 +136,9 @@ $(document).ready(function () {
             msg += '<div>El campo Segundo Apellido solo debe contener letras.</div>';
         }
 
-        if ($('#f-telefono').val() == '') {
+        if ($('#f-telefono').val() == '' && !/^[0-9]+$/.test($('#f-telefono').val())) {
             status = 0;
-            msg += '<div>El campo Teléfono del Postulante es obligatorio.</div>';
-        }
-
-        if ($('#f-email').val() == '') {
-            status = 0;
-            msg += '<div>El campo Email del Postulante es obligatorio.</div>';
-        } else {
-            // Validar formato de email
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test($('#f-email').val())) {
-                status = 0;
-                msg += '<div>El formato del email no es válido.</div>';
-            }
+            msg += '<div>El campo Teléfono del Postulante es obligatorio y debe ser numérico.</div>';
         }
 
         if ($('#f-cargo').val() == '') {
@@ -235,6 +236,10 @@ $(document).ready(function () {
                             closeBtn: true,
                             focus: true
                         });
+                        //esperar unos segundos
+                        setTimeout(function() {
+                            location.href = 'index.php?module=list-bolsas_empleos';
+                        }, 1000);
                     } else {
                         $.niftyNoty({
                             type: 'danger',

@@ -1,3 +1,8 @@
+<div class="panel">
+                <div class="form-control">
+                    <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Trabajador</button>
+                </div>
+            </div>
 <!--Basic Toolbar-->
 <!--===================================================-->
 <!-- atributos quitados del tag table:   -->
@@ -8,7 +13,6 @@
                 <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Trabajadores</a></li>
                 <li><a href="#" onclick="location.href='?module=delete-trabajadores'">Dar de baja</a></li>
                 <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
-                <li><a href="#" onclick="location.href='?module=list-cuentas'"></i> Listado de Cuentas</a></li>
             </ul>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
@@ -55,7 +59,6 @@
                         
                         <button id="btn-filter" class="btn btn-primary">Filtrar</button>
                         <button id="btn-reset" class="btn btn-default" style="margin-left: 5px;">Limpiar</button>
-                        <button id="btn-add-new" class="btn btn-mint btn-icon  pull-right" alt="Añadir Nuevo Trabajador" title="Añadir Nuevo Trabajador"><span class="icon-lg fa fa-plus"></span>  Añadir Nuevo Trabajador</button>
                     </div>
             <div class="tab-pane fade active in" id="tab-listado">
                 <div class="panel">
