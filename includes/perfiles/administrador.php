@@ -162,24 +162,13 @@
 
 <!--NEW MENU PROGRAMAS CAPACITACION-->
 <li class="list-divider"></li>
-<li>
-    <a href="javascript:void(0);">
+<li class="<?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion', 'finalizados-programas-capacitacion'))) print('active-link') ?>">
+    <a href="?module=list-programas-capacitacion">
         <i class="fa fa-graduation-cap"></i>
         <span class="menu-title">
-            <strong>Capacitación</strong>
+            <strong>Capacitaciones</strong>
         </span>
-        <i class="arrow"></i>
     </a>
-
-    <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion', 'delete-programas-capacitacion', 'finalizados-programas-capacitacion'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-programas-capacitacion', 'programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=list-programas-capacitacion">Lista de Programas</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('finalizados-programas-capacitacion'))) print('active-link') ?>">
-            <a href="?module=finalizados-programas-capacitacion">Programas Finalizados</a>
-        </li>
-    </ul>
 </li>
 
 

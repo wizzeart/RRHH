@@ -70,6 +70,9 @@ $(document).ready(function () {
         $('#modalBody').html(html);
         $('#programaFinalizadoModal').modal('show');
     });
+    $('#btn-add-new').click(function () {
+        location.href = 'index.php?module=programas-capacitacion';
+    });
 });
 
 // FORMAT COLUMN
