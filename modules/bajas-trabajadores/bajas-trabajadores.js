@@ -116,6 +116,9 @@ $(document).ready(function () {
         $('#modalBody').html(html);
         $('#trabajadorBajaModal').modal('show');
     });
+    $('#btn-add-new').click(function () {
+        location.href = 'index.php?module=trabajadores';
+    });
 });
 
 // FORMAT COLUMN
