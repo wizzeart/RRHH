@@ -84,7 +84,7 @@
                             }
                         </style>
 
-                        <h3 class="panel-title">General (<small><span style="color:#0078d7; font-weight: bold;"> <?php print($data['xusuario'].':'); ?> <?php print($data['email']); ?> </span></small>)</h3>
+                        <h3 class="panel-title">General (<span style="color:#0078d7; "> <?php print($data['xusuario'].':'); ?> <?php print($data['email']); ?> </span>)</h3>
                     </div>
                     <div class="panel-body orm-padding"><!-- form-horizontal -->
 
