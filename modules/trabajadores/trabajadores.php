@@ -434,10 +434,6 @@
                 <i class="fa fa-undo"></i>
                 Volver
             </button>
-            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                <i class="fa fa-plus"></i>
-                Nuevo
-            </button>
         </div>
     </div>
 

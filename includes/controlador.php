@@ -49,13 +49,13 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Trabajador($app);
             $mdl->controlador($_REQUEST);
             break;
-        case 'list-bolsas_empleos':
         case 'list-recursos':
         case 'gestion-recursos':
             include_once(BASE_CLASS . '/mdl.List_recursos.php');
             $mdl = new List_recursos($app);
             $mdl->controlador($_REQUEST);
             break;
+        case 'list-bolsas_empleos':
         case 'bolsas_empleos':
             include_once(BASE_CLASS . '/mdl.Bolsas_empleos.php');
             $mdl = new Bolsas_empleos($app);
@@ -66,7 +66,7 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Home($app);
             $mdl->controlador($_REQUEST);
             break;
-        
+
         case 'historial':
             include_once(BASE_CLASS . '/mdl.Historial.php');
             $mdl = new Historial($app);
@@ -120,6 +120,13 @@ if (isset($_REQUEST['module'])) {
         case 'finalizados-programas-capacitacion':
             include_once(BASE_CLASS . '/mdl.ProgramasCapacitacion.php');
             $mdl = new ProgramaCapacitacion($app);
+            $mdl->controlador($_REQUEST);
+            break;
+
+        case 'list-contratos':
+        case 'contratos':
+            include_once(BASE_CLASS . '/mdl.Contratos.php');
+            $mdl = new Contrato($app);
             $mdl->controlador($_REQUEST);
             break;
 

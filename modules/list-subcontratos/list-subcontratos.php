@@ -4,6 +4,11 @@
     <!-- </div>
 </div> -->
 
+<div class="panel">
+    <div class="form-control">
+        <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Subcontrato</button>
+    </div>
+</div>
 
 
 <!--Basic Toolbar-->
@@ -22,11 +27,6 @@
     <div class="panel-body">
         <div class="tab-content">
             <div class="tab-pane fade active in" id="tab-listado">
-                <div class="panel">
-                    <div class="form-control">
-                        <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Subcontrato</button>
-                    </div>
-                </div>
         <table 
             id="table-panel"
             data-toggle="table"

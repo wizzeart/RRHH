@@ -57,6 +57,11 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-sm-2">
+                  <button id="btn-filtrar" class="btn btn-primary">
+                    <i class="fa fa-search"></i> Filtrar
+                  </button>
+                </div>
               </div>
               <!-- Buscador de Trabajador -->
               <!-- <div class="col-md-3">
@@ -76,11 +81,6 @@
               </div> -->
               <!-- Estado de asistencia -->
             </div>
-          </div>
-          <div class="col-sm-2">
-            <button id="btn-filtrar" class="btn btn-primary">
-              <i class="fa fa-search"></i> Filtrar
-            </button>
           </div>
         </div>
       </div>

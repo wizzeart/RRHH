@@ -1,7 +1,18 @@
-<!--Basic Toolbar-->
+
+<div class="panel">
+    <div class="form-control">
+        <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo Programa" title="Añadir Nuevo Programa de Capacitación"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Programa</button>
+    </div>
+</div><!--Basic Toolbar-->
 <!--===================================================-->
 <div class="panel">
     <div class="panel-heading">
+      <div class="panel-control">
+            <ul class="nav nav-tabs">
+                <li><a href="#" onclick="location.href='?module=list-programas-capacitacion'">Programas Activos</a></li>
+                <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Programas Finalizados</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">

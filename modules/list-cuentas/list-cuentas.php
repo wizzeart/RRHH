@@ -4,14 +4,7 @@
 
 <div class="panel">
     <div class="panel-heading">
-        <div class="panel-control">
-            <ul class="nav nav-tabs">
-                <li><a href="#" onclick="location.href='?module=list-trabajadores'">Listado de Trabajadores</a></li>
-                <li><a href="#" onclick="location.href='?module=delete-trabajadores'">Dar de baja</a></li>
-                <li><a href="#" onclick="location.href='?module=bajas-trabajadores'">Listado de Bajas</a></li>
-                <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Cuentas</a></li>
-            </ul>
-        </div>
+        
         <h3 class="panel-title">Listado de Cuentas</h3>
     </div>
 

@@ -18,6 +18,9 @@ $(document).ready(function () {
     }
 }
 
+ $('#btn-add-new').click(function () {
+        location.href = 'index.php?module=subcontratos';
+    });
 
 
     // Delegar el clic sobre el botón con data-id (independiente del ícono)

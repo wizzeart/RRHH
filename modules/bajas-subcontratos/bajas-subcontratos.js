@@ -1,4 +1,8 @@
 $(document).ready(function () {
+     $('#btn-add-new').click(function () {
+        location.href = 'index.php?module=subcontratos';
+    });
+
     // Handler for subcontract details (eye icon)
     $('#table-panel').on('click', '.fa.fa-eye', function () {
         // Try to get the row index from the DOM (bootstrap-table sets data-index on <tr>)

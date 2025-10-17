@@ -3,7 +3,11 @@
         <!-- <button id="btn-back" class="btn btn-mint btn-icon icon-lg fa fa-arrow-left" alt="Volver" title="Volver"></button> -->
     <!-- </div>
 </div> -->
-
+<div class="panel">
+    <div class="form-control">
+        <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Añadir Nuevo Subcontrato" title="Añadir Nuevo Subcontrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Subcontrato</button>
+    </div>
+</div>
 <!--Basic Toolbar-->
 <!--===================================================-->
 <div class="panel">
@@ -12,7 +16,7 @@
             <ul class="nav nav-tabs">
                 <li><a href="#" onclick="location.href='?module=list-subcontratos'">Listado de Subcontratos</a></li>
                 <li class="active"><a href="#tab-dar-baja" data-toggle="tab" aria-expanded="true">Finalizar Subcontrato</a></li>
-                <li><a href="#" onclick="location.href='?module=bajas-subcontratos'">Listado de Finalizados</a></li>
+                <li><a href="#" onclick="location.href='?module=bajas-subcontratos'">Subcontratos Finalizados</a></li>
             </ul>
         </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>

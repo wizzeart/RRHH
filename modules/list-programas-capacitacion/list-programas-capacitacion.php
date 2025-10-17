@@ -8,6 +8,12 @@
 <!--===================================================-->
 <div class="panel">
     <div class="panel-heading">
+      <div class="panel-control">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Programas Activos</a></li>
+                <li><a href="#" onclick="location.href='?module=finalizados-programas-capacitacion'">Programas Finalizados</a></li>
+            </ul>
+        </div>
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
     </div>
     <div class="panel-body">

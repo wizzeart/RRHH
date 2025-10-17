@@ -1,9 +1,11 @@
-<div class="panel">
- 
-</div>
 
 <!--Basic Toolbar-->
 <!--===================================================-->
+<div class="panel">
+            <div class="form-control">
+                <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Agregar a la bolsa" title="Agregar a la bolsa"><span class="icon-lg fa fa-plus"></span> Agregar a la bolsa</button>
+            </div>
+        </div>
 <!-- atributos quitados del tag table:   --> 
 <div class="panel">
     <div class="panel-heading">
@@ -28,8 +30,7 @@
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="apellidos" data-sortable="true">Apellidos</th>
                     <th data-field="telefono" data-sortable="true">Teléfono</th>
-                    <th data-field="email" data-sortable="true">Email</th>
-                    <th data-field="cargo_postulado_id" data-sortable="true">Cargo Postulado</th>
+                    <th data-field="cargo_postulado" data-sortable="true">Cargo Postulado</th>
                     <th data-field="fecha_registro" data-sortable="true">Fecha Registro</th>
                     <th data-field="estatus" data-sortable="true">Estado</th>
                     <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Currículum</th>
