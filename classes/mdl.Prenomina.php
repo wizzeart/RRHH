@@ -320,6 +320,25 @@ class Prenomina {
                         ];
                         $this->db->insert('prenomina', $ins);
                     }
+
+                    // Upsert en tarjetas_snc225: salarios_devengados para el periodo YYYY-MM-01
+                    try {
+                        $periodo = sprintf('%04d-%02d-01', $year, $month);
+                        $valSD = round((float)$salario_pagar, 2);
+                        $snc = $this->db->fetchRow(
+                            "SELECT id FROM tarjetas_snc225 WHERE trabajador_id = :tid AND periodo = :p LIMIT 1",
+                            ['tid' => $trabajador_id, 'p' => $periodo]
+                        );
+                        if ($snc && isset($snc['id'])) {
+                            $this->db->update('tarjetas_snc225', ['salarios_devengados' => $valSD], ['id' => $snc['id']]);
+                        } else {
+                            $this->db->insert('tarjetas_snc225', [
+                                'trabajador_id' => $trabajador_id,
+                                'periodo' => $periodo,
+                                'salarios_devengados' => $valSD
+                            ]);
+                        }
+                    } catch (Exception $e) { /* ignore */ }
         
                     $resp['affected']++;
                     
