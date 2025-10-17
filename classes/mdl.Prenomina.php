@@ -332,27 +332,49 @@ class Prenomina {
                         $this->db->insert('prenomina', $ins);
                     }
 
+                    // Unificar fecha_inicio en tarjetas_snc225 para este trabajador (si alguna fila la tiene, ponerla en todas)
+                    try {
+                        $fiRow = $this->db->fetchRow(
+                            "SELECT fecha_inicio FROM tarjetas_snc225 WHERE trabajador_id = :tid AND fecha_inicio IS NOT NULL AND fecha_inicio <> '' AND fecha_inicio <> '0000-00-00' ORDER BY fecha_inicio ASC LIMIT 1",
+                            ['tid' => $trabajador_id]
+                        );
+                        if ($fiRow && !empty($fiRow['fecha_inicio'])) {
+                            $fiVal = $fiRow['fecha_inicio'];
+                            // Actualizar todas las filas de ese trabajador con la misma fecha_inicio
+                            $this->db->update('tarjetas_snc225', ['fecha_inicio' => $fiVal], ['trabajador_id' => $trabajador_id]);
+                        }
+                    } catch (Exception $e) { /* ignore */ }
+
                     // Upsert en tarjetas_snc225: salarios_devengados y (si existe) tiempo_trabajo (días) para el periodo YYYY-MM-01
                     try {
                         $periodo = sprintf('%04d-%02d-01', $year, $month);
                         $valSD = round((float)$salario_pagar, 2);
                         $diasTrab = (int)round($horas / 8);
                         $snc = $this->db->fetchRow(
-                            "SELECT id FROM tarjetas_snc225 WHERE trabajador_id = :tid AND periodo = :p LIMIT 1",
+                            "SELECT id, fecha_cierre FROM tarjetas_snc225 WHERE trabajador_id = :tid AND periodo = :p LIMIT 1",
                             ['tid' => $trabajador_id, 'p' => $periodo]
                         );
                         $includeCorrect = (isset($this->_ttCorrectExists) && $this->_ttCorrectExists === true);
-                        if ($snc && isset($snc['id'])) {
+                        // Si la fila del periodo tiene fecha_cierre, no tocar nada
+                        if ($snc && isset($snc['id']) && !empty($snc['fecha_cierre']) && $snc['fecha_cierre'] !== '0000-00-00') {
+                            // Skip: registro cerrado
+                        } elseif ($snc && isset($snc['id'])) {
                             $upd = [ 'salarios_devengados' => $valSD ];
                             if ($includeCorrect) { $upd['tiempo_trabajo'] = $diasTrab; }
                             $this->db->update('tarjetas_snc225', $upd, ['id' => $snc['id']]);
                         } else {
+                            // Insertar nuevo registro; si conocemos una fecha_inicio unificada, setearla
+                            $fiRow2 = $this->db->fetchRow(
+                                "SELECT fecha_inicio FROM tarjetas_snc225 WHERE trabajador_id = :tid AND fecha_inicio IS NOT NULL AND fecha_inicio <> '' AND fecha_inicio <> '0000-00-00' ORDER BY fecha_inicio ASC LIMIT 1",
+                                ['tid' => $trabajador_id]
+                            );
                             $ins = [
                                 'trabajador_id' => $trabajador_id,
                                 'periodo' => $periodo,
                                 'salarios_devengados' => $valSD,
                             ];
                             if ($includeCorrect) { $ins['tiempo_trabajo'] = $diasTrab; }
+                            if ($fiRow2 && !empty($fiRow2['fecha_inicio'])) { $ins['fecha_inicio'] = $fiRow2['fecha_inicio']; }
                             $this->db->insert('tarjetas_snc225', $ins);
                         }
                     } catch (Exception $e) { /* ignore */ }
