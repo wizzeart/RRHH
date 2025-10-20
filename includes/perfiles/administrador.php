@@ -72,9 +72,12 @@
     </a>
 
     <!--Submenus-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos', 'list-sedes', 'sedes'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
             <a href="?module=list-usuarios">Usuarios</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-sedes', 'sedes'))) print('active-link') ?>">
+            <a href="?module=list-sedes">Sedes</a>
         </li>
         <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
             <a href="?module=list-departamentos">Departamentos</a>
