@@ -18,84 +18,84 @@ $(document).ready(function () {
     });
 
     // Handler for subcontract details (eye icon)
-    $('#table-panel').on('click', '.fa.fa-eye', function () {
-        // Try to get the row index from the DOM (bootstrap-table sets data-index on <tr>)
-        var $tr = $(this).closest('tr');
-        var idx = $tr.data('index');
+    // $('#table-panel').on('click', '.fa.fa-eye', function () {
+    //     // Try to get the row index from the DOM (bootstrap-table sets data-index on <tr>)
+    //     var $tr = $(this).closest('tr');
+    //     var idx = $tr.data('index');
 
-        // Get all table data via bootstrapTable API
-        var allData = $('#table-panel').bootstrapTable('getData');
-        var rowData;
-        if (typeof idx !== 'undefined' && allData && allData[idx]) {
-            rowData = allData[idx];
-        } else {
-            // Fallback: try to find by data-id attribute
-            var id = $(this).data('id');
-            if (allData && allData.length) {
-                rowData = allData.find(function (r) { return r.id == id; });
-            }
-        }
+    //     // Get all table data via bootstrapTable API
+    //     var allData = $('#table-panel').bootstrapTable('getData');
+    //     var rowData;
+    //     if (typeof idx !== 'undefined' && allData && allData[idx]) {
+    //         rowData = allData[idx];
+    //     } else {
+    //         // Fallback: try to find by data-id attribute
+    //         var id = $(this).data('id');
+    //         if (allData && allData.length) {
+    //             rowData = allData.find(function (r) { return r.id == id; });
+    //         }
+    //     }
 
-        if (!rowData) {
-            alert('No se encontró la información del subcontrato.');
-            return;
-        }
+    //     if (!rowData) {
+    //         alert('No se encontró la información del subcontrato.');
+    //         return;
+    //     }
 
-        var s = rowData;
+    //     var s = rowData;
 
-        // Modal para visualizar subcontrato
-        var html = '<div class="row">'
-            + '<div class="col-md-12">'
-            + '<h3>Información del Subcontrato</h3>'
-            + '<div class="card">'
-            + '<div class="card-body">'
-            + '<h4 class="card-title mb-4">' + (s.persona_nombre || 'N/A') + '</h4>'
-            + '<div class="row mb-3">'
-            + '<div class="col-md-6">'
-            + '<ul class="list-group">'
-            + '<li class="list-group-item"><i class="fa fa-user mr-2"></i> <strong>Nombre:</strong> ' + (s.persona_nombre || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-id-card mr-2"></i> <strong>CI:</strong> ' + (s.carnet_identidad || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-tag mr-2"></i> <strong>Estatus:</strong> ' + (s.estatus || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-building mr-2"></i> <strong>Entidad:</strong> ' + (s.entidad_representada || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Inicio:</strong> ' + (s.fecha_inicio || 'N/A') + '</li>'
-            + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Fin:</strong> ' + (s.fecha_fin || 'Activo') + '</li>'
-            + '</ul>'
-            + '</div>'
-            + '<div class="col-md-6">'
-            + '<ul class="list-group">'
-            + '<li class="list-group-item"><i class="fa fa-map-marker mr-2"></i> <strong>Áreas Acceso:</strong> ' + (s.areas_acceso || 'No definidas') + '</li>'
-            + '</ul>'
-            + '<div class="card mt-3">'
-            + '<div class="card-header">'
-            + '<h6><i class="fa fa-briefcase mr-2"></i>Servicio/Objeto del Contrato</h6>'
-            + '</div>'
-            + '<div class="card-body">'
-            + '<p class="card-text">' + (s.servicio_objeto || 'No especificado') + '</p>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '<div class="row">'
-            + '<div class="col-12">'
-            + '<div class="alert ' + (s.fecha_fin ? 'alert-warning' : 'alert-success') + '">'
-            + '<i class="fa ' + (s.fecha_fin ? 'fa-clock-o' : 'fa-check-circle') + ' mr-2"></i> '
-            + '<strong>Estado:</strong> ' + (s.fecha_fin ? 'Contrato Finalizado' : 'Contrato Activo')
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '<div class="row mt-3">'
-            + '<div class="col-md-12">'
-            + '<div class="badge badge-secondary"><i class="fa fa-hashtag mr-1"></i> ID Subcontrato: ' + (s.id || 'N/A') + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>';
+    //     // Modal para visualizar subcontrato
+    //     var html = '<div class="row">'
+    //         + '<div class="col-md-12">'
+    //         + '<h3>Información del Subcontrato</h3>'
+    //         + '<div class="card">'
+    //         + '<div class="card-body">'
+    //         + '<h4 class="card-title mb-4">' + (s.persona_nombre || 'N/A') + '</h4>'
+    //         + '<div class="row mb-3">'
+    //         + '<div class="col-md-6">'
+    //         + '<ul class="list-group">'
+    //         + '<li class="list-group-item"><i class="fa fa-user mr-2"></i> <strong>Nombre:</strong> ' + (s.persona_nombre || 'N/A') + '</li>'
+    //         + '<li class="list-group-item"><i class="fa fa-id-card mr-2"></i> <strong>CI:</strong> ' + (s.carnet_identidad || 'N/A') + '</li>'
+    //         + '<li class="list-group-item"><i class="fa fa-tag mr-2"></i> <strong>Estatus:</strong> ' + (s.estatus || 'N/A') + '</li>'
+    //         + '<li class="list-group-item"><i class="fa fa-building mr-2"></i> <strong>Entidad:</strong> ' + (s.entidad_representada || 'N/A') + '</li>'
+    //         + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Inicio:</strong> ' + (s.fecha_inicio || 'N/A') + '</li>'
+    //         + '<li class="list-group-item"><i class="fa fa-calendar mr-2"></i> <strong>Fecha Fin:</strong> ' + (s.fecha_fin || 'Activo') + '</li>'
+    //         + '</ul>'
+    //         + '</div>'
+    //         + '<div class="col-md-6">'
+    //         + '<ul class="list-group">'
+    //         + '<li class="list-group-item"><i class="fa fa-map-marker mr-2"></i> <strong>Áreas Acceso:</strong> ' + (s.areas_acceso || 'No definidas') + '</li>'
+    //         + '</ul>'
+    //         + '<div class="card mt-3">'
+    //         + '<div class="card-header">'
+    //         + '<h6><i class="fa fa-briefcase mr-2"></i>Servicio/Objeto del Contrato</h6>'
+    //         + '</div>'
+    //         + '<div class="card-body">'
+    //         + '<p class="card-text">' + (s.servicio_objeto || 'No especificado') + '</p>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '<div class="row">'
+    //         + '<div class="col-12">'
+    //         + '<div class="alert ' + (s.fecha_fin ? 'alert-warning' : 'alert-success') + '">'
+    //         + '<i class="fa ' + (s.fecha_fin ? 'fa-clock-o' : 'fa-check-circle') + ' mr-2"></i> '
+    //         + '<strong>Estado:</strong> ' + (s.fecha_fin ? 'Contrato Finalizado' : 'Contrato Activo')
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '<div class="row mt-3">'
+    //         + '<div class="col-md-12">'
+    //         + '<div class="badge badge-secondary"><i class="fa fa-hashtag mr-1"></i> ID Subcontrato: ' + (s.id || 'N/A') + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>'
+    //         + '</div>';
 
-        $('#modalBody').html(html);
-        $('#subcontratoModal').modal('show');
-    });
+    //     $('#modalBody').html(html);
+    //     $('#subcontratoModal').modal('show');
+    // });
 
     // Handler for access pass generation (tablet icon) - same behavior as workers
     $('#table-panel').on('click', '.fa.fa-tablet', function () {
@@ -194,7 +194,6 @@ $(document).ready(function () {
 // =================================================================
 function formatoToolbar(value, row) {
     var s = '<button data-id="' + row.id + '" class="btn btn-info btn-icon icon-sm fa fa-edit" title="Editar subcontrato"></button>\n\
-                <button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-eye" title="Ver detalles"></button>\n\
                 <button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-tablet" title="Pase de acceso"></button>';
 
     return s;

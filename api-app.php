@@ -116,6 +116,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Ayudas($app);
         $mdl->api($_REQUEST);
         break;
+    case 'deudas':
+        include_once(BASE_CLASS . '/mdl.Deudas.php');
+        $mdl = new Deudas($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'prenomina':
         include_once(BASE_CLASS . '/mdl.Prenomina.php');
         $mdl = new Prenomina($app);
