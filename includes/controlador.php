@@ -103,6 +103,11 @@ if (isset($_REQUEST['module'])) {
             $mdl = new Ayudas($app);
             $mdl->controlador($_REQUEST);
             break;
+        case 'list-deudas':
+            include_once(BASE_CLASS . '/mdl.Deudas.php');
+            $mdl = new Deudas($app);
+            $mdl->controlador($_REQUEST);
+            break;
         case 'cuentas':
         case 'list-cuentas':
             include_once(BASE_CLASS . '/mdl.Cuentas.php');
