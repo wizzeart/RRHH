@@ -78,7 +78,13 @@
             <div class="tab-pane fade active in" id="tab-general">
                 <div class="panel">
                     <div class="panel-heading">
-                        <h3 class="panel-title">General</h3>
+                        <style>
+                            .panel-title span {
+                                color: #0053b3 !important;
+                            }
+                        </style>
+
+                        <h3 class="panel-title">General (<span style="color:#0078d7; "> <?php print($data['xusuario'].':'); ?> <?php print($data['email']); ?> </span>)</h3>
                     </div>
                     <div class="panel-body orm-padding"><!-- form-horizontal -->
 
@@ -566,7 +572,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="form-control">
-                            <button id="btn-add-new-doc" class="btn btn-mint btn-icon icon-lg fa fa-plus" alt="Añadir Nuevo Documento" title="Añadir Nuevo Documento"></button>
+                            <button id="btn-add-new-doc" class="btn btn-mint" alt="Añadir Nuevo Documento" title="Añadir Nuevo Documento"><i class="fa fa-plus fa-lg"></i>  Añadir Documento</button>
                         </div>
                         <table id="table-documentos"
                             data-toggle="table"

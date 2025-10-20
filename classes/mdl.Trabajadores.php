@@ -111,9 +111,10 @@ class Trabajador {
                 $val = array(
                     'id' => $param['id']
                 );
-                $sql = "SELECT t.*, p.nombre as provincia_nombre, m.nombre as municipio_nombre FROM trabajadores t 
+                $sql = "SELECT t.*, p.nombre as provincia_nombre, m.nombre as municipio_nombre, xusuario,u.xemail as email FROM trabajadores t 
                 LEFT JOIN municipio m ON m.id = t.municipio_id 
                 LEFT JOIN provincia p ON p.id = t.provincia_id 
+                LEFT JOIN usuarios u ON u.xusuario_id = t.usuario_id
                 WHERE t.id=:id";
                 $row = $this->db->fetchRow($sql, $val);
                 if ($row) {
@@ -1006,7 +1007,7 @@ class Trabajador {
                 CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
                 FROM trabajadores t 
                 WHERE t.trabajador_eliminado = '0'
-                ORDER BY t.apellidos, t.nombre";
+                ORDER BY t.id DESC";
                 
         error_log("Consulta sin JOIN: " . $sql);
         $data = $this->db->fetchAll($sql);
@@ -1035,7 +1036,7 @@ class Trabajador {
                     LEFT JOIN municipio m ON t.municipio_id = m.id
                     LEFT JOIN departamentos d ON t.departamento_id = d.id
                     WHERE t.trabajador_eliminado = '0'
-                    ORDER BY t.apellidos, t.nombre";
+                    ORDER BY t.id DESC";
                     
             $dataWithJoin = $this->db->fetchAll($sqlWithJoin);
             
@@ -1086,7 +1087,7 @@ class Trabajador {
                     LEFT JOIN cargos c ON t.cargos_id = c.id
                     LEFT JOIN departamentos d ON t.departamento_id = d.id
                     WHERE " . implode(' AND ', $where) . "
-                    ORDER BY t.apellidos, t.nombre";
+                    ORDER BY t.id DESC";
 
             $data = $this->db->fetchAll($sql,$params);
             return $data;
