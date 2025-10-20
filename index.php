@@ -173,6 +173,7 @@ $load_grid = true;
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <li class="tgl-menu-btn">
                             <a class="mainnav-toggle" href="javascript:void(0);">
+                                <i class="fa fa-navicon fa-lg"></i>
                             </a>
                         </li>
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->                        <!--End Navigation toogle button-->
