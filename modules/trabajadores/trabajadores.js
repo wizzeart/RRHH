@@ -297,10 +297,7 @@ $(document).ready(function () {
             status = 0;
             msg += '<div>El campo Contratación del Trabajador es obligatorio.</div>';
         }
-         if ($('#f-estatus').val() == '') {
-            status = 0;
-            msg += '<div>El campo Estatus del Trabajador es obligatorio.</div>';
-        }
+         
 
 
          if ($('#f-nombre').val() == '') {
@@ -348,9 +345,10 @@ $(document).ready(function () {
             var formDataObj = new FormData();
 
             // Formatear licencia de conducción para select simple
-            var licSel = $('#f-licencia').val(); // string o null
-            var licenciaStr = (typeof licSel === 'string' && licSel.trim() !== '') ? licSel.trim() : 'N/A';
-
+            
+            if(!$('#f-licencia').val()) {
+                $('#f-licencia').val('');
+            }
             var campos = {
                 'module': 'trabajadores',
                 'method': 'save',
@@ -365,7 +363,7 @@ $(document).ready(function () {
                 'provincia_id': $('#f-provincia').val(),
                 'municipio_id': $('#f-municipio').val(),
                 'telefono': $('#f-telefono').val(),
-                'licencia_conduccion': licenciaStr,
+                'licencia_conduccion': !$('#f-licencia').val() ? '' : $('#f-licencia').val().join(' '),
                 'tarjeta_salario': $('#f-tarjeta_salario').val(),
                 'cuenta_estandar': $('#f-cuenta_estandar').val(),
                 'email': $('#f-email').val(),

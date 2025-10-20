@@ -17,6 +17,16 @@ function firmadoFormatter(value, row, index) {
   return '<span class="label label-warning">No firmado</span>';
 }
 
+function tipoFormatter(value, row, index) {
+  //si tipo es 1, mostrar "Contrato de Trabajo Por Tiempo Determinado";
+  //si tipo es 2, mostrar "Contrato de Trabajo Por Tiempo Indeterminado";
+  if (value === '1') {
+    return 'Contrato de Trabajo Por Tiempo Indeterminado';
+  } else if (value === '2') {
+    return 'Contrato de Trabajo Por Tiempo Determinado';
+  }
+}
+
 // Formatter para la columna Opciones -> Ver PDF
 function pdfFormatter(value, row, index) {
   var url = value || row.archivo_contrato;

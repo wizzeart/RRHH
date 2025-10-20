@@ -102,13 +102,12 @@
 <!--NEW MENU CUENTAS BANCARIAS-->
 
 
-<!--NEW MENU TARJETA SNC -->
-<li class="list-divider"></li>
+
 
 
 <!--NEW MENU SUBCONTRATOS-->
 <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas'))) print('active-link') ?>">
+<li class="<?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-money"></i>
         <span class="menu-title">
@@ -118,7 +117,7 @@
     </a>
 
     <!--Submenu-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-saldos', 'saldos'))) print('active-link') ?>">
             <a href="?module=list-saldos">Tarifas por Hora</a>
         </li>

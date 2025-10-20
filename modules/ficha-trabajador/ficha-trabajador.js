@@ -421,10 +421,7 @@ $(document).ready(function () {
             status = 0;
             msg += '<div>El campo Contratación del Trabajador es obligatorio.</div>';
         }
-         if ($('#f-estatus').val() == '') {
-            status = 0;
-            msg += '<div>El campo Estatus del Trabajador es obligatorio.</div>';
-        }
+         
 
 
          if ($('#f-nombre').val() == '') {
@@ -708,6 +705,16 @@ function formatoProducto(value, row) {
     }
 
     return  s;
+}
+
+function tipoFormatter(value, row, index) {
+  //si tipo es 1, mostrar "Contrato de Trabajo Por Tiempo Determinado";
+  //si tipo es 2, mostrar "Contrato de Trabajo Por Tiempo Indeterminado";
+  if (value === '1') {
+    return 'Contrato de Trabajo Por Tiempo Indeterminado';
+  } else if (value === '2') {
+    return 'Contrato de Trabajo Por Tiempo Determinado';
+  }
 }
 
 // Formatter para la columna Opciones -> Ver PDF

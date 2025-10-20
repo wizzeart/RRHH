@@ -429,7 +429,7 @@
                             <thead>
                                 <tr>
                                     <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
-                                    <th data-field="tipo" data-sortable="true" data-width="260">Tipo</th>
+                                    <th data-field="tipo" data-sortable="true" data-width="260" data-formatter="tipoFormatter">Tipo</th>
                                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
 
                                     <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
@@ -641,3 +641,18 @@
 <?php include 'add-doc.php'; ?>
 
 <!-- Modal para detalles del recurso -->
+<div class="modal fade" id="trabajadorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- <h5 class="modal-title" id="modalLabel">Detalles del Trabajador</h5> -->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Aquí se insertan los datos -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -300,6 +300,10 @@ class Trabajador {
             'msg' => '',
             'action' => isset($param['action']) ? $param['action'] : 'insert'
         );
+
+        if (isset($param['licencia_conduccion'])) {
+            $param['licencia_conduccion'] = str_replace(',', ' ', $param['licencia_conduccion']);
+        }
         
         // Obtener el próximo ID de usuario disponible para nuevos registros
         if ($data['action'] === 'insert') {
