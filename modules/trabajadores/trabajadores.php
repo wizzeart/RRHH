@@ -177,7 +177,7 @@
                                     <!-- <small class="help-block">Teléfono de contacto</small> -->
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label" for="f-nivel">Nivel Educacional <span
                                             class="text-danger">*</span></label>
