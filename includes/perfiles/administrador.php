@@ -104,14 +104,7 @@
 
 <!--NEW MENU TARJETA SNC -->
 <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-tarjetas-snc'))) print('active-link') ?>">
-    <a href="?module=list-tarjetas-snc">
-        <i class="fa fa-id-card"></i>
-        <span class="menu-title">
-            <strong>Tarjeta SNC</strong>
-        </span>
-    </a>
-</li>
+
 
 <!--NEW MENU SUBCONTRATOS-->
 <li class="list-divider"></li>
@@ -135,11 +128,14 @@
         <li class="<?php if (in_array($_GET['module'], array('ayudas-trabajadores', 'list-ayudas-trabajadores'))) print('active-link') ?>">
             <a href="?module=list-ayudas-trabajadores">Ayudas a Trabajadores</a>
         </li>
-        <li class="<?php if (in_array($_GET['module'], array('deudas', 'list-deudas'))) print('active-link') ?>">
-            <a href="?module=list-deudas">Deudas</a>
-        </li>
         <li class="<?php if (in_array($_GET['module'], array('list-cuentas', 'cuentas'))) print('active-link') ?>">
             <a href="?module=list-cuentas">Cuentas Bancarias</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-tarjetas-snc'))) print('active-link') ?>">
+    <a href="?module=list-tarjetas-snc">Tarjeta SNC</a>
+</li>
+        <li class="<?php if (in_array($_GET['module'], array('deudas', 'list-deudas'))) print('active-link') ?>">
+            <a href="?module=list-deudas">Deudas</a>
         </li>
     </ul>
 </li>

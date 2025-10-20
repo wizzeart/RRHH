@@ -6,8 +6,6 @@
     <div class="panel-heading">
         <div class="panel-control">
             <ul class="nav nav-tabs">
-                <li><a href="#" onclick="location.href='?module=list-trabajadores'">Listado de Trabajadores</a></li>
-                <li><a href="#" onclick="location.href='?module=list-contratos'">Contratos</a></li>
                 <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado Tarjeta SNC</a></li>
             </ul>
         </div>
