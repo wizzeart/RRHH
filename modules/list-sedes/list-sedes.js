@@ -6,7 +6,7 @@ $(function(){
     }
 
     $('#btn-add-new').on('click', function(){
-        location.href='?module=departamentos';
+        location.href='?module=sedes';
     });
 });
 
@@ -20,14 +20,14 @@ function operateFormatter(value, row, index) {
 
 window.operateEvents = {
     'click .edit': function (e, value, row, index) {
-        location.href = '?module=departamentos&id=' + row.id;
+        location.href = '?module=sedes&id=' + row.id;
     },
     'click .remove': function (e, value, row, index) {
-        if (confirm('¿Está seguro de eliminar el departamento: ' + row.nombre + '?')) {
+        if (confirm('¿Está seguro de eliminar la sede: ' + row.nombre + '?')) {
             $.ajax({
                 url: 'api-app.php',
                 type: 'POST',
-                data: {module: 'departamentos', method: 'del', id: row.id},
+                data: {module: 'sedes', method: 'del', id: row.id},
                 dataType: 'json',
                 success: function(response) {
                     if (response.status == 1) {

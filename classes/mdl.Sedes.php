@@ -64,9 +64,9 @@ class Sedes {
     }
 
     private function _list($param) {
-        $sql = "SELECT d.id, d.nombre, d.descripcion, d.sede_id, COALESCE(e.nombre, 'Sin sede') AS sede_nombre
+        $sql = "SELECT d.id, d.nombre, d.direccion, d.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
                 FROM sedes d
-                LEFT JOIN empresas e ON d.sede_id = e.id
+                LEFT JOIN empresa e ON d.empresa_id = e.id
                 ORDER BY d.nombre ASC";
         $data = $this->db->fetchAll($sql);
         return $data;
@@ -83,7 +83,7 @@ class Sedes {
         // Validaciones
         $required = array(
             'nombre' => 'Nombre',
-            'sede_id' => 'Sede'
+            'empresa_id' => 'Empresa'
         );
         foreach ($required as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
@@ -96,8 +96,8 @@ class Sedes {
 
         $insert = array(
             'nombre' => $param['nombre'],
-            'descripcion' => isset($param['descripcion']) ? $param['descripcion'] : '',
-            'sede_id' => intval($param['sede_id'])
+            'direccion' => isset($param['direccion']) ? $param['direccion'] : '',
+            'empresa_id' => intval($param['empresa_id'])
         );
 
         // Campos de control

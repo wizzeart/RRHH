@@ -4,8 +4,8 @@ $(function(){
             $.niftyNoty({ type: type||'info', container:'floating', title:title||'', message:message||'', timer: timer!=null?timer:3000, closeBtn:true, focus:true });
         } else { alert((title?title+': ':'')+message); }
     }
-    $('#btn-back').on('click', function(){ location.href='?module=list-departamentos'; });
-    $('#btn-new').on('click', function(){ location.href='?module=departamentos'; });
+    $('#btn-back').on('click', function(){ location.href='?module=list-sedes'; });
+    $('#btn-new').on('click', function(){ location.href='?module=sedes'; });
     $('#btn-save').on('click', function(){
         var status=1, msg='';
         if($('#f-nombre').val()==''){ status=0; msg+='<div>El campo Nombre es obligatorio.</div>'; }
@@ -13,9 +13,9 @@ $(function(){
         if(status==0){ notify('danger','Validación',msg,4000); return; }
         $('#btn-save').prop('disabled', true);
         var payload={
-            module:'departamentos', method:'save', action: action,
+            module:'sedes', method:'save', action: action,
             nombre: $('#f-nombre').val(),
-            descripcion: $('#f-descripcion').val(),
+            direccion: $('#f-direccion').val(),
             empresa_id: $('#f-empresa').val()
         };
         if(action==='update'){ payload.id=$('#f-id').val(); }

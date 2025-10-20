@@ -35,8 +35,8 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <label class="control-label" for="f-descripcion">Descripción</label>
-                    <textarea id="f-descripcion" class="form-control" rows="3" placeholder="Descripción del departamento"><?php if (isset($data['descripcion'])) print($data['descripcion']); ?></textarea>
+                    <label class="control-label" for="f-direccion">Dirección</label>
+                    <textarea id="f-direccion" class="form-control" rows="3" placeholder="Dirección de la sede"><?php if (isset($data['direccion'])) print($data['direccion']); ?></textarea>
                 </div>
             </div>
         </div>

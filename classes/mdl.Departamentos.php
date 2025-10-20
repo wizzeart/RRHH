@@ -43,8 +43,8 @@ class Departamentos {
                 $page['title'] = 'Nuevo Departamento';
                 $page['subtitle'] = 'Formulario de Departamento';
 
-                // Cargar empresas para el select
-                $data_form['empresas'] = $this->get_empresas();
+                // Cargar sedes para el select
+                $data_form['sedes'] = $this->get_sedes();
 
                 $action = 'insert';
                 if (isset($param['id'])) {
@@ -186,8 +186,8 @@ class Departamentos {
         print(json_encode($data));
     }
 
-    private function get_empresas() {
-        $sql = "SELECT id, nombre FROM empresa ORDER BY nombre";
+    private function get_sedes() {
+        $sql = "SELECT id, nombre FROM sedes ORDER BY nombre";
         $data = $this->db->fetchAll($sql);
         return $data ? $data : array();
     }

@@ -1,6 +1,6 @@
 <div class="panel">
     <div class="form-control">
-        <button id="btn-add-new" class="btn btn-mint btn-icon" title="Añadir Nuevo Departamento"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Departamento</button>
+        <button id="btn-add-new" class="btn btn-mint btn-icon" title="Añadir Nueva Sede"><span class="icon-lg fa fa-plus"></span> Añadir Nueva Sede</button>
     </div>
 </div>
 
@@ -12,7 +12,7 @@
         <table 
             id="table-panel"
             data-toggle="table"
-            data-url="api-app.php?module=departamentos&method=list"
+            data-url="api-app.php?module=sedes&method=list"
             data-search="true"
             data-show-refresh="true"
             data-show-toggle="false"
@@ -25,7 +25,7 @@
                 <tr>
                   
                     <th data-field="nombre" data-sortable="true">Nombre</th>
-                    <th data-field="descripcion" data-sortable="false">Descripción</th>
+                    <th data-field="direccion" data-sortable="false">Dirección</th>
                     <th data-field="empresa_nombre" data-sortable="true">Empresa</th>
                     <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="240">Acciones</th>
                 </tr>
