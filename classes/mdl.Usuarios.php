@@ -171,7 +171,7 @@ class Usuario {
                 $insert['xuseralta_id'] = $this->app->user_id;
                 $insert['xdatealta'] = date(dateSQL);
                 $insert['xeliminado'] = '0';
-
+                unset($insert['xusuario_id']);
                 $this->app->db->insert('usuarios', $insert);
                 $data['msg_title'] = OPERATION_SUCCESS;
                 $data['msg'] = RECORD_INSERT;

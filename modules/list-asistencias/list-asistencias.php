@@ -126,7 +126,7 @@
             Salida
           </th>
           <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
-            Ausencia
+            Asistencia
           </th>
           <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
             Tipo Ausencia
