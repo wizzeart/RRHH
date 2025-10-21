@@ -92,10 +92,33 @@
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <?php if (isset($data['foto']) && !empty($data['foto'])) { ?>
+                                    <?php if (isset($data['id'])) {
+                                        // Prefer serving the image via the API which handles BLOBs
+                                        $imgSrc = 'api-app.php?module=imagenes-trabajadores&method=get-image&id=' . intval($data['id']);
+                                        // If you need to pass token add &token=... but the API validates KEYWEB header by default
+                                    ?>
                                         <div class="mar-top">
-                                            <img src="<?php print($data['foto']); ?>" alt="Foto del trabajador" class="img-thumbnail" style="max-width: 150px; height: auto;">
+                                            <img id="foto-preview" 
+                                                src="<?php print($imgSrc); ?>" 
+                                                alt="Foto del trabajador" 
+                                                class="img-thumbnail" 
+                                                style="max-width: 150px; height: auto;"
+                                                onerror="
+                                                    console.error('Error cargando imagen:', this.src); 
+                                                    fetch(this.src)
+                                                        .then(resp => {
+                                                            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                                                            return resp.text();
+                                                        })
+                                                        .then(text => console.log('Respuesta del servidor:', text))
+                                                        .catch(err => console.error('Error en fetch:', err));
+                                                    this.src='./images/default-user.png';">
                                         </div>
+                                        <script>
+                                            document.getElementById('foto-preview').addEventListener('load', function() {
+                                                console.log('Imagen cargada exitosamente:', this.src);
+                                            });
+                                        </script>
                                     <?php } ?>
                                     <small class="help-block">Foto del trabajador</small>
                                 </div>

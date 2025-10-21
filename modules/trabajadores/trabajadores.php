@@ -34,8 +34,9 @@
         <div class="tab-content" style="margin-top: 20px;">
             <!-- TAB: DATOS PERSONALES -->
             <div role="tabpanel" class="tab-pane active" id="datos-personales">
-                <div class="panel">
+                    <div class="panel">
                     <div class="panel-body orm-padding">
+                        <form id="form-trabajador" method="POST" enctype="multipart/form-data">
                         <!-- Primera fila -->
                         <div class="row">
                             <div class="col-md-3">
@@ -296,7 +297,29 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="control-label" for="f-foto">Foto del Trabajador</label>
-                                    <input type="file" id="f-foto" name="foto" class="form-control" accept="image/*">
+                                    <div class="mar-btm">
+                                        <img id="foto-preview" src="<?php 
+                                            if (isset($data['id'])) {
+                                                print('api-app.php?module=imagenes-trabajadores&method=get-image&id=' . intval($data['id']));
+                                            } else {
+                                                print('images/default-user.png');
+                                            }
+                                        ?>" 
+                                        alt="Vista previa de la foto" 
+                                        class="img-thumbnail" 
+                                        style="max-width: 200px; height: auto;">
+                                    </div>
+                                    <input type="file" id="f-foto" name="foto" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
+                                    <small class="help-block">Formatos permitidos: JPG, PNG, GIF, WEBP. Máximo 2MB.</small>
+                                    <script>
+                                        document.getElementById('f-foto').onchange = function(e) {
+                                            var reader = new FileReader();
+                                            reader.onload = function(e) {
+                                                document.getElementById('foto-preview').src = e.target.result;
+                                            }
+                                            reader.readAsDataURL(this.files[0]);
+                                        }
+                                    </script>
                                     <small class="help-block">Seleccione una foto del trabajador (opcional)</small>
                                 </div>
                             </div>
