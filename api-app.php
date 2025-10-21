@@ -6,7 +6,11 @@ error_reporting(E_ALL);
 
 ini_set("memory_limit", "512M");
 set_time_limit(120);
-header('Content-type: application/json; charset=utf-8');
+
+// No establecer Content-Type aquí para permitir que los módulos lo establezcan
+if (!isset($_REQUEST['module']) || $_REQUEST['module'] !== 'imagenes-trabajadores') {
+    header('Content-type: application/json; charset=utf-8');
+}
 
 include(__DIR__ . '/includes/config.php');
 include(INCLUDES . DS . 'functions.php');
@@ -73,9 +77,20 @@ switch ($_REQUEST['module']) {
         $mdl->api($_REQUEST);
         break;
     case 'imagenes-trabajadores':
-        include_once(BASE_CLASS . '/mdl.ImagenesTrabajadores.php');
-        $mdl = new ImagenesTrabajadores($app);
-        $mdl->api($_REQUEST);
+        try {
+            include_once(BASE_CLASS . '/mdl.ImagenesTrabajadores.php');
+            $mdl = new ImagenesTrabajadores($app);
+            error_log("api-app.php: Procesando solicitud imagenes-trabajadores. Request: " . json_encode($_REQUEST));
+            $mdl->api($_REQUEST);
+        } catch (Exception $e) {
+            error_log("Error en imagenes-trabajadores: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
         break;
     case 'config':
         include_once(BASE_CLASS . '/mdl.Config.php');
