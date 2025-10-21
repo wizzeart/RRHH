@@ -1,18 +1,19 @@
 <div class="panel">
     <div class="panel-heading">
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
+                   
     </div>
-    <div class="panel-body">
-        <div class="tab-base">
-            <ul class="nav nav-tabs">
+    
+        
+
+            <div class="tab-content">
+                <div id="tab-listado" class="tab-pane fade active in">
+                    
+                        <div class="panel-heading">
+                           <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-listado">Listado</a></li>
                 <li><a data-toggle="tab" href="#tab-registrar">Registrar Ayuda</a></li>
             </ul>
-            <div class="tab-content">
-                <div id="tab-listado" class="tab-pane fade active in">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">Ayudas registradas</h4>
                         </div>
                         <div class="panel-body">
                             <table 
@@ -39,13 +40,10 @@
                                 </thead>
                             </table>
                         </div>
-                    </div>
+                    
                 </div>
                 <div id="tab-registrar" class="tab-pane fade">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">Registrar nueva ayuda</h4>
-                        </div>
+                    
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-4">
@@ -109,8 +107,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+       
+
 </div>
 
 <script>
@@ -245,9 +243,9 @@
     }
 
     // Función para refrescar la tabla
-    function refreshTable() {
-        $('#table-ayudas').bootstrapTable('refresh');
-    }
+    // function refreshTable() {
+    //     $('#table-ayudas').bootstrapTable('refresh');
+    // }
 
     // Esperar a jQuery y luego inicializar
     waitForJQ(function($) { 

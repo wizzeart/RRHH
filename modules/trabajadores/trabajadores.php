@@ -323,12 +323,7 @@
                                     <small class="help-block">Seleccione una foto del trabajador (opcional)</small>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="preview-container" style="display:none">
-                                    <h5>Vista previa:</h5>
-                                    <img src="" class="img-thumbnail" style="max-width: 150px; height: auto;">
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
