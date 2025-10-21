@@ -43,6 +43,9 @@ function firmadoFormatter(value, row, index) {
   }
 
 $(document).ready(function () {
+    $('#btn-ver-tarjeta').on('click', function () {
+        window.open('?module=list-tarjetas-snc&id='+$('#f-id').val(), '_blank');
+    });
     function escapeHtml(str) {
         if (typeof str !== 'string') return str || '';
         return str.replace(/&/g, '&amp;')

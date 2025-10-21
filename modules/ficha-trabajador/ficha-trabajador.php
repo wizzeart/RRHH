@@ -55,7 +55,7 @@
 </script>
 <div class="panel">
     <div class="panel-heading">
-        <div class="panel-control">
+        <div class="panel-control">            
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#tab-general" data-toggle="tab" aria-expanded="true"><i class="fa fa-user"></i> General</a></li>
                 <li><a href="#tab-contacto" data-toggle="tab" aria-expanded="false"><i class="fa fa-phone"></i> Contacto</a></li>
@@ -508,49 +508,96 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="control-label" for="f-num-tarjeta">Número de Tarjeta</label>
                                 <input type="text" id="f-num-tarjeta" name="num-tarjeta" class="form-control" placeholder="Tarjeta Salario" readonly value="<?php if (isset($data['tarjeta_salario'])) print(htmlspecialchars($data['tarjeta_salario'], ENT_QUOTES, 'UTF-8')); ?>">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="control-label" for="f-num-cuenta">Número de Cuenta Estándar</label>
                                 <input type="text" id="f-num-cuenta" name="num-cuenta" class="form-control" placeholder="Cuenta Estándar" readonly value="<?php if (isset($data['cuenta_estandar'])) print(htmlspecialchars($data['cuenta_estandar'], ENT_QUOTES, 'UTF-8')); ?>">
+                            </div>                            
+                        </div>
+                        <br>
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <div class="panel-control">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a data-toggle="tab" href="#tab-salarios">Salarios</a></li>
+                                        <li><a data-toggle="tab" href="#tab-tarjeta-snc">Tarjeta SNC225</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="tab-content">
+                                    <div id="tab-salarios" class="tab-pane fade in active">
+                                        <table id="table-salarios"
+                                            data-toggle="table"
+                                            data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
+                                            data-search="true"
+                                            data-show-refresh="true"
+                                            data-show-toggle="false"
+                                            data-show-columns="false"
+                                            data-sort-name="year"
+                                            data-sort-order="desc"
+                                            data-page-list="[10, 25, 50]"
+                                            data-page-size="10"
+                                            data-pagination="true"
+                                            data-show-pagination-switch="true">
+                                            <thead>
+                                                <tr>
+                                                    <th data-field="year" data-sortable="true">Período</th>
+                                                    <th data-field="month" data-sortable="true">Mes</th>
+                                                    <th data-field="horas" data-sortable="true">Horas trabajadas</th>
+                                                    <th data-field="tarifa" data-sortable="true">Tarifa/hora (CUP)</th>
+                                                    <th data-field="a_cobrar" data-sortable="true">Total Bruto (CUP)</th>
+                                                    <!-- <th data-field="bonif" data-sortable="true">Bonif.</th> -->
+                                                    <!-- <th data-field="sal_dev" data-sortable="true">Sal. Dev.</th> -->
+                                                    <th data-field="ausencias" data-sortable="true">Ausencias</th>
+                                                    <th data-field="ausencias_costo" data-sortable="true">Costo Ausencias</th>
+                                                    <th data-field="vacaciones" data-sortable="true">Vacaciones</th>
+                                                    <th data-field="pago_vac" data-sortable="true">Pago Vac.</th>
+                                                    <th data-field="salario_neto" data-sortable="true">Sal. Neto (CUP)</th>
+                                                    <th data-field="seg_social" data-sortable="true">Seg. Social (CUP)</th>
+                                                    <th data-field="ing_pers" data-sortable="true">Ing. Pers. (CUP)</th>
+                                                    <th data-field="salario_pagar" data-sortable="true">Neto a Pagar (CUP)</th>
+                                                    <th data-field="cargo" data-sortable="true">Cargo</th>
+                                                    <th data-field="departamento" data-sortable="true">Departamento</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div id="tab-tarjeta-snc" class="tab-pane fade in">
+                                        <table id="table-tarjetas-snc" class="table table-striped table-bordered table-hover"
+                                            data-toggle="table"
+                                            data-url="api-app.php?module=tarjetas-snc&method=list-id&trabajador_id=<?php print($data['id']); ?>"
+                                            data-side-pagination="client"
+                                            data-pagination="true"
+                                            data-page-size="25"
+                                            data-search="true"
+                                            data-show-refresh="true"
+                                            data-show-columns="true"
+                                            data-sort-name="id"
+                                            data-sort-order="desc"
+                                            data-toolbar="#toolbar"
+                                            data-show-export="true"
+                                            data-export-types="['csv','excel']"
+                                            data-export-options='{"fileName":"tarjetas_snc225_" + new Date().toISOString().slice(0,10)}'>
+                                            <thead>
+                                                <tr>
+                                                    <th data-field="id" data-sortable="true">ID</th>
+                                                    <th data-field="periodo_display" data-sortable="true">Período</th>
+                                                    <th data-field="tiempo_trabajo_display" data-sortable="true">Tiempo Trabajo</th>
+                                                    <th data-field="salarios_devengados_display" data-sortable="true">Salarios Devengados</th>
+                                                    <th data-field="fecha_inicio_display" data-sortable="true">Fecha Inicio</th>
+                                                    <th data-field="fecha_cierre_display" data-sortable="true">Fecha Cierre</th>
+                                                    <th data-field="acciones" data-escape="false">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <table id="table-salarios"
-                            data-toggle="table"
-                            data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
-                            data-search="true"
-                            data-show-refresh="false"
-                            data-show-toggle="false"
-                            data-show-columns="false"
-                            data-sort-name="year"
-                            data-sort-order="desc"
-                            data-page-list="[10, 25, 50]"
-                            data-page-size="10"
-                            data-pagination="true">
-                            <thead>
-                                <tr>
-                                    <th data-field="year" data-sortable="true">Período</th>
-                                    <th data-field="month" data-sortable="true">Mes</th>
-                                    <th data-field="horas" data-sortable="true">Horas trabajadas</th>
-                                    <th data-field="tarifa" data-sortable="true">Tarifa/hora (CUP)</th>
-                                    <th data-field="a_cobrar" data-sortable="true">Total Bruto (CUP)</th>
-                                    <!-- <th data-field="bonif" data-sortable="true">Bonif.</th> -->
-                                    <!-- <th data-field="sal_dev" data-sortable="true">Sal. Dev.</th> -->
-                                    <th data-field="ausencias" data-sortable="true">Ausencias</th>
-                                    <th data-field="ausencias_costo" data-sortable="true">Costo Ausencias</th>
-                                    <th data-field="vacaciones" data-sortable="true">Vacaciones</th>
-                                    <th data-field="pago_vac" data-sortable="true">Pago Vac.</th>
-                                    <th data-field="salario_neto" data-sortable="true">Sal. Neto (CUP)</th>
-                                    <th data-field="seg_social" data-sortable="true">Seg. Social (CUP)</th>
-                                    <th data-field="ing_pers" data-sortable="true">Ing. Pers. (CUP)</th>
-                                    <th data-field="salario_pagar" data-sortable="true">Neto a Pagar (CUP)</th>
-                                    <th data-field="cargo" data-sortable="true">Cargo</th>
-                                    <th data-field="departamento" data-sortable="true">Departamento</th>
-                                </tr>
-                            </thead>
-                        </table>
                     </div>
                 </div>
 
