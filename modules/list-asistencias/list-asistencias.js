@@ -48,7 +48,11 @@ function formatoNombreCompleto(value, row) {
 function formatoAusencia(value, row) {
     if (value || row.ausencia == 1) {
         return '<span class="label label-danger">AUSENTE</span><br><small>' + (row.tipo_ausencia || '') + '</small>';
-    } else {
+    }
+    else if (row.tardanza == 1) {
+        return '<span class="label label-success">PRESENTE</span><br><small>Tardanza</small>';
+    }
+    else {
         return '<span class="label label-success">PRESENTE</span>';
     }
 }
