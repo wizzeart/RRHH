@@ -1,7 +1,7 @@
 <div class="panel">
-                <div class="form-control">
+                <!-- <div class="form-control">
                     <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo contrato" title="Añadir Nuevo contrato"><span class="icon-lg fa fa-plus"></span> Añadir Nuevo Contrato</button>
-                </div>
+                </div> -->
             </div>
     
 <div class="panel">
@@ -25,13 +25,13 @@
             data-pagination="true" data-show-pagination-switch="true">
             <thead>
                 <tr>
-                    <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
+                    <th data-field="id" data-sortable="true" data-width="80" data-visible="false">ID</th>
                     <th data-field="trabajador_nombre" data-sortable="true">Trabajador</th>
                     <th data-field="tipo" data-sortable="true" data-width="260" data-formatter="tipoFormatter">Tipo</th>
                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
 
                     <th data-field="firma_digital" data-formatter="firmadoFormatter" data-align="center" data-width="140">Firmado</th>
-                    <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
+                    <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="180">Opciones</th>
                 </tr>
             </thead>
         </table>

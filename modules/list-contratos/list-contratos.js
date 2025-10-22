@@ -29,13 +29,29 @@ function tipoFormatter(value, row, index) {
 
 // Formatter para la columna Opciones -> Ver PDF
 function pdfFormatter(value, row, index) {
+  var buttons = [];
+  
+  // Botón Editar
+  buttons.push('<button type="button" class="btn btn-primary btn-sm btn-edit-contract" data-id="' + row.id + '" data-toggle="tooltip" title="Editar Contrato" style="margin-right: 5px;"><i class="fa fa-edit"></i></button>');
+  
+  // Botón PDF
   var url = value || row.archivo_contrato;
   if (url && String(url).trim() !== '' && url !== 'null') {
     var filename = (function(u){ try { var p = u.split('?')[0]; var parts = p.split('/'); return parts[parts.length-1] || 'contrato.pdf'; } catch(e){ return 'contrato.pdf'; } })(url);
-    return '<button type="button" class="btn btn-danger btn-sm btn-view-pdf" data-url="' + url + '" data-toggle="tooltip" title="' + filename + '"><i class="fa fa-file-pdf-o"></i></button>';
+    buttons.push('<button type="button" class="btn btn-danger btn-sm btn-view-pdf" data-url="' + url + '" data-toggle="tooltip" title="' + filename + '"><i class="fa fa-file-pdf-o"></i></button>');
+  } else {
+    buttons.push('<button type="button" class="btn btn-default btn-sm" disabled data-toggle="tooltip" title="Sin archivo"><i class="fa fa-file-o"></i></button>');
   }
-  return '<button type="button" class="btn btn-default btn-sm" disabled data-toggle="tooltip" title="Sin archivo"><i class="fa fa-file-o"></i></button>';
+  
+  return buttons.join('');
 }
+
+// Click en botón editar
+$(document).on('click', '.btn-edit-contract', function(e){
+  e.preventDefault();
+  var id = $(this).data('id');
+  window.location.href = 'index.php?module=contratos&id=' + id;
+});
 
 // Delegado: click en Ver PDF -> verificar existencia del archivo antes de abrir
 $(document).on('click', '.btn-view-pdf', function(e){

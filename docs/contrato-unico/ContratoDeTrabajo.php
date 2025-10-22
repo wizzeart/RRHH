@@ -38,7 +38,62 @@ if (!isset($var29)) $var29 = '';
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>
     </title>
-    <link rel="stylesheet" type="text/css" href="https://myfiles.space/user_files/temporary/68e66c615e65f3.19887893/1759931488_contrato-de-trabajo-iml-servicios-surl/styles.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/doc/contrato-unico/sstyles.css" media="all">
+    <style>
+        @font-face {
+            font-family:'Arial';
+            font-style:normal;
+            font-weight:bold;
+            src:local('☺'), url('font1.woff') format('woff');
+        }
+        @font-face {
+            font-family:'Arial';
+            font-style:normal;
+            font-weight:normal;
+            src:local('☺'), url('font2.woff') format('woff');
+        }
+        .wcdiv {
+            position:absolute;
+        }
+        .wcspan {
+            position:absolute;
+            white-space:pre;
+            color:#000000;
+            font-size:12pt;
+        }
+        .wcimg {
+            position:absolute;
+        }
+        .wcsvg {
+            position:absolute;
+        }
+        .wcpage {
+            position:relative;
+            margin:10pt auto 10pt auto;
+            overflow:hidden;
+        }
+        @media print {
+            body {
+                margin:0pt;
+                padding:0pt;
+            }
+            .wcpage {
+                page-break-after:always;
+                margin:0pt;
+                padding:0pt;
+            }
+        }
+        .wctext001 {
+            font-family:'Arial';
+            font-style:normal;
+            font-weight:bold;
+        }
+        .wctext002 {
+            font-family:'Arial';
+            font-style:normal;
+            font-weight:normal;
+        }
+    </style>
 </head>
 
 <body data-gramm="false" spellcheck="false">
