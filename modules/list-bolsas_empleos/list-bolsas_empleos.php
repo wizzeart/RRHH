@@ -32,7 +32,7 @@
                     <th data-field="telefono" data-sortable="true">Teléfono</th>
                     <th data-field="cargo_postulado" data-sortable="true">Cargo Postulado</th>
                     <th data-field="fecha_registro" data-sortable="true">Fecha Registro</th>
-                    <th data-field="estatus" data-sortable="true">Estado</th>
+                    <th data-field="observaciones" data-sortable="false" data-align="center" data-formatter="formatoObservaciones">Observaciones</th>
                     <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Currículum</th>
 
                 </tr>

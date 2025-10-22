@@ -87,7 +87,7 @@ class Bolsas_empleos {
         $where = array(
             'id' => $param['id']
         );
-        $this->app->db->delete('bolsa_empleo', $where);
+        $this->app->db->del('bolsa_empleo', $where);
 
         $history = array(
             'xentity' => 'BOLSA_EMPLEO',
@@ -95,6 +95,7 @@ class Bolsas_empleos {
             'xid' => $param['id'],
             'xobs' => 'DEL POSTULACION: ' . $param['id']
         );
+        $data['status'] = 1;
         $this->app->add_history($history);
 
         print(json_encode($data));
@@ -325,7 +326,7 @@ class Bolsas_empleos {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.estatus
+        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.observaciones
                  FROM bolsa_empleo b
                  LEFT JOIN cargos c ON b.cargo_postulado_id = c.id
                  ORDER BY b.id DESC";

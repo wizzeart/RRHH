@@ -79,11 +79,52 @@ $(document).ready(function () {
         params.set('b_telefono', rowData.telefono || '');
         params.set('b_email', rowData.email || '');
         params.set('b_fecha_registro', rowData.fecha_registro || '');
-        params.set('b_estatus', rowData.estatus || '');
+        params.set('b_observaciones', rowData.observaciones || '');
         window.location.href = 'index.php?' + params.toString();
     });
 
+    $('#table-panel').on('click', '.btn-del', function () {
+        
+                    
+        var $tr = $(this).closest('tr');
+        var idx = $tr.data('index');
+        var allData = $('#table-panel').bootstrapTable('getData');
+        var rowData;
+        if (typeof idx !== 'undefined' && allData && allData[idx]) {
+            rowData = allData[idx];
+        } else {
+            var id = $(this).data('id');
+            if (allData && allData.length) {
+                rowData = allData.find(function (r) { return r.id == id; });
+            }
+        }
+        if (!rowData) {
+            alert('No se pudo obtener los datos de la postulación.');
+            return;
+        }
+        
+        if (!confirm('¿Está seguro de eliminar esta postulación?')) {
+            return;
+        }
+        
+
+        var params = new URLSearchParams();
+        params.set('module', 'bolsas_empleos');
+        params.set('id', rowData.id || '');
+        params.set('method', 'del');
+        params.set('row', idx || '');
+        $.ajax({url: 'api-app.php', type: 'GET', data: params.toString(), dataType: 'json',
+            success: function (d) {
+                if (d.status == 1) {
+                    $('#table-panel').bootstrapTable('refresh');
+                    
+                }
+            }
+        });
+    });
+
 });
+
 
 
 
@@ -114,6 +155,7 @@ function formatoToolbar(value, row) {
     var s = '';
     s += '<button data-id="' + row.id + '" class="btn ' + btnClass + ' btn-icon icon-sm fa fa-download" ' + btnDisabled + ' title="' + title + '"></button> ';
     s += '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-briefcase btn-contratar" title="Contratar"></button>';
+    s += '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-trash btn-del" title="Eliminar"></button>';
 
     return s;
 }
@@ -121,3 +163,12 @@ function formatoToolbar(value, row) {
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
 }
+
+function formatoObservaciones(value, row) {
+     if (value == 'S')
+        return '<button data-id="' + row.xusuario_id + '" class="btn btn-success btn-icon icon-sm fa fa-check toggle-status"></button>';
+    else
+        return '<button data-id="' + row.xusuario_id + '" class="btn btn-danger btn-icon icon-sm fa fa-remove toggle-status"></button>';
+
+}
+        
