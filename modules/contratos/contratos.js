@@ -1,6 +1,26 @@
 $(document).ready(function () {
   // Variables globales para datos del trabajador
   var trabajadorData = {};
+  var contratoId = $('#f-id').val();
+  
+  // Si es edición (existe contratoId), cargar los datos guardados
+  if (contratoId) {
+    // Campos del formulario a actualizar
+    ['tipo_contrato', 'regimen_trabajo_desde', 'regimen_trabajo_hasta', 
+     'hora_desde_h', 'hora_hasta_h', 'modalidad_trabajo', 'departamento_id',
+     'regimen_descanso', 'salario_base', 'frecuencia_trabajo'].forEach(function(campo) {
+      var valor = $('[name="' + campo + '"]').data('valor-guardado');
+      if (valor) {
+        $('#f-' + campo.replace(/_/g, '-')).val(valor);
+      }
+    });
+  }
+  
+  // Cargar datos iniciales si hay un trabajador seleccionado
+  var trabajadorIdInicial = $('#f-trabajador').val();
+  if (trabajadorIdInicial) {
+    cargarDatosTrabajador(trabajadorIdInicial);
+  }
   
   function notify(type, title, message, timer) {
     if ($.niftyNoty && typeof $.niftyNoty === 'function') {
@@ -44,6 +64,7 @@ $(document).ready(function () {
 
   // Función para mostrar datos del trabajador en el panel
   function mostrarDatosTrabajador(data) {
+    // Actualizar los campos de solo lectura
     $('#trabajador-nombre').text(data.nombre || '-');
     $('#trabajador-apellidos').text(data.apellidos || '-');
     $('#trabajador-apellidos-segundos').text(data.apellidos_segundos || '-');
@@ -51,6 +72,41 @@ $(document).ready(function () {
     $('#trabajador-provincia').text(data.provincia_nombre || '-');
     $('#trabajador-municipio').text(data.municipio_nombre || '-');
     $('#trabajador-direccion').text(data.direccion || '-');
+
+    // Actualizar campos del formulario si existen valores en data
+    if (data.regimen_trabajo_desde) {
+      $('#f-regimen-trabajo-desde').val(data.regimen_trabajo_desde);
+    }
+    if (data.regimen_trabajo_hasta) {
+      $('#f-regimen-trabajo-hasta').val(data.regimen_trabajo_hasta);
+    }
+    if (data.hora_desde_h) {
+      $('#f-desde-hora').val(data.hora_desde_h);
+    }
+    if (data.hora_hasta_h) {
+      $('#f-hasta-hora').val(data.hora_hasta_h);
+    }
+    if (data.modalidad_trabajo) {
+      $('#f-modalidad-trabajo').val(data.modalidad_trabajo);
+    }
+    if (data.tipo_contrato) {
+      $('#f-tipo-contrato').val(data.tipo_contrato);
+    }
+    if (data.departamento_id) {
+      $('#f-ubicacion-laboral').val(data.departamento_id);
+    }
+    if (data.regimen_descanso) {
+      $('#f-regimen-descanso').val(data.regimen_descanso);
+    }
+    if (data.salario_base) {
+      $('#f-salario-base').val(data.salario_base);
+    }
+    if (data.frecuencia_trabajo) {
+      $('#f-frecuencia-trabajo').val(data.frecuencia_trabajo);
+    }
+
+    // Disparar el evento change para actualizar la vista previa
+    actualizarVistaPrevia();
   }
 
   // Función para limpiar datos del trabajador
