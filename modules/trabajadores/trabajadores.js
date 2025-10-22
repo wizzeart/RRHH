@@ -418,11 +418,15 @@ $(document).ready(function () {
                             notify(
                                 'success',
                                 '¡Éxito!',
-                                'El trabajador ha sido registrado correctamente. Redirigiendo...',
+                                'El trabajador ha sido registrado correctamente. Redirigiendo al formulario de contratos...',
                                 1500
                             );
                             setTimeout(function() {
-                                window.location.href = '?module=list-trabajadores';
+                                // Redirigir al módulo de contratos pasando el ID del trabajador y el departamento
+                                var trabajadorId = d.id;
+                                var departamentoId = $('#f-departamento').val();
+                                window.location.href = '?module=contratos&trabajador_id=' + encodeURIComponent(trabajadorId) + 
+                                                     '&departamento_id=' + encodeURIComponent(departamentoId);
                             }, 1500);
                         } else {
                             notify(

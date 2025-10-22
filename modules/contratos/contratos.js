@@ -16,10 +16,27 @@ $(document).ready(function () {
     });
   }
   
-  // Cargar datos iniciales si hay un trabajador seleccionado
-  var trabajadorIdInicial = $('#f-trabajador').val();
+  // Obtener parámetros de la URL
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  // Cargar datos iniciales si hay un trabajador seleccionado o viene por URL
+  var trabajadorIdInicial = getUrlParameter('trabajador_id') || $('#f-trabajador').val();
+  var departamentoIdInicial = getUrlParameter('departamento_id');
+
   if (trabajadorIdInicial) {
+    // Seleccionar el trabajador en el select
+    $('#f-trabajador').val(trabajadorIdInicial);
     cargarDatosTrabajador(trabajadorIdInicial);
+
+    // Si viene un departamento, seleccionarlo
+    if (departamentoIdInicial) {
+      $('#f-ubicacion-laboral').val(departamentoIdInicial);
+    }
   }
   
   function notify(type, title, message, timer) {
