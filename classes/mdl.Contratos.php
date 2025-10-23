@@ -74,6 +74,7 @@ class Contrato {
                 if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var99 = '_X_'; }
                 if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
             }
+            $var31 = '_____________'; // mensual
             // Frecuencia de pago/trabajo: tres marcadores (semanal, quincenal, mensual)
             $var27 = '(_)'; // semanal
             $var28 = '(_)'; // quincenal
