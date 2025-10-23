@@ -26,6 +26,8 @@ $(function(){
             if(d.status==1){
                 if(d.action==='insert'){ action='update'; $('#f-id').val(d.id); }
                 notify('success','Éxito', d.msg||'Guardado correctamente', 3000);
+                //espera 1 segundo
+                setTimeout(function(){ location.href='?module=list-cargos'; }, 1000);
             } else { notify('danger','Error', d.msg||'Error al guardar', 4000); }
         }).fail(function(xhr){
             $('#btn-save').prop('disabled', false);
