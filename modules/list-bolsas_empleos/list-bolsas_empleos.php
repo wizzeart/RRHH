@@ -33,7 +33,7 @@
                     <th data-field="cargo_postulado" data-sortable="true">Cargo Postulado</th>
                     <th data-field="fecha_registro" data-sortable="true">Fecha Registro</th>
                     <th data-field="observaciones" data-sortable="false" data-align="center" data-formatter="formatoObservaciones">Observaciones</th>
-                    <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Currículum</th>
+                    <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Acciones</th>
 
                 </tr>
             </thead>
@@ -42,4 +42,35 @@
 </div>
 <!--===================================================-->
 
+<!-- Modal para observaciones -->
+<div class="modal fade" id="modalObservaciones" tabindex="-1" role="dialog" aria-labelledby="modalObservacionesLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalObservacionesLabel">Observaciones</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formObservaciones">
+                    <input type="hidden" id="observacion_id" name="id" value="">
+                    <div class="form-group">
+                        <label for="observacion_texto">Ingrese sus observaciones:</label>
+                        <textarea class="form-control" id="observacion_texto" name="observaciones" rows="5" placeholder="Escriba aquí sus observaciones..."></textarea>
+                        <input type="hidden" id="observacion_nombre" name="nombre" value="">
+                        <input type="hidden" id="observacion_apellidos" name="apellidos" value="">
+                        <input type="hidden" id="observacion_segundos_apellidos" name="segundos_apellidos" value="">
+                        <input type="hidden" id="observacion_curriculum" name="curriculum" value="">
+                        <input type="hidden" id="observacion_cargo_postulado_id" name="cargo_postulado_id" value="">
+                        <input type="hidden" id="observacion_telefono" name="telefono" value="">
+                        <input type="hidden" id="observacion_fecha_registro" name="fecha_registro" value="">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarObservacion">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
 

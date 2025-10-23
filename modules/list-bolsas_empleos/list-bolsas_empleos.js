@@ -1,28 +1,83 @@
 $(document).ready(function () {
-    $('#btn-add-new').click(function () {
-        location.href = 'index.php?module=bolsas_empleos';
-    });
-    $('#table-panel').on('click', '.toggle-status', function () {
-        var value = '';
-        if ($(this).hasClass('fa-check') == true) {
-            $(this).removeClass('btn-success');
-            $(this).addClass('btn-danger');
-            $(this).removeClass('fa-check');
-            $(this).addClass('fa-remove');
-            value = 'N';
+    function notify(type, title, message, timer) {
+        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+            $.niftyNoty({
+                type: type || 'info',
+                container: 'floating',
+                title: title || '',
+                message: message || '',
+                timer: timer != null ? timer : 3000,
+                closeBtn: true,
+                focus: true
+            });
         } else {
-            $(this).removeClass('btn-danger');
-            $(this).addClass('btn-success');
-            $(this).removeClass('fa-remove');
-            $(this).addClass('fa-check');
-            value = 'S';
+            // Fallback simple para garantizar feedback al usuario
+            var text = (title ? (title + ': ') : '') + (message || '');
+            try { alert(text); } catch(e) { console.warn('Notify:', text); }
         }
-        var cmd = 'module=bolsas_empleoscheckedid=' + $(this).data('id') + '&value=' + value;
-        $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
+    }
+    // Manejar clic en el botón de observaciones
+    $('#table-panel').on('click', '.btn-observaciones', function () {
+        var id = $(this).data('id');
+        var observaciones = $(this).data('observaciones') || '';
+        
+        // Actualizar el formulario del modal
+        $('#observacion_id').val(id);
+        $('#observacion_texto').val(observaciones);
+        
+        // Mostrar el modal
+        $('#modalObservaciones').modal('show');
+    });
+    
+    // Manejar clic en el botón de guardar observación
+    $('#btnGuardarObservacion').click(function() {
+        var id = $('#observacion_id').val();
+        var observaciones = $('#observacion_texto').val();
+        formData = new FormData();
+        formData.append('module', 'bolsas_empleos');
+        formData.append('method', 'save');
+        formData.append('action', 'update');
+        formData.append('id', id);
+        formData.append('observaciones', observaciones);
+        // Enviar la petición para guardar
+        $.ajax({
+            url: 'api-app.php', 
+            type: 'POST', 
+            data: formData, 
+            processData: false,
+            contentType: false,
+            dataType: 'json',
             success: function (d) {
+                if (d.status == 1) {
+                    $('#modalObservaciones').modal('hide');
+                    $('#table-panel').bootstrapTable('refresh');
+                    
+                    // Mostrar mensaje de éxito
+                    notify('success', 'Éxito', 'Las observaciones han sido guardadas correctamente.', 3000);
+                } 
+                else {
+                    notify('danger', 'Error', 'Error al guardar las observaciones: ' + (d.message || 'Error desconocido'), 3000);
+                }
+            },
+            error: function (xhr, status, error) {
+                var errorMsg = 'Error al guardar las observaciones: ' + (error || 'Error desconocido');
+    if (xhr.responseText) {
+        try {
+            var jsonResponse = JSON.parse(xhr.responseText);
+            errorMsg = jsonResponse.message || errorMsg;
+        } catch (e) {
+            // If not JSON, show the response text directly
+            errorMsg += '\n' + xhr.responseText.substring(0, 200);
+        }
+    }
+    notify('danger', 'Error', errorMsg, 3000);
             }
         });
     });
+    $('#btn-add-new').click(function () {
+        location.href = 'index.php?module=bolsas_empleos';
+    });
+  
 
     // Handler for curriculum download/view button
     $('#table-panel').on('click', '.fa.fa-download', function () {
@@ -148,13 +203,13 @@ function formatoActivo(value, row) {
 // =================================================================
 function formatoToolbar(value, row) {
     var curriculumAvailable = row.curriculum && row.curriculum !== '';
-    var btnClass = curriculumAvailable ? 'btn-primary' : 'btn-secondary';
+    var btnClass = curriculumAvailable ? 'btn-warning' : 'btn-secondary';
     var btnDisabled = curriculumAvailable ? '' : 'disabled';
     var title = curriculumAvailable ? 'Descargar/Ver Currículum' : 'Sin currículum';
 
     var s = '';
     s += '<button data-id="' + row.id + '" class="btn ' + btnClass + ' btn-icon icon-sm fa fa-download" ' + btnDisabled + ' title="' + title + '"></button> ';
-    s += '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-briefcase btn-contratar" title="Contratar"></button>';
+    s += '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-briefcase btn-contratar" title="Contratar"></button> ';
     s += '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-trash btn-del" title="Eliminar"></button>';
 
     return s;
@@ -165,10 +220,14 @@ function imageFormatter(value, row) {
 }
 
 function formatoObservaciones(value, row) {
-     if (value == 'S')
-        return '<button data-id="' + row.xusuario_id + '" class="btn btn-success btn-icon icon-sm fa fa-check toggle-status"></button>';
-    else
-        return '<button data-id="' + row.xusuario_id + '" class="btn btn-danger btn-icon icon-sm fa fa-remove toggle-status"></button>';
-
+    var hasObservations = value && value.trim() !== '';
+    var btnClass = hasObservations ? 'btn-success' : 'btn-danger';
+    var iconClass = hasObservations ? 'fa-check' : 'fa-remove';
+    var title = hasObservations ? 'Ver/Editar observaciones' : 'Agregar observaciones';
+    
+    return '<button data-id="' + row.id + '" ' +
+           'data-observaciones="' + (value || '') + '" ' +
+           'class="btn ' + btnClass + ' btn-icon icon-sm fa ' + iconClass + ' btn-observaciones" ' +
+           'title="' + title + '"></button>';
 }
         
