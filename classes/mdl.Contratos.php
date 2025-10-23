@@ -10,6 +10,125 @@ class Contrato {
         $action = 'insert';
     }
 
+    public function save_anterior() {
+        $response = array('status' => 0, 'msg' => '', 'id' => 0);
+        
+        try {
+            // Validar campos requeridos
+            if (!isset($_POST['trabajador_id']) || empty($_POST['trabajador_id'])) {
+                throw new Exception('El trabajador es requerido');
+            }
+            if (!isset($_POST['tipo_contrato']) || empty($_POST['tipo_contrato'])) {
+                throw new Exception('El tipo de contrato es requerido');
+            }
+            if (!isset($_POST['fecha_inicio']) || empty($_POST['fecha_inicio'])) {
+                throw new Exception('La fecha de inicio es requerida');
+            }
+            
+            // Validar que si es contrato determinado tenga fecha fin
+            if ($_POST['tipo_contrato'] === '1' && empty($_POST['fecha_fin'])) {
+                throw new Exception('Para contratos determinados la fecha de fin es requerida');
+            }
+
+            // Validar archivo
+            if (!isset($_FILES['archivo_contrato']) || !is_uploaded_file($_FILES['archivo_contrato']['tmp_name'])) {
+                throw new Exception('El archivo del contrato es requerido');
+            }
+
+            $archivo = $_FILES['archivo_contrato'];
+            $mimeType = mime_content_type($archivo['tmp_name']);
+            $allowedTypes = array(
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            );
+
+            if (!in_array($mimeType, $allowedTypes)) {
+                throw new Exception('Tipo de archivo no permitido. Solo se permiten archivos PDF y Word');
+            }
+
+            if ($archivo['size'] > 10 * 1024 * 1024) {
+                throw new Exception('El archivo no debe superar los 10MB');
+            }
+
+            // Insertar en la base de datos
+            $data = array(
+                'trabajador_id' => $_POST['trabajador_id'],
+                'tipo' => $_POST['tipo_contrato'],
+                'fecha_inicio' => $_POST['fecha_inicio'],
+                'fecha_fin' => $_POST['tipo_contrato'] === '1' ? $_POST['fecha_fin'] : null,
+                'firma_digital' => 0
+            );
+
+            // Iniciar transacción
+            $this->db->begin_transaction();
+
+            $sql = "INSERT INTO contratos (trabajador_id, tipo, fecha_inicio, fecha_fin, firma_digital) 
+                   VALUES (?, ?, ?, ?, ?)";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->bind_param('isssi', 
+                $data['trabajador_id'], 
+                $data['tipo'],
+                $data['fecha_inicio'],
+                $data['fecha_fin'],
+                $data['firma_digital']
+            );
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Error al guardar el contrato en la base de datos');
+            }
+
+            $contratoId = $this->db->insert_id;
+            
+            // Definir extensión según mime type
+            $extension = $mimeType === 'application/pdf' ? 'pdf' : 
+                       ($mimeType === 'application/msword' ? 'doc' : 'docx');
+            
+            // Crear directorio si no existe
+            $uploadDir = __DIR__ . '/../uploads/contratos';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            // Nombre del archivo será el ID del contrato
+            $nombreArchivo = $contratoId . '.' . $extension;
+            $rutaArchivo = $uploadDir . '/' . $nombreArchivo;
+
+            // Mover archivo
+            if (!move_uploaded_file($archivo['tmp_name'], $rutaArchivo)) {
+                throw new Exception('Error al guardar el archivo');
+            }
+
+            // Actualizar ruta en la base de datos
+            $rutaRelativa = 'uploads/contratos/' . $nombreArchivo;
+            $sql = "UPDATE contratos SET archivo_contrato = ? WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bind_param('si', $rutaRelativa, $contratoId);
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Error al actualizar la ruta del archivo');
+            }
+
+            // Confirmar transacción
+            $this->db->commit();
+
+            $response['status'] = 1;
+            $response['msg'] = 'Contrato guardado correctamente';
+            $response['id'] = $contratoId;
+
+        } catch (Exception $e) {
+            // Revertir transacción si hay error
+            if ($this->db->in_transaction()) {
+                $this->db->rollback();
+            }
+            $response['status'] = 0;
+            $response['msg'] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
     // Renderiza la vista PHP del contrato único con variables pasadas desde el formulario
     private function _render_contrato_unico($param) {
         $resp = array('status'=>0, 'html'=>'');
