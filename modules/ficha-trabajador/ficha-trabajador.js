@@ -817,3 +817,195 @@ function formatoNivel(value, row) {
     //return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
     return s;
 }
+
+  $('#btn-add-new').click(function(){ location.href = 'index.php?module=contratos'; });
+
+  // Abrir modal de contrato anterior
+  $('#btn-add-anterior').click(function(){
+    $('#form-contrato-anterior')[0].reset();
+    $('.fecha-fin-group').hide();
+    // Mantener el ID del trabajador después del reset
+    var trabajadorId = $('input[name="trabajador_id"]').val();
+    $('#modalContratoAnterior').modal('show');
+    // Asegurar que el ID del trabajador permanezca
+    $('input[name="trabajador_id"]').val(trabajadorId);
+  });
+
+  // Mostrar/ocultar fecha fin según tipo de contrato
+  $('#tipo_contrato').change(function(){
+    if($(this).val() === '2') { // 2 = Contrato Determinado
+      $('.fecha-fin-group').slideDown();
+      $('#fecha_fin').prop('required', true);
+    } else {
+      $('.fecha-fin-group').slideUp();
+      $('#fecha_fin').prop('required', false).val('');
+    }
+  });
+
+  // Validar archivo al seleccionarlo
+  $('#archivo_contrato').change(function(){
+    var file = this.files[0];
+    var fileType = file.type;
+    var validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    
+    if (!file) {
+      return;
+    }
+
+    if (validTypes.indexOf(fileType) === -1) {
+      notify('danger', 'Error', 'El archivo debe ser PDF o Word (doc/docx)', 4000);
+      $(this).val('');
+      return;
+    }
+
+    // Validar tamaño (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      notify('danger', 'Error', 'El archivo no debe superar los 10MB', 4000);
+      $(this).val('');
+      return;
+    }
+  });
+
+  // Guardar contrato anterior
+  $('#btn-guardar-contrato-anterior').click(function(){
+    var $form = $('#form-contrato-anterior');
+    var $submitBtn = $(this);
+
+    // Validar formulario
+    if (!$form[0].checkValidity()) {
+      notify('warning', 'Formulario incompleto', 'Por favor complete todos los campos requeridos', 3000);
+      return;
+    }
+
+    // Validaciones adicionales
+    var fechaInicio = $('#fecha_inicio').val();
+    var fechaFin = $('#fecha_fin').val();
+    var tipoContrato = $('#tipo_contrato').val();
+
+    // Validar tipo de contrato
+    if (!tipoContrato || (tipoContrato !== '1' && tipoContrato !== '2')) {
+      notify('warning', 'Error', 'El tipo de contrato debe ser 1 (indeterminado) o 2 (determinado)', 3000);
+      return;
+    }
+
+    // Validar fecha fin para contratos determinados (tipo 2)
+    if (tipoContrato === '2' && !fechaFin) {
+      notify('warning', 'Formulario incompleto', 'Para contratos determinados debe especificar la fecha de fin', 3000);
+      return;
+    }
+
+    if (fechaFin && new Date(fechaFin) <= new Date(fechaInicio)) {
+      notify('warning', 'Error en fechas', 'La fecha de fin debe ser posterior a la fecha de inicio', 3000);
+      return;
+    }
+
+    var formData = new FormData($form[0]);
+    
+    // Asegurar que tenemos el ID del trabajador
+    var trabajadorId = $('input[name="trabajador_id"]').val();
+    if (!trabajadorId) {
+        notify('danger', 'Error', 'No se pudo determinar el ID del trabajador', 3000);
+        return;
+    }
+
+    formData.append('module', 'contratos');
+    formData.append('method', 'save-anterior');
+    formData.append('firma_digital', '0'); // Por defecto, sin firma digital
+    
+    // Asegurar que el ID del trabajador esté en el FormData
+    formData.delete('trabajador_id'); // Eliminar si existe
+    formData.append('trabajador_id', trabajadorId);
+
+    // Debug: mostrar datos que se enviarán
+    console.log('Enviando datos del contrato:');
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
+    // Deshabilitar botón mientras se procesa
+    $submitBtn.prop('disabled', true);
+
+    $.ajax({
+        url: 'api-app.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 1) {
+                notify('success', '¡Éxito!', 'Contrato anterior guardado correctamente', 3000);
+                $('#modalContratoAnterior').modal('hide');
+                // Recargar tabla de contratos
+                $('#table-panel').bootstrapTable('refresh');
+            } else {
+                notify('danger', 'Error', response.msg || 'Error al guardar el contrato', 4000);
+                console.error('Error del servidor:', response);
+            }
+        },
+        error: function(xhr, status, error) {
+            var errorMsg = '';
+            try {
+                var response = JSON.parse(xhr.responseText);
+                errorMsg = response.msg || response.error || error;
+            } catch(e) {
+                errorMsg = xhr.responseText || error || 'Error desconocido';
+            }
+            notify('danger', 'Error', 'Error al guardar el contrato: ' + errorMsg, 4000);
+            console.error('Error en la petición:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+        },
+        complete: function() {
+            $submitBtn.prop('disabled', false);
+        }
+    });
+
+    // Deshabilitar botón mientras se procesa
+    $submitBtn.prop('disabled', true);
+
+    $.ajax({
+      url: 'api-app.php',
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      success: function(response){
+        if (response.status === 1) {
+          notify('success', '¡Éxito!', 'Contrato anterior guardado correctamente', 3000);
+          $('#modalContratoAnterior').modal('hide');
+          // Recargar tabla
+          $('#table-panel').bootstrapTable('refresh');
+        } else {
+          notify('danger', 'Error', response.msg || 'Error al guardar el contrato', 4000);
+        }
+      },
+      error: function(xhr, status, error){
+        notify('danger', 'Error', 'Error al comunicarse con el servidor', 4000);
+        console.error('Error:', error);
+      },
+      complete: function(){
+        $submitBtn.prop('disabled', false);
+      }
+    });
+  });
+    function notify(type, title, message, timer) {
+    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+      $.niftyNoty({
+        type: type || 'info',
+        container: 'floating',
+        title: title || '',
+        message: message || '',
+        timer: timer != null ? timer : 3000,
+        closeBtn: true,
+        focus: true
+      });
+    } else {
+      var text = (title ? (title + ': ') : '') + (message || '');
+      try { alert(text); } catch(e) { console.warn('Notify:', text); }
+    }
+  }
