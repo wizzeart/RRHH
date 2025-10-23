@@ -142,12 +142,12 @@ if (isset($_REQUEST['module'])) {
             session_destroy();
             header("Location:index.php");
             break;
-        case 'sedes':
-        case 'list-sedes':
-            include_once(BASE_CLASS . '/mdl.Sedes.php');
-            $mdl = new Sedes($app);
-            $mdl->controlador($_REQUEST);
-            break;
+        // case 'sedes':
+        // case 'list-sedes':
+        //     include_once(BASE_CLASS . '/mdl.Sedes.php');
+        //     $mdl = new Sedes($app);
+        //     $mdl->controlador($_REQUEST);
+        //     break;
     }
 } else {
     header("Location:index.php?module=home");

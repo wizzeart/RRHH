@@ -187,7 +187,7 @@ class Cargos {
             $where = array('id' => $id);
             
             // Eliminar físicamente el registro
-            $result = $this->db->delete('cargos', $where);
+            $result = $this->db->del('cargos', $where);
             
             if ($result) {
                 $data['msg'] = 'Cargo eliminado correctamente';

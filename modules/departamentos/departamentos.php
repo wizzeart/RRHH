@@ -22,11 +22,11 @@
             </div>
             <div class="col-md-5">
                 <div class="form-group">
-                    <label class="control-label" for="f-sede">Sede <span class="text-danger">*</span></label>
-                    <select id="f-sede" class="form-control">
-                        <option value="">Seleccione sede</option>
-                        <?php if(isset($data_form['sedes'])) { foreach($data_form['sedes'] as $e) { ?>
-                            <option value="<?php print($e['id']); ?>" <?php if (isset($data['sede_id']) && $data['sede_id']==$e['id']) print('selected'); ?>><?php print($e['nombre']); ?></option>
+                    <label class="control-label" for="f-empresa">Empresa <span class="text-danger">*</span></label>
+                    <select id="f-empresa" class="form-control">
+                        <option value="">Seleccione empresa</option>
+                        <?php if(isset($data_form['empresas'])) { foreach($data_form['empresas'] as $e) { ?>
+                            <option value="<?php print($e['id']); ?>" <?php if (isset($data['empresa_id']) && $data['empresa_id']==$e['id']) print('selected'); ?>><?php print($e['nombre']); ?></option>
                         <?php } } ?>
                     </select>
                 </div>
