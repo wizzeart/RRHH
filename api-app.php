@@ -28,12 +28,12 @@ if ($app->user_id == '' && !in_array($_REQUEST['module'], array('login', 'reset'
 }
 
 switch ($_REQUEST['module']) {
-    case 'list-sedes':
-    case 'sedes':
-        include_once(BASE_CLASS . '/mdl.Sedes.php');
-        $mdl = new Sedes($app);
-        $mdl->api($_REQUEST);
-        break;
+    // case 'list-sedes':
+    // case 'sedes':
+    //     include_once(BASE_CLASS . '/mdl.Sedes.php');
+    //     $mdl = new Sedes($app);
+    //     $mdl->api($_REQUEST);
+    //     break;
     case 'documentos':
         include_once(BASE_CLASS . '/mdl.Document.php');
         $mdl = new Document($app);

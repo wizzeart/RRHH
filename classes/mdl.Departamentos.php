@@ -43,8 +43,8 @@ class Departamentos {
                 $page['title'] = 'Nuevo Departamento';
                 $page['subtitle'] = 'Formulario de Departamento';
 
-                // Cargar sedes para el select
-                $data_form['sedes'] = $this->get_sedes();
+                // Cargar empresas para el select
+                $data_form['empresas'] = $this->get_empresas();
 
                 $action = 'insert';
                 if (isset($param['id'])) {
@@ -64,9 +64,9 @@ class Departamentos {
     }
 
     private function _list($param) {
-        $sql = "SELECT d.id, d.nombre, d.descripcion, d.sede_id, COALESCE(e.nombre, 'Sin sede') AS sede_nombre
+        $sql = "SELECT d.id, d.nombre, d.descripcion, d.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
                 FROM departamentos d
-                LEFT JOIN sedes e ON d.sede_id = e.id
+                LEFT JOIN empresa e ON d.empresa_id = e.id
                 ORDER BY d.nombre ASC";
         $data = $this->db->fetchAll($sql);
         return $data;
@@ -83,7 +83,7 @@ class Departamentos {
         // Validaciones
         $required = array(
             'nombre' => 'Nombre',
-            'sede_id' => 'Sede'
+            'empresa_id' => 'Empresa'
         );
         foreach ($required as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
@@ -97,7 +97,7 @@ class Departamentos {
         $insert = array(
             'nombre' => $param['nombre'],
             'descripcion' => isset($param['descripcion']) ? $param['descripcion'] : '',
-            'sede_id' => intval($param['sede_id'])
+            'empresa_id' => intval($param['empresa_id'])
         );
 
         // Campos de control
@@ -161,7 +161,7 @@ class Departamentos {
             $where = array('id' => $id);
             
             // Eliminar físicamente el registro
-            $result = $this->db->delete('departamentos', $where);
+            $result = $this->app->db->del('departamentos', $where);
             
             if ($result) {
                 $data['msg'] = 'Departamento eliminado correctamente';
@@ -186,8 +186,8 @@ class Departamentos {
         print(json_encode($data));
     }
 
-    private function get_sedes() {
-        $sql = "SELECT id, nombre FROM sedes ORDER BY nombre";
+    private function get_empresas() {
+        $sql = "SELECT id, nombre FROM empresa ORDER BY nombre";
         $data = $this->db->fetchAll($sql);
         return $data ? $data : array();
     }

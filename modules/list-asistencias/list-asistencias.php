@@ -125,6 +125,9 @@
           <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
             Salida
           </th>
+          <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120" data-formatter="formatoHoras">
+            Horas
+          </th>
           <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
             Asistencia
           </th>
