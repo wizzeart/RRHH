@@ -334,14 +334,14 @@
                         </div>
 
 
-                        <div class="row panel-footer" style="margin-top: 20px;">
+                        <!-- <div class="row panel-footer" style="margin-top: 20px;">
                             <div class="col-md-12">
                                 <button id="btn-pase-acceso" class="btn btn-warning icon-lg" type="button">
                                     <i class="fa fa-plus"></i>
                                     Descargar Pase de Acceso
                                 </button>
                             </div>
-                        </div>
+                        </div> -->
 
 
                     </div>

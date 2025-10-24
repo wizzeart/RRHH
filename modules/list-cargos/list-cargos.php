@@ -25,7 +25,7 @@
                 <tr>
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="descripcion" data-sortable="false">Descripción</th>
-                    <th data-field="salario" data-align="right" data-sortable="true" data-formatter="salarioFormatter">Salario</th>
+                    <th data-field="salario" data-align="right" data-sortable="true" data-formatter="salarioFormatter">Salario (CUP/Hora)</th>
                    
                     <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="240">Acciones</th>
                 </tr>
