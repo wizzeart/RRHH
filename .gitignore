@@ -3,6 +3,7 @@ includes/config.php
 img/
 images/
 uploads/
+includes/perfiles/
 classes.zip
 modules.zip
 plugins.zip
