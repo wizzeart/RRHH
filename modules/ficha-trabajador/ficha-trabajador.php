@@ -423,22 +423,21 @@
 
             </div>
             <div class="tab-pane fade" id="tab-contratacion">
-                <div>
-                    <!--agregar cargo y departamento-->
-
-                </div>
-
                 <div class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">Listado de contratos</h3>
                     </div>
 
                     <div class="panel-body orm-padding">
-                    <div class="form-group">
-                                        <button id="btn-add-anterior" class="btn btn-primary btn-icon" alt="Insertar Contrato Anterior" title="Insertar Contrato Anterior">
-                                            <span class="icon-lg fa fa-upload"></span> Insertar Contrato Anterior
-                                        </button>
-                                    </div>
+                        
+                        
+                        <div class="form-control">
+                            <button id="btn-add-anterior" class="btn btn-primary btn-icon" alt="Insertar Contrato Anterior" title="Insertar Contrato Anterior">
+                                <span class="icon-lg fa fa-upload"></span> Insertar Contrato Anterior
+                            </button>
+                        </div>
+                        
+                        
 
                         <table
                             id="table-panel"
