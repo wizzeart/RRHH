@@ -544,6 +544,9 @@ class Contrato {
                 case 'generatePdfWithFpdf':
                     $response = $this->_generatePdfWithFpdf($param);
                     break;
+                case 'del':
+                    $response = $this->_del($param);
+                    break;
                 default:
                     throw new Exception('Método no válido: ' . $param['method']);
             }
@@ -946,6 +949,74 @@ class Contrato {
         }
 
         print(json_encode($response));
+    }
+
+    // Eliminar contrato: borrar registro y archivo asociado (si existe)
+    private function _del($param) {
+        $resp = array('status' => 1, 'msg' => 'Contrato eliminado', 'id' => null);
+        try {
+            if (!isset($param['id']) || intval($param['id']) <= 0) {
+                throw new Exception('ID de contrato no proporcionado');
+            }
+            $id = intval($param['id']);
+            $resp['id'] = $id;
+
+            // Obtener ruta de archivo desde BD
+            $row = $this->db->fetchRow("SELECT archivo_contrato FROM contratos WHERE id = :id", array('id' => $id));
+            if ($row && !empty($row['archivo_contrato'])) {
+                $archivo = $row['archivo_contrato'];
+                $fsPath = null;
+                // Si es URL absoluta, tomar el path
+                if (preg_match('/^https?:\/\//i', $archivo)) {
+                    $u = parse_url($archivo);
+                    $path = isset($u['path']) ? $u['path'] : '';
+                    if (!empty($path)) {
+                        if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                            $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $path;
+                        } elseif (defined('BASE')) {
+                            $fsPath = rtrim(BASE, '/\\') . $path;
+                        }
+                    }
+                } elseif (substr($archivo, 0, 1) === '/') {
+                    // ruta absoluta en servidor
+                    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                        $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $archivo;
+                    } elseif (defined('BASE')) {
+                        $fsPath = rtrim(BASE, '/\\') . $archivo;
+                    }
+                } else {
+                    // ruta relativa: construir desde BASE o DOCUMENT_ROOT
+                    $baseRoot = defined('BASE') ? rtrim(BASE, '/\\') : (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') : __DIR__ . '/../');
+                    $fsPath = $baseRoot . DIRECTORY_SEPARATOR . str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $archivo);
+                }
+
+                if ($fsPath && file_exists($fsPath)) {
+                    @unlink($fsPath);
+                }
+            }
+
+            // Eliminar registro en la BD
+            $ok = $this->db->del('contratos', array('id' => $id));
+            if (!$ok) {
+                throw new Exception('No se pudo eliminar el registro de la base de datos');
+            }
+
+            // Registrar historial si es posible
+            try {
+                $history = array(
+                    'xentity' => 'CONTRATO',
+                    'xaction' => 'DEL-CONTRATO',
+                    'xid' => $id,
+                    'xobs' => 'Contrato eliminado: ' . $id
+                );
+                if (method_exists($this->app, 'add_history')) { $this->app->add_history($history); }
+            } catch (Exception $e) { }
+
+        } catch (Exception $e) {
+            $resp['status'] = 0;
+            $resp['msg'] = $e->getMessage();
+        }
+        return $resp;
     }
 
     private function _list($param) {

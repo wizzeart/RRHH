@@ -742,7 +742,9 @@ function pdfFormatter(value, row, index) {
     return '<div class="btn-group">' +
     '<a href="' + url + '" target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" title="Vista previa"><i class="fa fa-eye"></i></a>' +
            '<a href="' + url + '" download="' + filename + '" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Descargar PDF"><i class="fa fa-download"></i></a>' +
-           '</div>';
+        // Agregar botón eliminar (manejado por evento global)
+        '<button data-id="' + row.id + '" class="btn btn-danger btn-sm delete-contract" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></button>' +
+        '</div>';
 }
 
 
@@ -817,6 +819,34 @@ function formatoNivel(value, row) {
     //return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
     return s;
 }
+
+// Handler global para eliminar contrato
+$(document).on('click', '.delete-contract', function(e){
+    e.preventDefault();
+    var id = $(this).data('id');
+    if (!id) return;
+    if (!confirm('¿Desea eliminar este contrato? Esta acción eliminará también el archivo asociado.')) return;
+    var $btn = $(this);
+    $btn.prop('disabled', true);
+    $.ajax({
+        url: 'api-app.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { module: 'contratos', method: 'del', id: id }
+    }).done(function(resp){
+        if (resp && resp.status == 1) {
+            // Refrescar tabla de contratos (si existe)
+            try { $('#table-panel').bootstrapTable('refresh'); } catch(e) {}
+            alert('Contrato eliminado correctamente');
+        } else {
+            alert('Error al eliminar: ' + (resp && resp.msg ? resp.msg : 'Error desconocido'));
+        }
+    }).fail(function(xhr){
+        alert('Error en la comunicación con el servidor');
+    }).always(function(){
+        $btn.prop('disabled', false);
+    });
+});
 
  // $('#btn-add-new').click(function(){ location.href = 'index.php?module=contratos'; });
 
