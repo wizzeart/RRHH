@@ -627,6 +627,8 @@ $(document).ready(function () {
         formData.append('module', 'documentos');
         formData.append('method', 'del');
         formData.append('id', idRecurso);
+        //alerta de confirmación
+        if (!confirm('¿Desea eliminar este documento?')) return;
         $.ajax({
             url: 'api-app.php',
             type: 'POST',

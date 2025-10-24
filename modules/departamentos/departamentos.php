@@ -48,9 +48,6 @@
             <button id="btn-back" class="btn btn-default icon-lg" type="button">
                 <i class="fa fa-undo fa-lg"></i> Volver
             </button>
-            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                <i class="fa fa-plus fa-lg"></i> Nuevo
-            </button>
         </div>
     </div>
 </div>

@@ -597,8 +597,8 @@
                                             data-url="api-app.php?module=prenomina&method=list-prenomina-id&trabajador_id=<?php print($data['id']); ?>"
                                             data-search="true"
                                             data-show-refresh="true"
-                                            data-show-toggle="false"
-                                            data-show-columns="false"
+                                            data-show-toggle="true"
+                                            data-show-columns="true"
                                             data-sort-name="year"
                                             data-sort-order="desc"
                                             data-page-list="[10, 25, 50]"
@@ -675,7 +675,7 @@
                             data-toggle="table"
                             data-url="api-app.php?module=vacaciones&method=list-id&trabajador_id=<?php print($data['id']); ?>"
                             data-search="true"
-                            data-show-refresh="false"
+                            data-show-refresh="true"
                             data-show-toggle="false"
                             data-show-columns="false"
                             data-sort-name="year"
@@ -710,8 +710,8 @@
                             data-toggle="table"
                             data-url="api-app.php?module=documentos&method=list-id&trabajador_id=<?php print($data['id']); ?>"
                             data-search="true"
-                            data-show-refresh="false"
-                            data-show-toggle="false"
+                            data-show-refresh="true"
+                            data-show-toggle="true"
                             data-show-columns="false"
                             data-sort-name="year"
                             data-sort-order="desc"
@@ -723,7 +723,7 @@
                                     <th data-field="tipo" data-sortable="true">Descripción</th>
                                     <!--<th data-field="archivo"data-align="center" data-width="140">Archivo</th>-->
                                     <th data-field="fecha_upload" data-sortable="true">Fecha Subida</th>
-                                    <th data-field="archivo" data-formatter="pdfFormatter2" data-align="center" data-width="140">Descargar</th>
+                                    <th data-field="archivo" data-formatter="pdfFormatter2" data-align="center" data-width="140">Opciones</th>
 
                                 </tr>
                             </thead>

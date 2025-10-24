@@ -97,15 +97,6 @@
                             <i class="fa fa-undo"></i>
                             Volver
                         </button>
-                        <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                            <i class="fa fa-plus"></i>
-                            Nuevo
-                        </button>
-                        <?php if ($app->user_id == 1) { ?>
-                            <button id="btn-test" class="btn btn-danger icon-lg" type="button">
-                                Test
-                            </button>
-                        <?php } ?>
                     </div>
                 </div>
             </div><!-- TAB PEDIDOS -->
