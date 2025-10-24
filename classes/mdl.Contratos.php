@@ -65,9 +65,7 @@ class Contrato {
             }
             $stmtCheck = $this->db->conn->prepare($sqlCheck);
             $stmtCheck->execute($paramsCheck);
-            if ($stmtCheck->fetch()) {
-                throw new Exception('Ya existe un contrato igual para este trabajador, tipo y fecha.');
-            }
+           
 
             // Validar archivo
             if (!isset($_FILES['archivo_contrato'])) {

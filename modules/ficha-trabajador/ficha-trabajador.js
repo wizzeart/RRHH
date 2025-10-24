@@ -818,7 +818,7 @@ function formatoNivel(value, row) {
     return s;
 }
 
-  $('#btn-add-new').click(function(){ location.href = 'index.php?module=contratos'; });
+ // $('#btn-add-new').click(function(){ location.href = 'index.php?module=contratos'; });
 
   // Abrir modal de contrato anterior
   $('#btn-add-anterior').click(function(){
@@ -922,47 +922,7 @@ function formatoNivel(value, row) {
         console.log(pair[0] + ': ' + pair[1]);
     }
 
-    // Deshabilitar botón mientras se procesa
-    $submitBtn.prop('disabled', true);
-
-    $.ajax({
-        url: 'api-app.php',
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 1) {
-                notify('success', '¡Éxito!', 'Contrato anterior guardado correctamente', 3000);
-                $('#modalContratoAnterior').modal('hide');
-                // Recargar tabla de contratos
-                $('#table-panel').bootstrapTable('refresh');
-            } else {
-                notify('danger', 'Error', response.msg || 'Error al guardar el contrato', 4000);
-                console.error('Error del servidor:', response);
-            }
-        },
-        error: function(xhr, status, error) {
-            var errorMsg = '';
-            try {
-                var response = JSON.parse(xhr.responseText);
-                errorMsg = response.msg || response.error || error;
-            } catch(e) {
-                errorMsg = xhr.responseText || error || 'Error desconocido';
-            }
-            notify('danger', 'Error', 'Error al guardar el contrato: ' + errorMsg, 4000);
-            console.error('Error en la petición:', {
-                status: xhr.status,
-                statusText: xhr.statusText,
-                responseText: xhr.responseText,
-                error: error
-            });
-        },
-        complete: function() {
-            $submitBtn.prop('disabled', false);
-        }
-    });
+    
 
     // Deshabilitar botón mientras se procesa
     $submitBtn.prop('disabled', true);
