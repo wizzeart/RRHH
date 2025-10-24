@@ -425,8 +425,7 @@ $(document).ready(function () {
                                 // Redirigir al módulo de contratos pasando el ID del trabajador y el departamento
                                 var trabajadorId = d.id;
                                 var departamentoId = $('#f-departamento').val();
-                                window.location.href = '?module=contratos&trabajador_id=' + encodeURIComponent(trabajadorId) + 
-                                                     '&departamento_id=' + encodeURIComponent(departamentoId);
+                                window.location.href = '?module=list-trabajadores';
                             }, 1500);
                         } else {
                             notify(

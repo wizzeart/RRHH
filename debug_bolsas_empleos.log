@@ -624,3 +624,101 @@ Array
     [estatus] => pendiente
 )
 
+2025-10-24 16:21:06 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Cacho
+    [apellidos] => Muchacho
+    [segundos_apellidos] => Pangacho
+    [telefono] => 53453232
+    [email] => undefined
+    [cargo_postulado_id] => 2
+    [fecha_registro] => 2025-10-24
+    [estatus] => undefined
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => pruebaCV.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\phpEF16.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-24 16:21:06 - Intentando insertar:
+Array
+(
+    [nombre] => Cacho
+    [apellidos] => Muchacho
+    [segundos_apellidos] => Pangacho
+    [curriculum] => uploads/curriculos/cv_68fb8b5258db5_pruebaCV.docx
+    [cargo_postulado_id] => 2
+    [telefono] => 53453232
+    [fecha_registro] => 2025-10-24
+)
+
+2025-10-24 16:21:21 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => update
+    [id] => 30
+    [observaciones] => Este tipo es genial
+)
+
+FILES: Array
+(
+)
+
+Action: update
+2025-10-24 16:21:21 - Intentando actualizar postulación ID: 30
+Array
+(
+    [nombre] => Cacho
+    [apellidos] => Muchacho
+    [segundos_apellidos] => Pangacho
+    [curriculum] => uploads/curriculos/cv_68fb8b5258db5_pruebaCV.docx
+    [cargo_postulado_id] => 2
+    [telefono] => 53453232
+    [fecha_registro] => 2025-10-24 00:00:00
+    [observaciones] => Este tipo es genial
+)
+
+2025-10-24 16:21:28 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => update
+    [id] => 30
+    [observaciones] => Este tipo es genial
+)
+
+FILES: Array
+(
+)
+
+Action: update
+2025-10-24 16:21:28 - Intentando actualizar postulación ID: 30
+Array
+(
+    [nombre] => Cacho
+    [apellidos] => Muchacho
+    [segundos_apellidos] => Pangacho
+    [curriculum] => uploads/curriculos/cv_68fb8b5258db5_pruebaCV.docx
+    [cargo_postulado_id] => 2
+    [telefono] => 53453232
+    [fecha_registro] => 2025-10-24 00:00:00
+    [observaciones] => Este tipo es genial
+)
+
