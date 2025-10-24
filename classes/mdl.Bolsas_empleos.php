@@ -87,7 +87,7 @@ class Bolsas_empleos {
         $where = array(
             'id' => $param['id']
         );
-        $this->app->db->delete('bolsa_empleo', $where);
+        $this->app->db->del('bolsa_empleo', $where);
 
         $history = array(
             'xentity' => 'BOLSA_EMPLEO',
@@ -143,6 +143,18 @@ class Bolsas_empleos {
             'apellidos' => 'Apellidos',
             'segundos_apellidos' => 'Segundo Apellido'
         );
+
+        if ($data['action'] == 'update') {
+            $sql = "SELECT * FROM bolsa_empleo WHERE id=:id";
+            $get = $this->db->fetchAll($sql, array('id' => $param['id']));
+            $param['nombre'] = $get[0]['nombre'];
+            $param['apellidos'] = $get[0]['apellidos'];
+            $param['segundos_apellidos'] = $get[0]['segundos_apellidos'];
+            $param['cargo_postulado_id'] = $get[0]['cargo_postulado_id'];
+            $param['telefono'] = $get[0]['telefono'];
+            $param['fecha_registro'] = $get[0]['fecha_registro'];
+            $param['curriculum'] = $get[0]['curriculum'];
+        }
         foreach ($soloLetras as $f => $label) {
             if (isset($param[$f]) && trim($param[$f]) !== '') {
                 if (!preg_match('/^[\p{L}\s]+$/u', $param[$f])) {
@@ -264,6 +276,8 @@ class Bolsas_empleos {
             try {
                 $id = $param['id'];
                 
+               $insert['observaciones'] = $param['observaciones'];
+
                 // Filtrar campos válidos para actualización
                 $campos_validos = [
                     'nombre',
@@ -273,6 +287,7 @@ class Bolsas_empleos {
                     'cargo_postulado_id',
                     'telefono',
                     'fecha_registro',
+                    'observaciones',
                 ];
                 
                 // Filtrar solo los campos válidos
@@ -325,7 +340,7 @@ class Bolsas_empleos {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.estatus
+        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.observaciones
                  FROM bolsa_empleo b
                  LEFT JOIN cargos c ON b.cargo_postulado_id = c.id
                  ORDER BY b.id DESC";

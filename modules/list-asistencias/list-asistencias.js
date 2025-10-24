@@ -48,7 +48,11 @@ function formatoNombreCompleto(value, row) {
 function formatoAusencia(value, row) {
     if (value || row.ausencia == 1) {
         return '<span class="label label-danger">AUSENTE</span><br><small>' + (row.tipo_ausencia || '') + '</small>';
-    } else {
+    }
+    else if (row.tardanza == 1) {
+        return '<span class="label label-success">PRESENTE</span><br><small>Tardanza</small>';
+    }
+    else {
         return '<span class="label label-success">PRESENTE</span>';
     }
 }
@@ -122,6 +126,40 @@ function toggleTipoAusencia() {
     } else {
         $('#tipo-ausencia-container').hide();
         $('#tipo_ausencia').prop('required', false);
+    }
+}
+
+function formatoHoras(value, row) {
+    if (!row.hora_entrada || !row.hora_salida) {
+        return '-';
+    }
+    function timeStringToSeconds(timeStr) {
+        if (!timeStr) return 0;
+        const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+    try {
+        // Convert time strings to seconds
+        const entradaSegundos = timeStringToSeconds(row.hora_entrada);
+        const salidaSegundos = timeStringToSeconds(row.hora_salida);
+        
+        // Calculate difference in seconds
+        let diffSegundos = salidaSegundos - entradaSegundos;
+        
+
+        // If the result is negative, the times might be on different days
+        if (diffSegundos < 0) {
+            // Add 24 hours if the end time is on the next day
+            diffSegundos += 86400; // 24 hours in seconds
+            
+            
+        }
+        
+        const horasDecimal = (diffSegundos / 3600).toFixed(1);
+        return parseFloat(horasDecimal) + ' h'; 
+    } catch (e) {
+        console.error('Error calculating time difference:', e);
+        return '-';
     }
 }
 

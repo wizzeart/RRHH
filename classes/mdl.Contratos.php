@@ -10,6 +10,201 @@ class Contrato {
         $action = 'insert';
     }
 
+    public function save_anterior() {
+        $response = array('status' => 0, 'msg' => '', 'id' => 0);
+        $connection = $this->db->conn;
+        
+        try {
+            // Log inicial
+            error_log("=== Inicio save_anterior ===");
+            error_log("POST: " . print_r($_POST, true));
+            if (isset($_FILES['archivo_contrato'])) {
+                error_log("Archivo: " . print_r($_FILES['archivo_contrato'], true));
+            }
+
+            // Validar campos requeridos
+            if (!isset($_POST['trabajador_id']) || empty($_POST['trabajador_id'])) {
+                throw new Exception('El trabajador es requerido');
+            }
+            
+            // Validar que trabajador_id sea numérico
+            if (!is_numeric($_POST['trabajador_id'])) {
+                throw new Exception('ID de trabajador inválido');
+            }
+
+            if (!isset($_POST['tipo_contrato']) || empty($_POST['tipo_contrato'])) {
+                throw new Exception('El tipo de contrato es requerido');
+            }
+
+            // Validar que el tipo de contrato sea 1 (indeterminado) o 2 (determinado)
+            if (!in_array($_POST['tipo_contrato'], ['1', '2'], true)) {
+                throw new Exception('Tipo de contrato inválido. Debe ser 1 (indeterminado) o 2 (determinado)');
+            }
+
+            if (!isset($_POST['fecha_inicio']) || empty($_POST['fecha_inicio'])) {
+                throw new Exception('La fecha de inicio es requerida');
+            }
+            
+            // Validar que si es contrato determinado (tipo 2) tenga fecha fin
+            if ($_POST['tipo_contrato'] === '2' && empty($_POST['fecha_fin'])) {
+                throw new Exception('Para contratos determinados la fecha de fin es requerida');
+            }
+
+            // Verificar duplicado antes de insertar
+            $sqlCheck = "SELECT id FROM contratos WHERE trabajador_id = :trabajador_id AND tipo = :tipo AND fecha_inicio = :fecha_inicio ";
+            $paramsCheck = [
+                ':trabajador_id' => $_POST['trabajador_id'],
+                ':tipo' => $_POST['tipo_contrato'],
+                ':fecha_inicio' => $_POST['fecha_inicio']
+            ];
+            if ($_POST['tipo_contrato'] === '2') {
+                $sqlCheck .= " AND fecha_fin = :fecha_fin ";
+                $paramsCheck[':fecha_fin'] = $_POST['fecha_fin'];
+            } else {
+                $sqlCheck .= " AND (fecha_fin IS NULL OR fecha_fin = '') ";
+            }
+            $stmtCheck = $this->db->conn->prepare($sqlCheck);
+            $stmtCheck->execute($paramsCheck);
+           
+
+            // Validar archivo
+            if (!isset($_FILES['archivo_contrato'])) {
+                throw new Exception('No se recibió ningún archivo');
+            }
+
+            $archivo = $_FILES['archivo_contrato'];
+
+            if ($archivo['error'] !== UPLOAD_ERR_OK) {
+                $errorMessages = array(
+                    UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por PHP',
+                    UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo permitido por el formulario',
+                    UPLOAD_ERR_PARTIAL => 'El archivo se subió parcialmente',
+                    UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Falta la carpeta temporal',
+                    UPLOAD_ERR_CANT_WRITE => 'Error al escribir el archivo',
+                    UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida'
+                );
+                $errorMsg = isset($errorMessages[$archivo['error']]) ? 
+                           $errorMessages[$archivo['error']] : 
+                           'Error desconocido al subir el archivo';
+                throw new Exception($errorMsg);
+            }
+
+            if (!is_uploaded_file($archivo['tmp_name'])) {
+                throw new Exception('El archivo no se subió correctamente');
+            }
+
+            $mimeType = mime_content_type($archivo['tmp_name']);
+            if ($mimeType === false) {
+                throw new Exception('No se pudo determinar el tipo de archivo');
+            }
+
+            $allowedTypes = array(
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            );
+
+            if (!in_array($mimeType, $allowedTypes)) {
+                throw new Exception('Tipo de archivo no permitido. Solo se permiten archivos PDF y Word');
+            }
+
+            if ($archivo['size'] > 10 * 1024 * 1024) {
+                throw new Exception('El archivo no debe superar los 10MB');
+            }
+
+            // Iniciar transacción
+            $this->db->conn->beginTransaction();
+
+            // Preparar la consulta de inserción
+            $sql = "INSERT INTO contratos (trabajador_id, tipo, fecha_inicio, fecha_fin, firma_digital) 
+                   VALUES (:trabajador_id, :tipo, :fecha_inicio, :fecha_fin, :firma_digital)";
+            
+            $params = array(
+                ':trabajador_id' => $_POST['trabajador_id'],
+                ':tipo' => $_POST['tipo_contrato'],
+                ':fecha_inicio' => $_POST['fecha_inicio'],
+                ':fecha_fin' => $_POST['tipo_contrato'] === '2' ? $_POST['fecha_fin'] : null,
+                ':firma_digital' => 0
+            );
+            
+            error_log("SQL a ejecutar: " . $sql);
+            error_log("Parámetros: " . print_r($params, true));
+            
+            $stmt = $this->db->conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception('Error al preparar la consulta: ' . implode(', ', $this->db->conn->errorInfo()));
+            }
+            
+            // Ejecutar la consulta una sola vez
+            if (!$stmt->execute($params)) {
+                throw new Exception('Error al ejecutar la consulta: ' . implode(', ', $stmt->errorInfo()));
+            }
+            // Obtener el ID del contrato insertado
+            $contratoId = $this->db->conn->lastInsertId();
+            if (!$contratoId) {
+                throw new Exception('Error al obtener el ID del contrato insertado');
+            }
+
+            // Definir extensión según mime type
+            $extension = $mimeType === 'application/pdf' ? 'pdf' : 
+                       ($mimeType === 'application/msword' ? 'doc' : 'docx');
+            
+            // Crear directorio si no existe
+            $uploadDir = __DIR__ . '/../uploads/contratos';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            // Mover archivo
+            $nombreArchivo = $contratoId . '.' . $extension;
+            $rutaArchivo = $uploadDir . '/' . $nombreArchivo;
+            $rutaRelativa = 'uploads/contratos/' . $nombreArchivo;
+
+            if (!move_uploaded_file($archivo['tmp_name'], $rutaArchivo)) {
+                throw new Exception('Error al guardar el archivo');
+            }
+
+            // Actualizar ruta del archivo en la base de datos
+            $sqlUpdate = "UPDATE contratos SET archivo_contrato = :ruta WHERE id = :id";
+            $updateParams = array(
+                ':ruta' => $rutaRelativa,
+                ':id' => $contratoId
+            );
+            
+            error_log("SQL Update: " . $sqlUpdate);
+            error_log("Parámetros Update: " . print_r($updateParams, true));
+
+            $stmtUpdate = $this->db->conn->prepare($sqlUpdate);
+            if (!$stmtUpdate) {
+                throw new Exception('Error al preparar la consulta de actualización');
+            }
+
+            if (!$stmtUpdate->execute($updateParams)) {
+                throw new Exception('Error al actualizar la ruta del archivo: ' . implode(', ', $stmtUpdate->errorInfo()));
+            }
+
+            // Confirmar transacción
+            $this->db->conn->commit();
+
+            $response['status'] = 1;
+            $response['msg'] = 'Contrato guardado correctamente';
+            $response['id'] = $contratoId;
+
+        } catch (Exception $e) {
+            // Revertir transacción si hay error
+            if ($this->db->conn && $this->db->conn->inTransaction()) {
+                $this->db->conn->rollBack();
+            }
+            
+            error_log("Error en save_anterior: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            $response['status'] = 0;
+            $response['msg'] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
     // Renderiza la vista PHP del contrato único con variables pasadas desde el formulario
     private function _render_contrato_unico($param) {
         $resp = array('status'=>0, 'html'=>'');
@@ -74,6 +269,7 @@ class Contrato {
                 if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var99 = '_X_'; }
                 if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
             }
+            $var31 = '_____________'; // mensual
             // Frecuencia de pago/trabajo: tres marcadores (semanal, quincenal, mensual)
             $var27 = '(_)'; // semanal
             $var28 = '(_)'; // quincenal
@@ -296,48 +492,77 @@ class Contrato {
     }
 
     public function api($param) {
-        switch ($param['method']) {
-            case 'list':
-                $data = $this->_list($param);
-                print(json_encode($data));
-                break;
-            case 'list-id':
-                $data = $this->_list_id($param);
-                print(json_encode($data));
-                break;
-            case 'list-trabajadores':
-                $data = $this->_list_trabajadores();
-                print(json_encode($data));
-                break;
-            case 'list-departamentos':
-                $data = $this->_list_departamentos();
-                print(json_encode($data));
-                break;
-            case 'get-trabajador-data':
-                $data = $this->_get_trabajador_data($param);
-                print(json_encode($data));
-                break;
-            case 'getTemplate':
-                $this->_getTemplate($param);
-                break;
-            case 'render-contrato-unico':
-                $this->_render_contrato_unico($param);
-                break;
-            case 'save':
-                $this->_save($param);
-                break;
-            case 'generatePdfFromHtml':
-                $this->_generatePdfFromHtml($param);
-                break;
-            case 'generatePdfById':
-                $this->_generatePdfById($param);
-                break;
-            case 'savePdfContrato':
-                $this->_savePdfContrato($param);
-                break;
-            case 'generatePdfWithFpdf':
-                $this->_generatePdfWithFpdf($param);
-                break;
+        try {
+            if (!isset($param['method'])) {
+                throw new Exception('Método no especificado');
+            }
+
+            // Asegurar que siempre enviamos JSON
+            if (!headers_sent()) {
+                header('Content-Type: application/json; charset=utf-8');
+            }
+
+            $response = null;
+
+            switch ($param['method']) {
+                case 'save-anterior':
+                    $response = $this->save_anterior();
+                    break;
+                case 'list':
+                    $response = $this->_list($param);
+                    break;
+                case 'list-id':
+                    $response = $this->_list_id($param);
+                    break;
+                case 'list-trabajadores':
+                    $response = $this->_list_trabajadores();
+                    break;
+                case 'list-departamentos':
+                    $response = $this->_list_departamentos();
+                    break;
+                case 'get-trabajador-data':
+                    $response = $this->_get_trabajador_data($param);
+                    break;
+                case 'getTemplate':
+                    $response = $this->_getTemplate($param);
+                    break;
+                case 'render-contrato-unico':
+                    $response = $this->_render_contrato_unico($param);
+                    break;
+                case 'save':
+                    $response = $this->_save($param);
+                    break;
+                case 'generatePdfFromHtml':
+                    $response = $this->_generatePdfFromHtml($param);
+                    break;
+                case 'generatePdfById':
+                    $response = $this->_generatePdfById($param);
+                    break;
+                case 'savePdfContrato':
+                    $response = $this->_savePdfContrato($param);
+                    break;
+                case 'generatePdfWithFpdf':
+                    $response = $this->_generatePdfWithFpdf($param);
+                    break;
+                case 'del':
+                    $response = $this->_del($param);
+                    break;
+                default:
+                    throw new Exception('Método no válido: ' . $param['method']);
+            }
+
+            if ($response === null) {
+                throw new Exception('No se obtuvo respuesta del método');
+            }
+
+            echo json_encode($response);
+        } catch (Exception $e) {
+            error_log("Error en Contratos->api: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            echo json_encode([
+                'status' => 0,
+                'msg' => $e->getMessage(),
+                'error' => true
+            ]);
         }
     }
 
@@ -726,6 +951,74 @@ class Contrato {
         print(json_encode($response));
     }
 
+    // Eliminar contrato: borrar registro y archivo asociado (si existe)
+    private function _del($param) {
+        $resp = array('status' => 1, 'msg' => 'Contrato eliminado', 'id' => null);
+        try {
+            if (!isset($param['id']) || intval($param['id']) <= 0) {
+                throw new Exception('ID de contrato no proporcionado');
+            }
+            $id = intval($param['id']);
+            $resp['id'] = $id;
+
+            // Obtener ruta de archivo desde BD
+            $row = $this->db->fetchRow("SELECT archivo_contrato FROM contratos WHERE id = :id", array('id' => $id));
+            if ($row && !empty($row['archivo_contrato'])) {
+                $archivo = $row['archivo_contrato'];
+                $fsPath = null;
+                // Si es URL absoluta, tomar el path
+                if (preg_match('/^https?:\/\//i', $archivo)) {
+                    $u = parse_url($archivo);
+                    $path = isset($u['path']) ? $u['path'] : '';
+                    if (!empty($path)) {
+                        if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                            $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $path;
+                        } elseif (defined('BASE')) {
+                            $fsPath = rtrim(BASE, '/\\') . $path;
+                        }
+                    }
+                } elseif (substr($archivo, 0, 1) === '/') {
+                    // ruta absoluta en servidor
+                    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                        $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $archivo;
+                    } elseif (defined('BASE')) {
+                        $fsPath = rtrim(BASE, '/\\') . $archivo;
+                    }
+                } else {
+                    // ruta relativa: construir desde BASE o DOCUMENT_ROOT
+                    $baseRoot = defined('BASE') ? rtrim(BASE, '/\\') : (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') : __DIR__ . '/../');
+                    $fsPath = $baseRoot . DIRECTORY_SEPARATOR . str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $archivo);
+                }
+
+                if ($fsPath && file_exists($fsPath)) {
+                    @unlink($fsPath);
+                }
+            }
+
+            // Eliminar registro en la BD
+            $ok = $this->db->del('contratos', array('id' => $id));
+            if (!$ok) {
+                throw new Exception('No se pudo eliminar el registro de la base de datos');
+            }
+
+            // Registrar historial si es posible
+            try {
+                $history = array(
+                    'xentity' => 'CONTRATO',
+                    'xaction' => 'DEL-CONTRATO',
+                    'xid' => $id,
+                    'xobs' => 'Contrato eliminado: ' . $id
+                );
+                if (method_exists($this->app, 'add_history')) { $this->app->add_history($history); }
+            } catch (Exception $e) { }
+
+        } catch (Exception $e) {
+            $resp['status'] = 0;
+            $resp['msg'] = $e->getMessage();
+        }
+        return $resp;
+    }
+
     private function _list($param) {
         $data = array();
         try {
@@ -823,15 +1116,47 @@ class Contrato {
     private function _save($param) {
         $data = array('status'=>1, 'msg_title'=>'Éxito', 'msg'=>'Contrato guardado correctamente');
 
-        // Validaciones básicas - solo campos mínimos solicitados
-        $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
-        $tipo_contrato = isset($param['tipo_contrato']) ? trim($param['tipo_contrato']) : '';
-        
-        // La fecha de inicio se toma automáticamente como la fecha actual
-        $fecha_inicio = date('Y-m-d');
+        try {
+            // Iniciar transacción
+            if ($this->db->conn) {
+                $this->db->conn->beginTransaction();
+            } else {
+                throw new Exception('No hay conexión a la base de datos disponible');
+            }
 
-        if ($trabajador_id <= 0) { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El trabajador es obligatorio'; print(json_encode($data)); return; }
-        if ($tipo_contrato === '') { $data['status']=0; $data['msg_title']='Validación'; $data['msg']='El tipo de contrato es obligatorio'; print(json_encode($data)); return; }
+            // Validaciones básicas - solo campos mínimos solicitados
+            $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
+            $tipo_contrato = isset($param['tipo_contrato']) ? trim($param['tipo_contrato']) : '';
+            $fecha_inicio = date('Y-m-d');
+
+            // Validaciones
+            if ($trabajador_id <= 0) {
+                throw new Exception('El trabajador es obligatorio');
+            }
+            if (empty($tipo_contrato)) {
+                throw new Exception('El tipo de contrato es obligatorio');
+            }
+
+            // Verificar duplicado antes de insertar
+            $sqlCheck = "SELECT id FROM contratos WHERE trabajador_id = :trabajador_id AND tipo = :tipo AND fecha_inicio = :fecha_inicio ";
+            $paramsCheck = [
+                ':trabajador_id' => $trabajador_id,
+                ':tipo' => $tipo_contrato,
+                ':fecha_inicio' => $fecha_inicio
+            ];
+            if ($tipo_contrato === '2' && isset($param['fecha_fin'])) {
+                $sqlCheck .= " AND fecha_fin = :fecha_fin ";
+                $paramsCheck[':fecha_fin'] = $param['fecha_fin'];
+            } else {
+                $sqlCheck .= " AND (fecha_fin IS NULL OR fecha_fin = '') ";
+            }
+            $stmtCheck = $this->db->conn->prepare($sqlCheck);
+            $stmtCheck->execute($paramsCheck);
+            if ($stmtCheck->fetch()) {
+                throw new Exception('Ya existe un contrato igual para este trabajador, tipo y fecha.');
+            }
+
+        // Las validaciones ya se hicieron arriba
 
         // Manejo de uploads (solo firma, el contrato se genera como PDF automáticamente)
         $upload_dir = 'uploads/contratos/';
@@ -851,16 +1176,15 @@ class Contrato {
         }
 
         // Solo guardar columnas mínimas: trabajador_id, tipo, fecha_inicio, archivo_contrato, firma_digital (flag int)
-        $insert = array(
-            'trabajador_id'     => $trabajador_id,
-            'tipo'              => $tipo_contrato, // mapeamos 'tipo_contrato' del form a columna 'tipo'
-            'fecha_inicio'      => $fecha_inicio,
-            'archivo_contrato'  => $archivo_contrato_path,
-            // columna firma_digital es entera: 1 si se subió archivo de firma en esta operación, 0 en caso contrario
-            'firma_digital'     => ($firma_digital_path ? 1 : 0)
-        );
 
-        try {
+            $insert = array(
+                'trabajador_id'     => $trabajador_id,
+                'tipo'              => $tipo_contrato, // mapeamos 'tipo_contrato' del form a columna 'tipo'
+                'fecha_inicio'      => $fecha_inicio,
+                'archivo_contrato'  => $archivo_contrato_path,
+                // columna firma_digital es entera: 1 si se subió archivo de firma en esta operación, 0 en caso contrario
+                'firma_digital'     => ($firma_digital_path ? 1 : 0)
+            );
             if (!isset($param['id']) || $param['id'] == '') {
                 // 1) Insertar sin archivo_contrato para obtener el ID
                 $result = $this->db->insert('contratos', $insert);
@@ -876,7 +1200,9 @@ class Contrato {
                             $data['file_url'] = $pdfPath;
                         }
                     }
-                } else { $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al insertar'; }
+                } else { 
+                    throw new Exception('Error al insertar el contrato');
+                }
             } else {
                 $id = intval($param['id']);
                 // No sobrescribir archivos si no subieron nuevos
@@ -884,21 +1210,38 @@ class Contrato {
                 if (!$firma_digital_path) unset($insert['firma_digital']);
                 $where = array('id' => $id);
                 $result = $this->db->update('contratos', $insert, $where);
-                if ($result === false) { $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al actualizar'; }
-                else {
-                    $data['id'] = $id;
-                    // Regenerar PDF con datos actualizados (usar ruta de firma si se subió en esta operación)
-                    $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, $firma_digital_path);
-                    if ($pdfPath) {
-                        $this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $id));
-                        $data['file_url'] = $pdfPath;
+                if ($result === false) { 
+                    throw new Exception('Error al actualizar el contrato');
+                }
+                
+                $data['id'] = $id;
+                // Regenerar PDF con datos actualizados (usar ruta de firma si se subió en esta operación)
+                $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, $firma_digital_path);
+                if ($pdfPath) {
+                    if (!$this->db->update('contratos', array('archivo_contrato' => $pdfPath), array('id' => $id))) {
+                        throw new Exception('Error al actualizar la ruta del archivo');
                     }
+                    $data['file_url'] = $pdfPath;
                 }
             }
+
+            // Si llegamos aquí sin errores, confirmar la transacción
+            if ($this->db->conn && $this->db->conn->inTransaction()) {
+                $this->db->conn->commit();
+            }
+
         } catch (Exception $e) {
-            $data['status']=0; $data['msg_title']='Error'; $data['msg']='Error al guardar: ' . $e->getMessage();
+            // Revertir transacción si hay error
+            if ($this->db->conn && $this->db->conn->inTransaction()) {
+                $this->db->conn->rollBack();
+            }
+            $data['status'] = 0;
+            $data['msg_title'] = 'Error';
+            $data['msg'] = 'Error al guardar: ' . $e->getMessage();
+            error_log("Error en _save: " . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
-        print(json_encode($data));
+
+        return $data;
     }
 
     // Helper: Genera el PDF del contrato con mPDF

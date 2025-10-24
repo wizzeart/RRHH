@@ -105,7 +105,6 @@ class App
 
         $sql = "select a.*"
             . " from " .   "bolsa_empleo a"
-            . " where a.estatus = 'aprobado'"
             . $cond
             . " order by a.id";
 

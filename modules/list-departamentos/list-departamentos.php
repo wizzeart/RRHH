@@ -26,7 +26,7 @@
                   
                     <th data-field="nombre" data-sortable="true">Nombre</th>
                     <th data-field="descripcion" data-sortable="false">Descripción</th>
-                    <th data-field="sede_nombre" data-sortable="true">Sede</th>
+                    <th data-field="empresa_nombre" data-sortable="true">Empresa</th>
                     <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="240">Acciones</th>
                 </tr>
             </thead>

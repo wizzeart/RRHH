@@ -230,9 +230,9 @@
     };
     }
 
-    function refreshTable() {
-        $('#table-deudas').bootstrapTable('refresh');
-    }
+    // function refreshTable() {
+    //     $('#table-deudas').bootstrapTable('refresh');
+    // }
 
     waitForJQ(function($) { 
         initHandlers($);

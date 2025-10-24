@@ -1,6 +1,4 @@
-<?php
-// Vista del módulo Prenómina con 5 tabs y una tabla principal
-?>
+<div class="panel">
 <div class="panel-heading">
     <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
 </div>
@@ -72,4 +70,4 @@
     </div>
 </div>
 
-<?php // El JS del módulo se carga automáticamente desde index.php al final de la página (después de jQuery) ?>
+</div>

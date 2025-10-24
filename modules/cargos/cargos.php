@@ -22,11 +22,17 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label class="control-label" for="f-salario">Salario</label>
-                    <input type="number" id="f-salario" class="form-control" placeholder="0.00" step="0.01" value="<?php if (isset($data['salario'])) print($data['salario']); ?>" />
+                    <label class="control-label" for="f-salario">CUP/HORA</label>
+                    <input type="number" id="f-salario" class="form-control" placeholder="0.00" step="0.01" value="<?php if (isset($data['salario'])) print($data['salario']); ?>" disabled/>
                 </div>
             </div>
-            
+                        <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label" for="f-salario-mensual">Salario Mensual</label>
+                    <input type="number" id="f-salario-mensual" class="form-control" placeholder="0.00" step="0.01" value="" />
+                </div>
+            </div>
+
         </div>
         <div class="row">
             <div class="col-md-12">
@@ -43,9 +49,6 @@
             </button>
             <button id="btn-back" class="btn btn-default icon-lg" type="button">
                 <i class="fa fa-undo fa-lg"></i> Volver
-            </button>
-            <button id="btn-new" class="btn btn-warning icon-lg" type="button">
-                <i class="fa fa-plus fa-lg"></i> Nuevo
             </button>
         </div>
     </div>

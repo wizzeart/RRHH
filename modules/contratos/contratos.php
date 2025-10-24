@@ -31,7 +31,8 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="f-tipo-contrato">Tipo de Contrato <span class="text-danger">*</span></label>
-                        <select id="f-tipo-contrato" name="tipo_contrato" class="form-control">
+                        <select id="f-tipo-contrato" name="tipo_contrato" class="form-control" 
+                            data-valor-guardado="<?php echo isset($data['tipo']) ? htmlspecialchars($data['tipo']) : ''; ?>">
                             <option value="">Seleccione tipo</option>
                             <option value="1" <?php echo (isset($data['tipo']) && $data['tipo'] == '1') ? 'selected' : ''; ?>>1 - Tiempo Determinado</option>
                             <option value="2" <?php echo (isset($data['tipo']) && $data['tipo'] == '2') ? 'selected' : ''; ?>>2 - Tiempo Indeterminado</option>
@@ -87,30 +88,32 @@
                                 <div class="col-md-6">
                                     <div class="form-group" style="margin-bottom: 10px;">
                                         <label for="f-regimen-trabajo-desde" class="control-label">Desde (día)</label>
-                                        <select id="f-regimen-trabajo-desde" name="regimen_trabajo_desde" class="form-control">
+                                        <select id="f-regimen-trabajo-desde" name="regimen_trabajo_desde" class="form-control"
+                                            data-valor-guardado="<?php echo isset($data['regimen_trabajo_desde']) ? htmlspecialchars($data['regimen_trabajo_desde']) : ''; ?>">
                                             <option value="">Seleccione día</option>
-                                            <option value="Lunes">Lunes</option>
-                                            <option value="Martes">Martes</option>
-                                            <option value="Miércoles">Miércoles</option>
-                                            <option value="Jueves">Jueves</option>
-                                            <option value="Viernes">Viernes</option>
-                                            <option value="Sábado">Sábado</option>
-                                            <option value="Domingo">Domingo</option>
+                                            <option value="Lunes" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Lunes') ? 'selected' : ''; ?>>Lunes</option>
+                                            <option value="Martes" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Martes') ? 'selected' : ''; ?>>Martes</option>
+                                            <option value="Miércoles" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Miércoles') ? 'selected' : ''; ?>>Miércoles</option>
+                                            <option value="Jueves" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Jueves') ? 'selected' : ''; ?>>Jueves</option>
+                                            <option value="Viernes" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Viernes') ? 'selected' : ''; ?>>Viernes</option>
+                                            <option value="Sábado" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Sábado') ? 'selected' : ''; ?>>Sábado</option>
+                                            <option value="Domingo" <?php echo (isset($data['regimen_trabajo_desde']) && $data['regimen_trabajo_desde'] == 'Domingo') ? 'selected' : ''; ?>>Domingo</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group" style="margin-bottom: 10px;">
                                         <label for="f-regimen-trabajo-hasta" class="control-label">Hasta (día)</label>
-                                        <select id="f-regimen-trabajo-hasta" name="regimen_trabajo_hasta" class="form-control">
+                                        <select id="f-regimen-trabajo-hasta" name="regimen_trabajo_hasta" class="form-control"
+                                            data-valor-guardado="<?php echo isset($data['regimen_trabajo_hasta']) ? htmlspecialchars($data['regimen_trabajo_hasta']) : ''; ?>">
                                             <option value="">Seleccione día</option>
-                                            <option value="Lunes">Lunes</option>
-                                            <option value="Martes">Martes</option>
-                                            <option value="Miércoles">Miércoles</option>
-                                            <option value="Jueves">Jueves</option>
-                                            <option value="Viernes">Viernes</option>
-                                            <option value="Sábado">Sábado</option>
-                                            <option value="Domingo">Domingo</option>
+                                            <option value="Lunes" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Lunes') ? 'selected' : ''; ?>>Lunes</option>
+                                            <option value="Martes" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Martes') ? 'selected' : ''; ?>>Martes</option>
+                                            <option value="Miércoles" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Miércoles') ? 'selected' : ''; ?>>Miércoles</option>
+                                            <option value="Jueves" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Jueves') ? 'selected' : ''; ?>>Jueves</option>
+                                            <option value="Viernes" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Viernes') ? 'selected' : ''; ?>>Viernes</option>
+                                            <option value="Sábado" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Sábado') ? 'selected' : ''; ?>>Sábado</option>
+                                            <option value="Domingo" <?php echo (isset($data['regimen_trabajo_hasta']) && $data['regimen_trabajo_hasta'] == 'Domingo') ? 'selected' : ''; ?>>Domingo</option>
                                         </select>
                                     </div>
                                 </div>
@@ -119,14 +122,20 @@
                                 <div class="col-md-6">
                                     <div class="form-group" style="margin-bottom: 10px;">
                                         <label for="f-desde-hora" class="control-label">Desde Hora</label>
-                                        <input type="time" id="f-desde-hora" name="hora_desde_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <input type="time" id="f-desde-hora" name="hora_desde_h" class="form-control" step="3600" 
+                                            value="<?php echo isset($data['hora_desde_h']) ? htmlspecialchars($data['hora_desde_h']) : ''; ?>" 
+                                            placeholder="HH"
+                                            data-valor-guardado="<?php echo isset($data['hora_desde_h']) ? htmlspecialchars($data['hora_desde_h']) : ''; ?>" />
                                         <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group" style="margin-bottom: 10px;">
                                         <label for="f-hasta-hora" class="control-label">Hasta Hora</label>
-                                        <input type="time" id="f-hasta-hora" name="hora_hasta_h" class="form-control" step="3600" value="" placeholder="HH" />
+                                        <input type="time" id="f-hasta-hora" name="hora_hasta_h" class="form-control" step="3600"
+                                            value="<?php echo isset($data['hora_hasta_h']) ? htmlspecialchars($data['hora_hasta_h']) : ''; ?>"
+                                            placeholder="HH"
+                                            data-valor-guardado="<?php echo isset($data['hora_hasta_h']) ? htmlspecialchars($data['hora_hasta_h']) : ''; ?>" />
                                         <small class="text-muted">Solo horas (sin minutos ni segundos)</small>
                                     </div>
                                 </div>
@@ -169,11 +178,12 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="control-label" for="f-frecuencia-trabajo">Frecuencia de Pago/Trabajo</label>
-                        <select id="f-frecuencia-trabajo" name="frecuencia_trabajo" class="form-control">
+                        <select id="f-frecuencia-trabajo" name="frecuencia_trabajo" class="form-control"
+                            data-valor-guardado="<?php echo isset($data['frecuencia_trabajo']) ? htmlspecialchars($data['frecuencia_trabajo']) : ''; ?>">
                             <option value="">Seleccione frecuencia</option>
-                            <option value="semanal">Semanal</option>
-                            <option value="quincenal">Quincenal</option>
-                            <option value="mensual">Mensual</option>
+                            <option value="semanal" <?php echo (isset($data['frecuencia_trabajo']) && $data['frecuencia_trabajo'] == 'semanal') ? 'selected' : ''; ?>>Semanal</option>
+                            <option value="quincenal" <?php echo (isset($data['frecuencia_trabajo']) && $data['frecuencia_trabajo'] == 'quincenal') ? 'selected' : ''; ?>>Quincenal</option>
+                            <option value="mensual" <?php echo (isset($data['frecuencia_trabajo']) && $data['frecuencia_trabajo'] == 'mensual') ? 'selected' : ''; ?>>Mensual</option>
                         </select>
                         <small class="text-muted">Se reflejará como (X) en el contrato.</small>
                     </div>
