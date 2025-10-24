@@ -3,7 +3,7 @@ $(document).ready(function() {
         selectors: {
             total: '#total-trabajadores',
             activos: '#trabajadores-activos',
-            edad: '#promedio-edad',
+            departamentos: '#departamentos',
             cargos: '#total-cargos',
             subcontratos: '#total-subcontratos',
             contratos: '#total-contratos',
@@ -54,7 +54,7 @@ $(document).ready(function() {
 
             $(this.selectors.total).text(stats.total || 0);
             $(this.selectors.activos).text(stats.activos || 0);
-            $(this.selectors.edad).text(stats.promedioEdad || 0);
+            $(this.selectors.departamentos).text(stats.departamentos || 0);
             $(this.selectors.cargos).text(stats.totalCargos || 0);
             $(this.selectors.subcontratos).text(stats.totalSubcontratos || 0);
             $(this.selectors.contratos).text(stats.totalContratos || 0);

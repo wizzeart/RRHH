@@ -25,7 +25,7 @@ class Home {
                     $sql = "SELECT 
                         COUNT(*) as total,
                         SUM(CASE WHEN trabajador_eliminado = 0 THEN 1 ELSE 0 END) as activos,
-                        ROUND(AVG(edad)) as promedioEdad,
+                       
                         COUNT(DISTINCT cargos_id) as totalCargos
                     FROM trabajadores 
                     WHERE trabajador_eliminado = 0";
@@ -39,7 +39,6 @@ class Home {
                     $quickStats = [
                         'total' => (int)$result['total'],
                         'activos' => (int)$result['activos'],
-                        'promedioEdad' => (int)$result['promedioEdad'],
                         'totalCargos' => (int)$result['totalCargos']
                     ];
 
@@ -53,7 +52,10 @@ class Home {
                         $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM contratos");
                         $quickStats['totalContratos'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['totalContratos'] = 0; }
-
+                    try {
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM departamentos");
+                        $quickStats['departamentos'] = $row ? (int)$row['val'] : 0;
+                    } catch (Exception $e) { $quickStats['departamentos'] = 0; }
                     try {
                         $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM programas_capacitacion");
                         $quickStats['totalCapacitaciones'] = $row ? (int)$row['val'] : 0;

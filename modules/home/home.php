@@ -45,26 +45,16 @@ global $data, $page;
                         </div>
                     </a>
                 </div>
-                <!-- Trabajadores Activos -->
-                <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver trabajadores activos">
-                        <div class="panel panel-info panel-colorful">
-                            <div class="pad-all text-center">
-                                <div class="mar-btm"><i class="fa fa-user fa-2x"></i></div>
-                                <span class="text-3x text-thin" id="trabajadores-activos">0</span>
-                                <p>Trabajadores Activos</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+               
+               
                 <!-- Promedio de Edad -->
                 <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver detalle de trabajadores">
+                    <a href="?module=list-departamentos" style="text-decoration:none;" data-toggle="tooltip" title="Ver detalle de departamentos">
                         <div class="panel panel-success panel-colorful">
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-bar-chart fa-2x"></i></div>
-                                <span class="text-3x text-thin" id="promedio-edad">0</span>
-                                <p>Promedio de Edad</p>
+                                <span class="text-3x text-thin" id="departamentos">0</span>
+                                <p>Departamentos</p>
                             </div>
                         </div>
                     </a>
@@ -81,6 +71,18 @@ global $data, $page;
                         </div>
                     </a>
                 </div>
+                <!-- Usuarios -->
+                <div class="col-sm-6 col-lg-3">
+                    <a href="?module=list-usuarios" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de usuarios">
+                        <div class="panel panel-info panel-colorful">
+                            <div class="pad-all text-center">
+                                <div class="mar-btm"><i class="fa fa-user fa-2x"></i></div>
+                                <span class="text-3x text-thin" id="total-usuarios">0</span>
+                                <p>Usuarios</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -91,7 +93,7 @@ global $data, $page;
             <div class="row">
                 <!-- Subcontratos -->
                 <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-subcontratos" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de subcontratos">
+                    <a href="#" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de subcontratos">
                         <div class="panel panel-purple panel-colorful">
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-sort-desc fa-2x"></i></div>
@@ -103,7 +105,7 @@ global $data, $page;
                 </div>
                 <!-- Contratos -->
                 <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-contratos" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de contratos">
+                    <a href="#" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de contratos">
                         <div class="panel panel-danger panel-colorful">
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-file-text-o fa-2x"></i></div>
@@ -115,7 +117,7 @@ global $data, $page;
                 </div>
                 <!-- Capacitaciones -->
                 <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-programas-capacitacion" style="text-decoration:none;" data-toggle="tooltip" title="Ver programas de capacitación">
+                    <a href="#" style="text-decoration:none;" data-toggle="tooltip" title="Ver programas de capacitación">
                         <div class="panel panel-dark panel-colorful">
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-graduation-cap fa-2x"></i></div>
@@ -145,21 +147,10 @@ global $data, $page;
     <div class="row">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-sm-6 col-lg-3"></div>
-                <!-- Usuarios -->
-                <div class="col-sm-6 col-lg-3">
-                    <a href="?module=list-usuarios" style="text-decoration:none;" data-toggle="tooltip" title="Ver listado de usuarios">
-                        <div class="panel panel-info panel-colorful">
-                            <div class="pad-all text-center">
-                                <div class="mar-btm"><i class="fa fa-user fa-2x"></i></div>
-                                <span class="text-3x text-thin" id="total-usuarios">0</span>
-                                <p>Usuarios</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                
+                
                 <!-- Trabajadores dados de baja -->
-                <div class="col-sm-6 col-lg-3">
+                <!-- <div class="col-sm-6 col-lg-3">
                     <a href="?module=bajas-trabajadores" style="text-decoration:none;" data-toggle="tooltip" title="Ver trabajadores dados de baja">
                         <div class="panel panel-warning panel-colorful">
                             <div class="pad-all text-center">
@@ -169,7 +160,7 @@ global $data, $page;
                             </div>
                         </div>
                     </a>
-                </div>
+                </div> -->
                 <div class="col-sm-6 col-lg-3"></div>
             </div>
         </div>
@@ -225,8 +216,7 @@ global $data, $page;
                             <tr>
                                 <th>ID</th>
                                 <th>Departamento</th>
-                                <th>Nombre</th>
-                                <th>Salario</th>
+                                <th>Salario (CUP/HORA)</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -258,29 +248,3 @@ global $data, $page;
     </div>
 </div>
 
-<div class="row" style="margin-top:20px;">
-    <div class="col-md-12">
-        <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">Pases de Acceso (recientes)</h3>
-            </div>
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="pases-list">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Trabajador ID</th>
-                                <th>Subcontrato ID</th>
-                                <th>Áreas</th>
-                                <th>Fecha</th>
-                                <th>Vigente</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
