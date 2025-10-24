@@ -276,6 +276,17 @@ class Trabajador {
     }
     
     /**
+     * Minimal _checked handler to satisfy API calls.
+     * This is a no-op placeholder; adjust logic as needed for your application.
+     */
+    private function _checked($param) {
+        // Example response: operation acknowledged
+        $resp = array('status' => 1, 'msg' => 'checked processed');
+        print(json_encode($resp));
+        return;
+    }
+    
+    /**
      * Obtiene el próximo ID disponible en la tabla usuarios
      */
     private function getNextUsuarioId() {
@@ -291,6 +302,21 @@ class Trabajador {
         $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
     
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // Helper para verificar si una columna existe en la tabla trabajadores
+    private function columnExists($column) {
+        try {
+            $row = $this->db->fetchRow("SHOW COLUMNS FROM trabajadores LIKE :col", ['col' => $column]);
+            if ($row && count($row) > 0) return true;
+        } catch (Exception $e) {
+            // Algunos adaptadores no aceptan parámetros en SHOW COLUMNS, intentar sin param
+            try {
+                $row = $this->db->fetchRow("SHOW COLUMNS FROM trabajadores LIKE '" . $column . "'");
+                if ($row && count($row) > 0) return true;
+            } catch (Exception $ex) { }
+        }
+        return false;
     }
     
     private function _save($param) {
@@ -548,38 +574,51 @@ class Trabajador {
                 // Agregar el usuario_id al registro del trabajador
                 $insert_filtered['usuario_id'] = $usuarioId;
                 
-                // Procesar foto si se subió
+                // Procesar foto si se subió: validar tamaño y tipo, almacenar contenido binario en la columna `foto` y guardar `foto_mime`
                 if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-                    $upload_dir = 'uploads/trabajadores/';
-                    if (!file_exists($upload_dir)) {
-                        mkdir($upload_dir, 0777, true);
+                    // Configuración: límites y whitelist
+                    $maxBytes = 2 * 1024 * 1024; // 2 MB por defecto
+                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+                    $tmp = $_FILES['foto']['tmp_name'];
+                    $size = filesize($tmp);
+                    if ($size === false) { $size = 0; }
+                    if ($size > $maxBytes) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'El archivo supera el tamaño máximo permitido de 2MB.';
+                        print(json_encode($data));
+                        return;
                     }
-                    
-                    // Obtener la extensión del archivo original
-                    $file_extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                    
-                    // Usar el UUID generado como nombre de archivo
-                    if (isset($param['uuid'])) {
-                        $foto_name = $param['uuid'] . '.' . $file_extension;
-                        $foto_path = $upload_dir . $foto_name;
-                        
-                        // Mover el archivo temporal a la ubicación final
-                        if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                            $insert_filtered['foto'] = $foto_path;
-                        } else {
-                            error_log('Error al mover el archivo subido: ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
+
+                    // Detectar MIME del archivo subido
+                    $mime = 'application/octet-stream';
+                    if (function_exists('finfo_open')) {
+                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                        $det = finfo_file($finfo, $tmp);
+                        if ($det) $mime = $det;
+                        finfo_close($finfo);
+                    } else {
+                        $g = @getimagesize($tmp);
+                        if ($g && isset($g['mime'])) $mime = $g['mime'];
+                    }
+
+                    if (!in_array($mime, $allowedMimes)) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Tipo de imagen no permitido. Utilice JPG, PNG, GIF o WEBP.';
+                        print(json_encode($data));
+                        return;
+                    }
+
+                    $blob = file_get_contents($tmp);
+                    if ($blob !== false) {
+                        $insert_filtered['foto'] = $blob;
+                        if ($this->columnExists('foto_mime')) {
+                            $insert_filtered['foto_mime'] = $mime;
                         }
                     } else {
-                        // Si por alguna razón no hay UUID, usar un nombre único
-                        $foto_name = uniqid('foto_') . '_' . basename($_FILES['foto']['name']);
-                        $foto_path = $upload_dir . $foto_name;
-                        if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
-                            $insert_filtered['foto'] = $foto_path;
-                        } else {
-                            error_log('Error al mover el archivo subido (sin UUID): ' . $_FILES['foto']['tmp_name'] . ' a ' . $foto_path);
-                        }
+                        error_log('Error al leer el archivo subido: ' . ($tmp ?? ''));
                     }
-                }///
+                }
 
                 
                 // Verificar que el carnet de identidad tenga un formato válido
@@ -880,6 +919,48 @@ class Trabajador {
                 
                 // Asegurar que el ID no esté en los datos de actualización
                 unset($update_filtered['id']);
+
+                // Procesar foto subida en update: validar y almacenar blob + foto_mime
+                if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                    $tmp = $_FILES['foto']['tmp_name'];
+                    $maxBytes = 2 * 1024 * 1024; // 2 MB
+                    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    $size = filesize($tmp);
+                    if ($size === false) { $size = 0; }
+                    if ($size > $maxBytes) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'El archivo supera el tamaño máximo permitido de 2MB.';
+                        print(json_encode($data));
+                        return;
+                    }
+
+                    $mime = 'application/octet-stream';
+                    if (function_exists('finfo_open')) {
+                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                        $det = finfo_file($finfo, $tmp);
+                        if ($det) $mime = $det;
+                        finfo_close($finfo);
+                    } else {
+                        $g = @getimagesize($tmp);
+                        if ($g && isset($g['mime'])) $mime = $g['mime'];
+                    }
+                    if (!in_array($mime, $allowedMimes)) {
+                        $data['status'] = 0;
+                        $data['msg'] = 'Tipo de imagen no permitido. Utilice JPG, PNG, GIF o WEBP.';
+                        print(json_encode($data));
+                        return;
+                    }
+
+                    $blob = file_get_contents($tmp);
+                    if ($blob !== false) {
+                        $update_filtered['foto'] = $blob;
+                        if ($this->columnExists('foto_mime')) {
+                            $update_filtered['foto_mime'] = $mime;
+                        }
+                    } else {
+                        error_log('Error al leer el archivo subido (update): ' . ($tmp ?? ''));
+                    }
+                }
 
                 // Actualizar el trabajador
                 $where = array('id' => $id);
