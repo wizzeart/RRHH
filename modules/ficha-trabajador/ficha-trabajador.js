@@ -161,6 +161,8 @@ $(document).ready(function () {
         
         formData.append('module', 'documentos');
         formData.append('method', 'save');
+        //deshabilitar el boton
+        $('#btn-add-new-doc').prop('disabled', true);
         $.ajax({
             url: 'api-app.php',
             type: 'POST',
@@ -172,9 +174,13 @@ $(document).ready(function () {
                 $('#documentoModal').modal('hide');
                 notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
                 $('#table-documentos').bootstrapTable('refresh');
+                //habilitar el boton
+                $('#btn-add-new-doc').prop('disabled', false);
             },
             error: function(xhr, status, error) {
                 notify('danger', 'Error', 'Hubo un error al agregar el documento');
+                //habilitar el boton
+                $('#btn-add-new-doc').prop('disabled', false);
             }
         });
     });
