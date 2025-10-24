@@ -8,7 +8,7 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-3" hidden>
                 <div class="form-group">
                     <label class="control-label" for="f-id">ID</label>
                     <input type="text" id="f-id" class="form-control" value="<?php if (isset($data['id'])) print($data['id']); ?>" disabled />
