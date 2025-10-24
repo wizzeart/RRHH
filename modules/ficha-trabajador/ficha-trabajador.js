@@ -140,6 +140,7 @@ $(document).ready(function () {
     });
 
     $('#docForm').on('submit', function(e) {
+        $('#btn-add-new-doc').prop('disabled', true);
         e.preventDefault();
         var tipo_doc = $('#tipo_doc').val();
         var archivo = $('#file_doc')[0].files[0];
@@ -162,7 +163,6 @@ $(document).ready(function () {
         formData.append('module', 'documentos');
         formData.append('method', 'save');
         //deshabilitar el boton
-        $('#btn-add-new-doc').prop('disabled', true);
         $.ajax({
             url: 'api-app.php',
             type: 'POST',
