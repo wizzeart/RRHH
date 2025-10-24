@@ -39,7 +39,7 @@
                         <form id="form-trabajador" method="POST" enctype="multipart/form-data">
                         <!-- Primera fila -->
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-3" hidden>
                                 <div class="form-group">
                                     <label class="control-label" for="f-id">Código del trabajador</label>
                                     <input type="text" id="f-id" name="id" class="form-control" placeholder="ID" value="<?php if (isset($data['id']))
