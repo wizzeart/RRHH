@@ -435,9 +435,6 @@
 
                     <div class="panel-body orm-padding">
                     <div class="form-group">
-                                        <button id="btn-add-new" class="btn btn-mint btn-icon" alt="Añadir Nuevo contrato" title="Añadir Nuevo contrato">
-                                            <span class="icon-lg fa fa-plus"></span> Añadir Nuevo Contrato
-                                        </button>
                                         <button id="btn-add-anterior" class="btn btn-primary btn-icon" alt="Insertar Contrato Anterior" title="Insertar Contrato Anterior">
                                             <span class="icon-lg fa fa-upload"></span> Insertar Contrato Anterior
                                         </button>

@@ -1,6 +1,3 @@
-<div class="panel">
-                
-            </div>
 
 
 <div class="panel">
