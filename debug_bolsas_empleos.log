@@ -722,3 +722,45 @@ Array
     [observaciones] => Este tipo es genial
 )
 
+2025-10-24 21:53:37 - Parámetros recibidos:
+POST: Array
+(
+    [module] => bolsas_empleos
+    [method] => save
+    [action] => insert
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley 
+    [segundos_apellidos] => Pangacho
+    [telefono] => 53453232
+    [email] => undefined
+    [cargo_postulado_id] => 1
+    [fecha_registro] => 2025-10-24
+    [estatus] => undefined
+)
+
+FILES: Array
+(
+    [curriculum] => Array
+        (
+            [name] => cv_68fb8b5258db5_pruebaCV.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php5EA8.tmp
+            [error] => 0
+            [size] => 15776
+        )
+
+)
+
+Action: insert
+2025-10-24 21:53:37 - Intentando insertar:
+Array
+(
+    [nombre] => Pedro Antonio
+    [apellidos] => Manduley 
+    [segundos_apellidos] => Pangacho
+    [curriculum] => uploads/curriculos/cv_68fbd941b3eff_cv_68fb8b5258db5_pruebaCV.docx
+    [cargo_postulado_id] => 1
+    [telefono] => 53453232
+    [fecha_registro] => 2025-10-24
+)
+

@@ -106,7 +106,7 @@ class Bolsas_empleos {
         $log .= "POST: " . print_r($param, true) . "\n";
         $log .= "FILES: " . print_r($_FILES, true) . "\n";
         $log .= "Action: " . (isset($param['action']) ? $param['action'] : 'NO ACTION') . "\n";
-        file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
+        // file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
         $data = array(
             'status' => 1,
@@ -213,7 +213,7 @@ class Bolsas_empleos {
             // Debug: Guardar la consulta de inserción
             $log = date('Y-m-d H:i:s') . " - Intentando insertar:\n";
             $log .= print_r($insert_filtered, true) . "\n";
-            file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
+            // file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
             try {
                 // Insertar la postulación usando solo los campos filtrados
@@ -257,7 +257,7 @@ class Bolsas_empleos {
                 // Log del error
                 $errorLog = date('Y-m-d H:i:s') . " - Error al insertar:\n";
                 $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
+                //file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
                 
                 // Respuesta de error
                 $data['status'] = 0;
@@ -296,7 +296,7 @@ class Bolsas_empleos {
                 // Debug log before update
                 $log = date('Y-m-d H:i:s') . " - Intentando actualizar postulación ID: " . $id . "\n";
                 $log .= print_r($update_filtered, true) . "\n";
-                file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
+               // file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
 
                 // Actualizar la postulación
                 $where = array('id' => $id);
@@ -326,7 +326,7 @@ class Bolsas_empleos {
                 // Log del error
                 $errorLog = date('Y-m-d H:i:s') . " - Error al actualizar:\n";
                 $errorLog .= $e->getMessage() . "\n";
-                file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
+               // file_put_contents('debug_bolsas_empleos.log', $errorLog, FILE_APPEND);
                 
                 // Respuesta de error
                 $data['status'] = 0;
