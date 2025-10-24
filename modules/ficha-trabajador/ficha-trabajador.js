@@ -139,8 +139,9 @@ $(document).ready(function () {
         $('#documentoModal').modal('show');  
     });
 
+
     $('#docForm').on('submit', function(e) {
-        $('#btn-add-new-doc').prop('disabled', true);
+        $('#btn-save-doc').prop('disabled', true);
         e.preventDefault();
         var tipo_doc = $('#tipo_doc').val();
         var archivo = $('#file_doc')[0].files[0];
@@ -174,13 +175,11 @@ $(document).ready(function () {
                 $('#documentoModal').modal('hide');
                 notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
                 $('#table-documentos').bootstrapTable('refresh');
-                //habilitar el boton
-                $('#btn-add-new-doc').prop('disabled', false);
+                $('#btn-save-doc').prop('disabled', false);
             },
             error: function(xhr, status, error) {
                 notify('danger', 'Error', 'Hubo un error al agregar el documento');
-                //habilitar el boton
-                $('#btn-add-new-doc').prop('disabled', false);
+                $('#btn-save-doc').prop('disabled', false);
             }
         });
     });
