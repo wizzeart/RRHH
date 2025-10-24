@@ -136,48 +136,47 @@ $(document).ready(function () {
        
 
     $('#btn-add-new-doc').on('click', function() {
+        $('#documentoModal').modal('show');  
+    });
 
-        $('#docForm').on('submit', function(e) {
-            e.preventDefault();
-            var tipo_doc = $('#tipo_doc').val();
-            var archivo = $('#file_doc')[0].files[0];
-            
-            
-            if (!archivo) {
-                notify('danger', 'Error', 'Debe seleccionar un archivo');
-                return;
+    $('#docForm').on('submit', function(e) {
+        e.preventDefault();
+        var tipo_doc = $('#tipo_doc').val();
+        var archivo = $('#file_doc')[0].files[0];
+        
+        
+        if (!archivo) {
+            notify('danger', 'Error', 'Debe seleccionar un archivo');
+            return;
+        }
+        
+        if (!tipo_doc) {
+            notify('danger', 'Error', 'Debe escribir una descripción del documento');
+            return;
+        }
+        var formData = new FormData();
+        formData.append('trabajador_id', $('#f-id').val());
+        formData.append('tipo_doc', tipo_doc);
+        formData.append('archivo', archivo);
+        
+        formData.append('module', 'documentos');
+        formData.append('method', 'save');
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#docForm')[0].reset();
+                $('#documentoModal').modal('hide');
+                notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
+                $('#table-documentos').bootstrapTable('refresh');
+            },
+            error: function(xhr, status, error) {
+                notify('danger', 'Error', 'Hubo un error al agregar el documento');
             }
-            
-            if (!tipo_doc) {
-                notify('danger', 'Error', 'Debe escribir un tipo de documento');
-                return;
-            }
-            var formData = new FormData();
-            formData.append('trabajador_id', $('#f-id').val());
-            formData.append('tipo_doc', tipo_doc);
-            formData.append('archivo', archivo);
-            
-            formData.append('module', 'documentos');
-            formData.append('method', 'save');
-            $.ajax({
-                url: 'api-app.php',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    $('#documentoModal').modal('hide');
-                    notify('success', 'Documento agregado', 'El documento se ha agregado correctamente');
-                    $('#table-documentos').bootstrapTable('refresh');
-                },
-                error: function(xhr, status, error) {
-                    notify('danger', 'Error', 'Hubo un error al agregar el documento');
-                }
-            });
         });
-        
-        $('#documentoModal').modal('show');
-        
     });
 
     // Manejador para el botón de descargar

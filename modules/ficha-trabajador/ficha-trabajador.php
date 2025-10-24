@@ -720,7 +720,7 @@
                             data-pagination="true">
                             <thead>
                                 <tr>
-                                    <th data-field="tipo" data-sortable="true">Tipo</th>
+                                    <th data-field="tipo" data-sortable="true">Descripción</th>
                                     <!--<th data-field="archivo"data-align="center" data-width="140">Archivo</th>-->
                                     <th data-field="fecha_upload" data-sortable="true">Fecha Subida</th>
                                     <th data-field="archivo" data-formatter="pdfFormatter2" data-align="center" data-width="140">Descargar</th>

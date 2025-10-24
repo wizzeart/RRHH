@@ -58,24 +58,13 @@ class Document
                 }
 
                 if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === 0) {
-                    $nombreArchivo = basename($_FILES['archivo']['name']);
-                    $rutaDestino = $rutaBase . $nombreArchivo;
-                    if (file_exists($rutaDestino)) {
-                        $info = pathinfo($nombreArchivo);
-                        $nombre = $info['filename'];
-                        $extension = isset($info['extension']) ? '.' . $info['extension'] : '';
-            
-                        $contadori = 1;
-                        // Generar nuevo nombre hasta que no exista
-                        do {
-                            $nuevoNombre = $nombre . '_' . $contadori . $extension;
-                            $rutaDestino = $rutaBase . $nuevoNombre;
-                            $contadori++;
-                        } while (file_exists($rutaDestino));
-            
-                        $nombreArchivo = $nuevoNombre; // Actualizamos el nombre final
-                        $rutaDestino = $rutaBase . $nombreArchivo;
-                    }
+                    //pa poner el nombre seleccionar el maximo id+1
+                    $sql = "SELECT MAX(id) as max_id FROM documentos_trabajador WHERE trabajador_id=:id";
+                    $data = $this->db->fetchAll($sql, array('id' => $param['trabajador_id']));
+                    $max_id = $data[0]['max_id'] + 1;
+
+                    $rutaDestino = $rutaBase . $max_id . "." . pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
+                    
                     if (move_uploaded_file($_FILES['archivo']['tmp_name'], $rutaDestino)) {
                         // Aquí podrías guardar en tu BD si quieres
                         echo json_encode(['status' => 'success', 'path' => $rutaDestino]);

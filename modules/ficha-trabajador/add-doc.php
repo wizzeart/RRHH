@@ -11,8 +11,8 @@
                 <!-- Aquí se insertan los datos -->
                 <form id="docForm" enctype="multipart/form-data" method="POST">
                     <div class="form-group">
-                        <label for="tipo_doc" class="col-form-label">Tipo de Documento</label>
-                        <input type="text" class="form-control" id="tipo_doc" aria-describedby="tipo_doc_help" placeholder="Escriba el tipo de documento" required>
+                        <label for="tipo_doc" class="col-form-label">Descripción del Documento</label>
+                        <input type="text" class="form-control" id="tipo_doc" aria-describedby="tipo_doc_help" placeholder="Escriba la descripción del documento" required>
                     </div>
                     <div class="form-group">
                         <label for="file_doc" class="form-label">Seleccione un archivo</label>
