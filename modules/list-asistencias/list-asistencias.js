@@ -62,8 +62,7 @@ function operateFormatter(value, row, index) {
     // Escapar comillas dobles en el JSON para evitar problemas de sintaxis
     var rowData = JSON.stringify(row).replace(/"/g, '&quot;');
     return [
-        '<button class="btn btn-xs btn-primary" title="Editar" onclick="editarAsistencia(' + rowData + '); return false;">',
-        '<i class="fa fa-edit"></i>',
+        '<button class="btn btn-icon icon-sm btn-info fa fa-edit" title="Editar" onclick="editarAsistencia(' + rowData + '); return false;">',
         '</button>'
     ].join('');
 }

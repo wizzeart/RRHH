@@ -85,7 +85,7 @@
                             <th data-field="cargo_nombre" data-sortable="true">Cargo</th>
                             <th data-field="departamento_nombre" data-sortable="true">Departamento</th>
                             <!-- <th data-field="estatus" data-align="center" data-formatter="formatoActivo" data-sortable="false">Estado</th>  -->
-                            <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Opciones</th>
+                            <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Acciones</th>
 
                         </tr>
                     </thead>

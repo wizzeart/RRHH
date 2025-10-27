@@ -40,7 +40,7 @@ global $data, $page;
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-users fa-2x"></i></div>
                                 <span class="text-3x text-thin" id="total-trabajadores">0</span>
-                                <p>Total Trabajadores</p>
+                                <p>Trabajadores</p>
                             </div>
                         </div>
                     </a>
@@ -66,7 +66,7 @@ global $data, $page;
                             <div class="pad-all text-center">
                                 <div class="mar-btm"><i class="fa fa-briefcase fa-2x"></i></div>
                                 <span class="text-3x text-thin" id="total-cargos">0</span>
-                                <p>Cantidad de Cargos</p>
+                                <p>Cargos</p>
                             </div>
                         </div>
                     </a>

@@ -31,7 +31,7 @@
                     <th data-field="xusuario" data-sortable="true">Nombre</th>
                     <th data-field="xrol" data-sortable="true">Rol</th>
                     <th data-field="xactivo" data-align="center" data-formatter="formatoActivo" data-sortable="false">Activo</th>
-                    <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar"></th>
+                    <th data-field="toolbar" data-align="center" data-sortable="false" data-formatter="formatoToolbar">Acciones</th>
                 </tr>
             </thead>
         </table>
