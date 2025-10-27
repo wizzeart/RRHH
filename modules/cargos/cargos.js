@@ -11,7 +11,8 @@ $(function(){
         try {
             var v = parseFloat($(this).val());
             if (!isNaN(v) && v !== 0) {
-                var sh = Math.round(v / 192);
+                // Dividir y mantener 2 decimales para precisión
+                var sh = (v / 192).toFixed(2);
                 $('#f-salario').val(sh);
             } else {
                 // si el campo mensual está vacío o cero, limpiar el salario/hora
@@ -31,8 +32,8 @@ $(function(){
         try {
             var salarioMensualVal = parseFloat($('#f-salario-mensual').val());
             if (!isNaN(salarioMensualVal) && salarioMensualVal !== 0) {
-                var salarioHora = Math.round(salarioMensualVal / 192);
-                // Garantizar número entero y asignarlo al campo de salario (CUP/HORA)
+                // Dividir y mantener 2 decimales para precisión
+                var salarioHora = (salarioMensualVal / 192).toFixed(2);
                 $('#f-salario').val(salarioHora);
             }
         } catch (e) {

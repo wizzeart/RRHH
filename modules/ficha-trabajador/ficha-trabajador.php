@@ -457,7 +457,7 @@
                                     <!-- <th data-field="id" data-sortable="true" data-width="80">ID</th> -->
                                     <th data-field="tipo" data-sortable="true" data-width="260" data-formatter="tipoFormatter">Tipo</th>
                                     <th data-field="fecha_inicio" data-sortable="true" data-width="140">Fecha Inicio</th>
-
+                                        <th data-field="fecha_fin" data-sortable="true" data-formatter="formatoFecha" data-width="140">Fecha Fin</th>
                                     
                                     <th data-field="archivo_contrato" data-formatter="pdfFormatter" data-align="center" data-width="140">Opciones</th>
                                 </tr>
@@ -487,8 +487,8 @@
                                     <label for="tipo_contrato">Tipo de Contrato <span class="text-danger">*</span></label>
                                     <select class="form-control" id="tipo_contrato" name="tipo_contrato" required>
                                         <option value="">Seleccione tipo de contrato</option>
-                                        <option value="1">Contrato Determinado</option>
-                                        <option value="2">Contrato Indeterminado</option>
+                                        <option value="2">Determinado</option>
+                                        <option value="1">Indeterminado</option>
                                     </select>
                                 </div>
 
