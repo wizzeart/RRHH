@@ -53,7 +53,7 @@ $load_grid = true;
             padding: 15px 20px;
             color: #333;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 1px;
         }
         .navbar-company-display .company-name {
             margin-right: 8px;
@@ -184,7 +184,7 @@ $load_grid = true;
                 <!--================================-->
                 <div class="navbar-header">
                     <a href="index.php" class="navbar-brand">
-                        <img src="img/logo.png" alt="Logo" class="brand-icon">
+                        <img src="img/logo.png" alt="Logo" class="brand-icon" style="max-height: 60px; width: auto;">
                         <div class="brand-title">
                             <span class="brand-text"></span>
                         </div>
