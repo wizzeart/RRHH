@@ -53,7 +53,7 @@ $load_grid = true;
             padding: 15px 20px;
             color: #333;
             font-weight: 600;
-            font-size: 1px;
+            font-size: 16px;
         }
         .navbar-company-display .company-name {
             margin-right: 8px;
