@@ -152,3 +152,18 @@ a[title*="Añadir nueva"],
     display: inline-block;
     margin-left: 10px;
 }
+
+/* Brand Icon Resizing Fix */
+#container.mainnav-sm .brand-icon {
+    width: auto !important;
+    max-height: 34px !important;
+    margin: 0 5px !important;
+    -webkit-transition: all 0.3s ease !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Ensure smooth transition for brand icon */
+.brand-icon {
+    -webkit-transition: all 0.3s ease !important;
+    transition: all 0.3s ease !important;
+}
