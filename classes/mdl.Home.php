@@ -24,11 +24,13 @@ class Home {
                     // Obtener estadísticas rápidas
                     $sql = "SELECT 
                         COUNT(*) as total,
-                        SUM(CASE WHEN trabajador_eliminado = 0 THEN 1 ELSE 0 END) as activos,
+                        SUM(CASE WHEN t.trabajador_eliminado = 0 THEN 1 ELSE 0 END) as activos,
                        
-                        COUNT(DISTINCT cargos_id) as totalCargos
-                    FROM trabajadores 
-                    WHERE trabajador_eliminado = 0";
+                        COUNT(DISTINCT t.cargos_id) as totalCargos
+                    FROM trabajadores t
+                    LEFT JOIN departamentos d ON d.id = t.departamento_id
+                    WHERE t.trabajador_eliminado = 0
+                    AND d.empresa_id = {$this->app->empresa_id}";
                     
                     $result = $this->db->fetchRow($sql);
                     
@@ -53,7 +55,7 @@ class Home {
                         $quickStats['totalContratos'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['totalContratos'] = 0; }
                     try {
-                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM departamentos");
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM departamentos where empresa_id = {$this->app->empresa_id}");
                         $quickStats['departamentos'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['departamentos'] = 0; }
                     try {
@@ -63,7 +65,7 @@ class Home {
 
                     // Bolsas de empleo
                     try {
-                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM bolsa_empleo");
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM bolsa_empleo where empresa_id = {$this->app->empresa_id}");
                         $quickStats['totalBolsas'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['totalBolsas'] = 0; }
 
@@ -75,7 +77,10 @@ class Home {
 
                     // Trabajadores dados de baja (trabajador_eliminado IS NULL o vacío)
                     try {
-                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM trabajadores WHERE trabajador_eliminado IS NULL OR trabajador_eliminado = ''");
+                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM trabajadores t
+                        LEFT JOIN departamentos d ON d.id = t.departamento_id
+                        WHERE t.trabajador_eliminado IS NULL OR t.trabajador_eliminado = ''
+                        AND d.empresa_id = {$this->app->empresa_id}");
                         $quickStats['totalBajasTrabajadores'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['totalBajasTrabajadores'] = 0; }
 
@@ -83,7 +88,9 @@ class Home {
                     $workersSql = "SELECT t.id, t.nombre, t.apellidos, t.cargos_id, c.nombre AS cargo
                                    FROM trabajadores t
                                    LEFT JOIN cargos c ON c.id = t.cargos_id
+                                   LEFT JOIN departamentos d ON d.id = t.departamento_id
                                    WHERE t.trabajador_eliminado = 0
+                                   AND d.empresa_id = {$this->app->empresa_id}
                                    ORDER BY t.apellidos, t.nombre
                                    LIMIT 1000"; // limit para evitar respuestas enormes
 
@@ -98,7 +105,10 @@ class Home {
                     // Intentar obtener departamentos si existe la tabla 'departamentos'
                     $departamentos = [];
                     try {
-                        $depSql = "SELECT id, nombre FROM departamentos ORDER BY nombre";
+                        $depSql = "SELECT d.id, d.nombre FROM departamentos d
+                        LEFT JOIN empresa e ON e.id = d.empresa_id
+                        WHERE e.id = {$this->app->empresa_id}
+                        ORDER BY nombre";
                         $departamentos = $this->db->fetchAll($depSql);
                     } catch (Exception $e) {
                         // Si no existe tabla departamentos, construir lista a partir de cargos (por departamento_id)

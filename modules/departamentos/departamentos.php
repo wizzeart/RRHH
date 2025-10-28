@@ -20,7 +20,7 @@
                     <input type="text" id="f-nombre" class="form-control" placeholder="Nombre" value="<?php if (isset($data['nombre'])) print($data['nombre']); ?>" />
                 </div>
             </div>
-            <div class="col-md-5">
+            <!-- <div class="col-md-5">
                 <div class="form-group">
                     <label class="control-label" for="f-empresa">Empresa <span class="text-danger">*</span></label>
                     <select id="f-empresa" class="form-control">
@@ -30,7 +30,7 @@
                         <?php } } ?>
                     </select>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="row">
             <div class="col-md-12">
