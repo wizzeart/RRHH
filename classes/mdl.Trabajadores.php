@@ -1195,6 +1195,7 @@ class Trabajador {
                     LEFT JOIN cargos c ON t.cargos_id = c.id
                     LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
                     WHERE " . implode(' AND ', $where) . "
+                    AND (d.empresa_id = {$this->app->empresa_id} OR t.departamento_id IS NULL)
                     ORDER BY t.id DESC";
 
             $data = $this->db->fetchAll($sql,$params);
