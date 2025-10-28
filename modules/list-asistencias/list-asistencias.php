@@ -6,14 +6,18 @@
     <div class="panel-control">
       <ul class="nav nav-tabs">
         <li class="active"><a href="#tab-listado" data-toggle="tab" aria-expanded="true">Listado de Asistencias</a></li>
+        <li><a href="#tab-registro" data-toggle="tab" aria-expanded="false">Control de Asistencia</a></li>
       </ul>
     </div>
-    <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
   </div>
   <div class="panel-body">
     <div class="tab-content">
       <div class="tab-pane fade active in" id="tab-listado">
         <div class="panel">
+          <div class="panel-heading">
+            <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
+          </div>
+          <div class="panel-body">
           <div class="form-control">
             <div class="row">
               <div class="col-md-12">
@@ -82,64 +86,105 @@
               <!-- Estado de asistencia -->
             </div>
           </div>
+          </div>
+        </div>
+        <table
+          id="table-panel"
+          data-toggle="table"
+          data-url="api-app.php?module=asistencias&method=list-filter"
+          data-search="true"
+          data-show-refresh="true"
+          data-show-toggle="false"
+          data-show-columns="true"
+          data-sort-name="fecha"
+          data-sort-order="desc"
+          data-page-list="[10, 25, 50, 100]"
+          data-page-size="25"
+          data-pagination="true"
+          data-show-pagination-switch="true"
+          data-show-export="true"
+          data-export-data-type="all"
+          data-export-types="['excel', 'pdf']">
+          <thead>
+            <tr class="bg-primary">
+              <th data-field="fecha" data-sortable="true" data-width="100">
+                Fecha
+              </th>
+              <th data-field="carnet_identidad" data-sortable="true">
+                CI
+              </th>
+              <th data-field="nombre" data-sortable="true" >
+                Nombre
+              </th>
+              <th data-field="apellidos" data-sortable="true">
+                Apellidos
+              </th>
+              <th data-field="cargo_nombre" data-sortable="true">
+                Cargo
+              </th>
+              <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120">
+                Entrada
+              </th>
+              <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
+                Salida
+              </th>
+              <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120" data-formatter="formatoHoras">
+                Horas
+              </th>
+              <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
+                Asistencia
+              </th>
+              <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
+                Tipo Ausencia
+              </th>
+              <th data-field="justificacion" data-sortable="true" data-visible="false">
+                Justificación
+              </th>
+              <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="100">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="tab-pane fade" id="tab-registro">
+        <div class="panel">
+          <div class="panel-heading">
+            <h3 class="panel-title">Control de Asistencia</h3>
+          </div>
+          <div class="panel-body">
+        <table 
+          id="table-panel-registro"
+          data-toggle="table"
+          data-url="api-app.php?module=trabajadores&method=list"
+          data-search="true"
+          data-show-refresh="true"
+          data-show-toggle="false"
+          data-show-columns="false"
+          data-sort-name="id"
+          data-page-list="[20, 50, 100]"
+          data-page-size="50"
+          data-pagination="true" data-show-pagination-switch="true">
+          <thead>
+            <tr>
+              <th data-field="carnet_identidad" data-sortable="true" data-width="100">CI</th>
+              <th data-field="nombre" data-sortable="true" data-width="150">Nombre</th>
+              <th data-field="apellidos" data-sortable="true" data-width="150">Apellidos</th>
+              <th data-field="tipo_horario" data-formatter="formatoTipoHorario" data-align="center">Horario Regular</th>
+              <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoHorasMes">
+                Horas / Total Horas Mes
+              </th>
+              <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoPorcentajeHorasMes">
+                Porcentaje de Horas Mes
+              </th>
+            </tr>
+          </thead>
+        </table>
+            
+          </div>
         </div>
       </div>
     </div>
-    <table
-      id="table-panel"
-      data-toggle="table"
-      data-url="api-app.php?module=asistencias&method=list-filter"
-      data-search="true"
-      data-show-refresh="true"
-      data-show-toggle="false"
-      data-show-columns="true"
-      data-sort-name="fecha"
-      data-sort-order="desc"
-      data-page-list="[10, 25, 50, 100]"
-      data-page-size="25"
-      data-pagination="true"
-      data-show-pagination-switch="true"
-      data-show-export="true"
-      data-export-data-type="all"
-      data-export-types="['excel', 'pdf']">
-      <thead>
-        <tr class="bg-primary">
-          <th data-field="fecha" data-sortable="true" data-width="100">
-            Fecha
-          </th>
-          <th data-field="carnet_identidad" data-sortable="true">
-            CI
-          </th>
-          <th data-field="nombre" data-sortable="true" >
-            Nombre
-          </th>
-          <th data-field="apellidos" data-sortable="true">
-            Apellidos
-          </th>
-          <th data-field="cargo_nombre" data-sortable="true">
-            Cargo
-          </th>
-          <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120">
-            Entrada
-          </th>
-          <th data-field="hora_salida" data-sortable="true" data-align="center" data-width="120">
-            Salida
-          </th>
-          <th data-field="hora_entrada" data-sortable="true" data-align="center" data-width="120" data-formatter="formatoHoras">
-            Horas
-          </th>
-          <th data-field="tipo_ausencia" data-sortable="true" data-align="center" data-width="100" data-formatter="formatoAusencia">
-            Asistencia
-          </th>
-          <th data-field="tipo_ausencia" data-sortable="true" data-visible="false">
-            Tipo Ausencia
-          </th>
-          <th data-field="operate" data-formatter="operateFormatter" data-events="operateEvents" data-align="center" data-width="100">
-            Acciones
-          </th>
-        </tr>
-      </thead>
-    </table>
   </div>
 </div>
 
@@ -182,7 +227,7 @@
           <div class="form-group">
             <div class="checkbox">
               <label>
-                <input type="checkbox" id="ausencia" name="ausencia"> Marcar como ausencia
+                <input type="checkbox" id="ausencia" name="ausencia"> Marcar/Describir ausencia
               </label>
             </div>
           </div>
@@ -197,6 +242,11 @@
               <option value="Vacaciones">Vacaciones</option>
               <option value="Licencia de Maternidad">Licencia de Maternidad</option>
             </select>
+          </div>
+
+          <div class="form-group" id="justificacion-container" style="display: none;">
+            <label for="justificacion">Descripción</label>
+            <textarea class="form-control" id="justificacion" name="justificacion" rows="3" placeholder="Ingrese la descripción de la ausencia"></textarea>
           </div>
         </form>
       </div>
