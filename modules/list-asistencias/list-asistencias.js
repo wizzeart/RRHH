@@ -47,7 +47,11 @@ function formatoNombreCompleto(value, row) {
 // Formateador para la columna de ausencia
 function formatoAusencia(value, row) {
     if (value || row.ausencia == 1) {
-        return '<span class="label label-danger">AUSENTE</span><br><small>' + (row.tipo_ausencia || '') + '</small>';
+        let tooltip = '';
+        if (row.justificacion) {
+            tooltip = ` data-toggle="tooltip" data-placement="top" title="${row.justificacion}"`;
+        }
+        return `<span class="label label-danger"${tooltip}>AUSENTE</span><br><small>${row.tipo_ausencia || ''}</small>`;
     }
     else if (row.tardanza == 1) {
         return '<span class="label label-success">PRESENTE</span><br><small>Tardanza</small>';
@@ -100,9 +104,10 @@ window.editarAsistencia = function(row) {
     $modal.find('#fecha').val(row.fecha || new Date().toISOString().split('T')[0]);
     $modal.find('#hora_entrada').val(row.hora_entrada || '');
     $modal.find('#hora_salida').val(row.hora_salida || '');
-    $modal.find('#ausencia').prop('checked', row.ausencia == 1 || row.ausencia === '1' || row.ausencia === true);
+    $modal.find('#ausencia').prop('checked', row.ausencia === '1' || (row.tipo_ausencia !== null && row.tipo_ausencia !== ''));
     $modal.find('#tipo_ausencia').val(row.tipo_ausencia || '');
-    
+    $modal.find('#justificacion').val(row.justificacion || '');
+
     // Actualizar título del modal
     $modal.find('.modal-title').text(row.id ? 'Editar Asistencia' : 'Nueva Asistencia');
     
@@ -118,24 +123,46 @@ $('#ausencia').change(function() {
     toggleTipoAusencia();
 });
 
+// Mostrar/ocultar campo de justificación según el tipo de ausencia
+$('#tipo_ausencia').change(function() {
+    
+});
+
 function toggleTipoAusencia() {
     if ($('#ausencia').is(':checked')) {
         $('#tipo-ausencia-container').show();
         $('#tipo_ausencia').prop('required', true);
+        $('#justificacion-container').show();
+        $('#justificacion').prop('required', true);
     } else {
         $('#tipo-ausencia-container').hide();
         $('#tipo_ausencia').prop('required', false);
+        $('#justificacion-container').hide();
+        $('#justificacion').prop('required', false);
     }
 }
 
+function formatoHorasMes(value, row) {
+    let horas = timeStringToSeconds(value);
+    const horasDecimal = (horas / 3600).toFixed(1);
+    return parseFloat(horasDecimal) + ' h / 192 h'; 
+}
+
+function formatoPorcentajeHorasMes(value, row) {
+    let horas = timeStringToSeconds(value);
+    const horasDecimal = (horas / 3600).toFixed(1);
+    const porcentaje = (horasDecimal / 192) * 100;
+    return parseFloat(porcentaje.toFixed(2)) + '%'; 
+}
+
+function timeStringToSeconds(timeStr) {
+    if (!timeStr) return 0;
+    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+}
 function formatoHoras(value, row) {
     if (!row.hora_entrada || !row.hora_salida) {
         return '-';
-    }
-    function timeStringToSeconds(timeStr) {
-        if (!timeStr) return 0;
-        const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-        return hours * 3600 + minutes * 60 + seconds;
     }
     try {
         // Convert time strings to seconds
@@ -161,6 +188,13 @@ function formatoHoras(value, row) {
         return '-';
     }
 }
+
+// Inicializar tooltips
+$(document).ready(function() {
+    $('body').tooltip({
+        selector: '[data-toggle="tooltip"]'
+    });
+});
 
 // Guardar asistencia
 $('#btn-guardar-asistencia').click(function() {
@@ -371,6 +405,54 @@ $(document).ready(function() {
     $('#table-panel').bootstrapTable({
         // Configuraciones adicionales si son necesarias
     });
+
+    $('#table-panel-registro').on('click', '.toggle-status', function () {
+        var $button = $(this);
+        var rowId = $button.data('id');
+        var newValue = $button.hasClass('fa-check') ? '0' : '1';
+        var $row = $button.closest('tr');
+        var rowIndex = $row.data('index');
+        
+        // Update the button appearance immediately for better UX
+        if ($button.hasClass('fa-check')) {
+            $button.removeClass('btn-success fa-check').addClass('btn-warning fa-remove');
+        } else {
+            $button.removeClass('btn-warning fa-remove').addClass('btn-success fa-check');
+        }
+
+        // Make the AJAX call
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: {
+                module: 'trabajadores',
+                method: 'check',
+                action: 'update',
+                id: rowId,
+                tipo_horario: newValue
+            },
+            success: function(response) {
+                console.log('Tipo de horario actualizado:', response);
+                // Update the row data in the table
+                var $table = $('#table-panel-registro');
+                var rowData = $table.bootstrapTable('getData')[rowIndex];
+                rowData.tipo_horario = newValue;
+                $table.bootstrapTable('updateRow', {
+                    index: rowIndex,
+                    row: rowData
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al actualizar el tipo de horario:', error);
+                // Revert the button state on error
+                if (newValue === '1') {
+                    $button.removeClass('btn-success fa-check').addClass('btn-danger fa-remove');
+                } else {
+                    $button.removeClass('btn-danger fa-remove').addClass('btn-success fa-check');
+                }
+            }
+        });
+    });
     
     // Configurar fecha actual por defecto
     $('#fecha-filtro').val(new Date().toISOString().split('T')[0]);
@@ -404,4 +486,13 @@ function formatoToolbar(value, row) {
 
 function imageFormatter(value, row) {
     return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
+}
+
+function formatoTipoHorario(value, row) {
+    //button check
+    if (value == '0') {
+        return '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-remove toggle-status"></button>';
+    } else {
+        return '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-check toggle-status"></button>';
+    }
 }

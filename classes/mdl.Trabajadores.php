@@ -64,6 +64,9 @@ class Trabajador {
             case 'checked':
                 $this->_checked($param);
                 break;
+            case 'check':
+                $this->_check($param);
+                break;
             case 'del':
                 $this->_del($param);
                 break; 
@@ -319,6 +322,31 @@ class Trabajador {
         return false;
     }
     
+    private function _check($param) {
+        $data = array(
+            'status' => 1,
+            'msg_title' => '',
+            'msg' => '',
+            'action' => isset($param['action']) ? $param['action'] : 'update'
+        );
+
+        $where = array(
+            'id' => $param['id']
+        );
+        if ($param['tipo_horario'] == '') {
+            $update = array(
+                'tipo_horario' => null
+            );
+        } 
+        $update = array(
+            'tipo_horario' => $param['tipo_horario']
+        );
+
+        $this->app->db->update('trabajadores', $update, $where);
+
+        print(json_encode($data));
+    }
+
     private function _save($param) {
         $data = array(
             'status' => 1,
@@ -1078,28 +1106,9 @@ class Trabajador {
         $data = array();
         
         // Primero probamos sin JOIN para confirmar que funciona
-        $sql = "SELECT 
-                t.id,
-                t.nombre,
-                t.apellidos,
-                t.carnet_identidad,
-                t.sexo,
-                t.edad,
-                t.estatus,
-                t.cargos_id,
-                t.provincia_id,
-                t.municipio_id,
-                CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
-                FROM trabajadores t 
-                WHERE t.trabajador_eliminado = '0'
-                ORDER BY t.id DESC";
-                
-        error_log("Consulta sin JOIN: " . $sql);
-        $data = $this->db->fetchAll($sql);
-        error_log("Registros sin JOIN: " . count($data));
+       
         
         // Si funciona sin JOIN, probamos con JOIN
-        if (!empty($data)) {
             $sqlWithJoin = "SELECT 
                     t.id,
                     t.nombre,
@@ -1107,6 +1116,7 @@ class Trabajador {
                     t.carnet_identidad,
                     t.sexo,
                     t.edad,
+                    t.tipo_horario,
                     t.estatus,
                     c.nombre as cargo_nombre,
                     t.provincia_id,
@@ -1114,24 +1124,37 @@ class Trabajador {
                     d.nombre as departamento_nombre,
                     COALESCE(p.nombre, 'Sin provincia') as provincia_nombre,
                     COALESCE(m.nombre, 'Sin municipio') as municipio_nombre,
-                    CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
+                    CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo,
+                    COALESCE(ra.horas_trabajadas, '00:00:00') AS horas_trabajadas_mes
                     FROM trabajadores t 
                     LEFT JOIN cargos c ON t.cargos_id = c.id
                     LEFT JOIN provincia p ON t.provincia_id = p.id
                     LEFT JOIN municipio m ON t.municipio_id = m.id
-                    LEFT JOIN departamentos d ON t.departamento_id = d.id
+                    LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
+                    LEFT JOIN (
+                        SELECT 
+                            trabajador_id,
+                            SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)))) AS horas_trabajadas
+                        FROM 
+                            registro_asistencia
+                        WHERE 
+                            MONTH(fecha) = MONTH(CURDATE())
+                            AND YEAR(fecha) = YEAR(CURDATE())
+                            AND hora_entrada IS NOT NULL
+                            AND hora_salida IS NOT NULL
+                        GROUP BY 
+                            trabajador_id
+                    ) ra ON ra.trabajador_id = t.id
                     WHERE t.trabajador_eliminado = '0'
+                    AND (d.empresa_id = {$this->app->empresa_id} OR t.departamento_id IS NULL)
                     ORDER BY t.id DESC";
+
+            
                     
             $dataWithJoin = $this->db->fetchAll($sqlWithJoin);
-            
-            // Si el JOIN funciona, usar esos datos
-            if (!empty($dataWithJoin)) {    
-                $data = $dataWithJoin;
-            }}
+            return $dataWithJoin;
+        }
         
-        return $data;
-    }
 
     private function _list_filter($param){
         try {
@@ -1170,7 +1193,7 @@ class Trabajador {
                     CONCAT(t.nombre, ' ', t.apellidos) as nombre_completo
                     FROM trabajadores t 
                     LEFT JOIN cargos c ON t.cargos_id = c.id
-                    LEFT JOIN departamentos d ON t.departamento_id = d.id
+                    LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
                     WHERE " . implode(' AND ', $where) . "
                     ORDER BY t.id DESC";
 
@@ -1209,7 +1232,9 @@ class Trabajador {
                 COALESCE(c.nombre, 'Sin cargo') as cargo_nombre
                 FROM trabajadores t 
                 LEFT JOIN cargos c ON t.cargos_id = c.id
+                LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
                 WHERE t.trabajador_eliminado = 1
+                AND (d.empresa_id = {$this->app->empresa_id} OR t.departamento_id IS NULL)
                 ORDER BY t.fecha_baja DESC, t.apellidos, t.nombre";
                 
         /* Versión completa comentada para referencia

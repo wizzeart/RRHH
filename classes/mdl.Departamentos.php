@@ -67,6 +67,7 @@ class Departamentos {
         $sql = "SELECT d.id, d.nombre, d.descripcion, d.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
                 FROM departamentos d
                 LEFT JOIN empresa e ON d.empresa_id = e.id
+                WHERE d.empresa_id = {$this->app->empresa_id}
                 ORDER BY d.nombre ASC";
         $data = $this->db->fetchAll($sql);
         return $data;
@@ -79,7 +80,7 @@ class Departamentos {
             'msg' => '',
             'action' => isset($param['action']) ? $param['action'] : 'insert'
         );
-
+        $param['empresa_id'] = $this->app->empresa_id;
         // Validaciones
         $required = array(
             'nombre' => 'Nombre',

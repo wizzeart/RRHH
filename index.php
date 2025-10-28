@@ -42,8 +42,38 @@ $load_grid = true;
     <link href="css/custom.css" rel="stylesheet" />
 
 
-    <!--Nifty Stylesheet [ REQUIRED ]-->
+    <!--Nifty Stylesheet [ RECOMMENDED ]-->
     <link href="css/nifty.css" rel="stylesheet">
+    
+    <style>
+        /* Company display in navbar */
+        .navbar-company-display {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .navbar-company-display .company-name {
+            margin-right: 8px;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .navbar-company-display .fa-building {
+            font-size: 18px;
+        }
+        @media (max-width: 768px) {
+            .navbar-company-display {
+                padding: 15px 10px;
+            }
+            .navbar-company-display .company-name {
+                max-width: 120px;
+            }
+        }
+    </style>
 
 
     <!--Font Awesome [ OPTIONAL ]-->
@@ -168,7 +198,6 @@ $load_grid = true;
                 <!--================================-->
                 <div class="navbar-content clearfix">
                     <ul class="nav navbar-top-links pull-left">
-
                         <!--Navigation toogle button-->
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <li class="tgl-menu-btn">
@@ -176,7 +205,24 @@ $load_grid = true;
                                 <i class="fa fa-navicon fa-lg"></i>
                             </a>
                         </li>
-                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->                        <!--End Navigation toogle button-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End Navigation toogle button-->
+                        
+                        <!-- Current Company Display -->
+                        <li class="hidden-xs">
+                            <div class="navbar-company-display">
+                                <?php
+                                if (isset($_SESSION['empresa_id'])) {
+                                    $sql = "SELECT nombre FROM empresa WHERE id = ?";
+                                    $empresa = $app->db->fetchRow($sql, [$_SESSION['empresa_id']]);
+                                    if ($empresa) {
+                                        echo '<span class="company-name">' . htmlspecialchars($empresa['nombre']) . '</span>';
+                                        echo '<i class="fa fa-building text-primary"></i>';
+                                    }
+                                }
+                                ?>
+                            </div>
+                        </li>
                     </ul>
                     <ul class="nav navbar-top-links pull-right">
 
@@ -189,6 +235,37 @@ $load_grid = true;
                                 <i class="fa fa-comments fa-lg"></i>
                                 <span id="notif-count" class="badge badge-danger" style="display:none; margin-left:6px;">0</span>
                             </a>
+                        </li>
+
+                        <!-- Botón de cambio de empresa -->
+                        <li>
+                            <a id="btn-cambiar-empresa" href="#" title="Cambiar empresa" data-toggle="dropdown" class="dropdown-toggle">
+                                <i class="fa fa-cog fa-lg"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-sm dropdown-menu-right panel-default">
+                                <?php 
+                                // Get available companies from database
+                                $sql = "SELECT id, nombre FROM empresa ORDER BY nombre";
+                                $empresas = $app->db->fetchAll($sql);
+                                
+                                if (!empty($empresas)) {
+                                    echo '<ul class="head-list">';
+                                    foreach ($empresas as $empresa) {
+                                        $active = ($_SESSION['empresa_id'] == $empresa['id']) ? ' active' : '';
+                                        echo '<li class="' . $active . '">';
+                                        echo '<a href="#" class="cambiar-empresa" data-empresa-id="' . $empresa['id'] . '">';
+                                        echo '<i class="fa fa-building fa-fw"></i> ' . htmlspecialchars($empresa['nombre']);
+                                        if ($_SESSION['empresa_id'] == $empresa['id']) {
+                                            echo ' <i class="fa fa-check text-success"></i>';
+                                        }
+                                        echo '</a></li>';
+                                    }
+                                    echo '</ul>';
+                                } else {
+                                    echo '<div class="p-3 text-muted">No hay empresas disponibles</div>';
+                                }
+                                ?>
+                            </div>
                         </li>
 
                         <!--City selector-->
@@ -398,6 +475,9 @@ $load_grid = true;
 
     <!-- JS de Lightbox2 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
+    <!-- Script para manejar el cambio de empresa -->
+    <script src="index.js"></script>
 
     <!--Demo script [ DEMONSTRATION ]-->
     <script src="js/demo/nifty-demo.js"></script>

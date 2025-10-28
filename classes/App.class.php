@@ -14,18 +14,17 @@ class App
     var $dbs; //conexion a la base de datos.
     var $rol; //rol.
     var $rol_name; //rol.
+    var $empresa_id; // Default company ID
 
     public function __construct()
     {
-
-
         $this->name = '';
         $this->rol = '';
         $this->rol_name = '';
         session_start();
 
-    $this->db = new MsSql(_DB_SERVER_, _DB_NAME_, _DB_USER_, _DB_PASSWD_, '3306'); //sql server
-    // Debug flag removed
+        $this->db = new MsSql(_DB_SERVER_, _DB_NAME_, _DB_USER_, _DB_PASSWD_, '3306'); //sql server
+        // Debug flag removed
 
         if (isset($_SESSION['guser_id'])) {
             $this->user_id = $_SESSION['guser_id'];
@@ -41,6 +40,34 @@ class App
                 $this->rol_name = $_SESSION['grol_name'];
         } else {
             $this->user_id = '';
+        }
+
+        $this->handle_company_change();
+    }
+
+    /**
+     * Handle company change request
+     */
+    private function handle_company_change() {
+        if (isset($_POST['cambiar_empresa']) && is_numeric($_POST['empresa_id'])) {
+            $empresa_id = (int)$_POST['empresa_id'];
+            // Verify the company exists
+            $sql = "SELECT id FROM empresa WHERE id = ?";
+            $result = $this->db->fetchAll($sql, [$empresa_id]);
+            
+            if (!empty($result)) {
+                $_SESSION['empresa_id'] = $empresa_id;
+                $this->empresa_id = $empresa_id;
+                // Optionally add a success message
+                $_SESSION['mensaje_exito'] = 'Empresa cambiada correctamente';
+            }
+        }
+        if(isset($_SESSION['empresa_id'])){
+            $this->empresa_id = $_SESSION['empresa_id'];
+        }
+        else{
+            $this->empresa_id = 1;
+            $_SESSION['empresa_id'] = 1;
         }
     }
 
@@ -87,6 +114,7 @@ class App
         $sql = "select a.*"
             . " from " .   "departamentos a"
             . " where 1=1"
+            . " and a.empresa_id = {$this->empresa_id}"
             . $cond
             . " order by a.nombre";
 
@@ -105,6 +133,8 @@ class App
 
         $sql = "select a.*"
             . " from " .   "bolsa_empleo a"
+            . " where 1=1"
+            . " and a.empresa_id = {$this->empresa_id}"
             . $cond
             . " order by a.id";
 
@@ -165,6 +195,13 @@ class App
 
     public function add_history($val)
     {
+        
+        // Set default company ID if not set
+        if (!isset($_SESSION['empresa_id'])) {
+            $_SESSION['empresa_id'] = $this->empresa_id;
+        } else {
+            $this->empresa_id = $_SESSION['empresa_id'];
+        }
         $val['xuser'] = $this->user_id;
         // Ensure xdate is properly formatted for database insertion
         if (defined('dateSQL')) {

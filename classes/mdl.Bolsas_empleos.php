@@ -106,8 +106,8 @@ class Bolsas_empleos {
         $log .= "POST: " . print_r($param, true) . "\n";
         $log .= "FILES: " . print_r($_FILES, true) . "\n";
         $log .= "Action: " . (isset($param['action']) ? $param['action'] : 'NO ACTION') . "\n";
-        // file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
-
+        //file_put_contents('debug_bolsas_empleos.log', $log, FILE_APPEND);
+        $param['empresa_id'] = $this->app->empresa_id;
         $data = array(
             'status' => 1,
             'msg_title' => '',
@@ -154,6 +154,7 @@ class Bolsas_empleos {
             $param['telefono'] = $get[0]['telefono'];
             $param['fecha_registro'] = $get[0]['fecha_registro'];
             $param['curriculum'] = $get[0]['curriculum'];
+            $param['empresa_id'] = $get[0]['empresa_id'];
         }
         foreach ($soloLetras as $f => $label) {
             if (isset($param[$f]) && trim($param[$f]) !== '') {
@@ -185,6 +186,7 @@ class Bolsas_empleos {
             'cargo_postulado_id' => intval($param['cargo_postulado_id']),
             'telefono' => $param['telefono'],
             'fecha_registro' => isset($param['fecha_registro']) && !empty($param['fecha_registro']) ? $param['fecha_registro'] : date('Y-m-d'),
+            'empresa_id' => $param['empresa_id'],
         );
 
         $data['action'] = $param['action'];
@@ -205,6 +207,7 @@ class Bolsas_empleos {
                 'cargo_postulado_id',
                 'telefono',
                 'fecha_registro',
+                'empresa_id',
             ];
             
             // Filtrar solo los campos válidos
@@ -288,6 +291,7 @@ class Bolsas_empleos {
                     'telefono',
                     'fecha_registro',
                     'observaciones',
+                    'empresa_id',
                 ];
                 
                 // Filtrar solo los campos válidos
@@ -343,6 +347,7 @@ class Bolsas_empleos {
         $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.observaciones
                  FROM bolsa_empleo b
                  LEFT JOIN cargos c ON b.cargo_postulado_id = c.id
+                 WHERE (b.empresa_id = {$this->app->empresa_id} OR b.empresa_id IS NULL)
                  ORDER BY b.id DESC";
         
         $data = $this->db->fetchAll($sql);

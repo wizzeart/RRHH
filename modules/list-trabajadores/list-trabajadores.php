@@ -49,7 +49,7 @@
                             <select id="filterDepartamento" class="form-control">
                                 <option value="">Todos los departamentos</option>
                                 <?php
-                                $deptos = $app->db->fetchAll("SELECT DISTINCT id, nombre FROM departamentos ORDER BY nombre");
+                                $deptos = $app->db->fetchAll("SELECT DISTINCT id, nombre FROM departamentos WHERE empresa_id = {$app->empresa_id} ORDER BY nombre");
                                 foreach ($deptos as $depto) {
                                     echo "<option value='" . $depto['id'] . "'>" . htmlspecialchars($depto['nombre']) . "</option>";
                                 }

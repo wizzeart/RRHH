@@ -126,6 +126,7 @@ class Asistencia
                     ra.ausencia,
                     ra.tardanza,
                     ra.tipo_ausencia,
+                    ra.justificacion,
                     t.nombre,
                     t.apellidos,
                     t.carnet_identidad,
@@ -133,7 +134,9 @@ class Asistencia
                 FROM registro_asistencia ra
                 INNER JOIN trabajadores t ON ra.trabajador_id = t.id
                 LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
+                LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
                 WHERE " . implode(' AND ', $where) . "
+                AND (d.empresa_id = {$this->app->empresa_id} OR t.departamento_id IS NULL)
                 ORDER BY ra.fecha DESC, t.nombre, t.apellidos";
 
 
@@ -160,6 +163,7 @@ class Asistencia
                     ra.hora_salida,
                     ra.ausencia,
                     ra.tipo_ausencia,
+                    ra.justificacion,
                     ra.tardanza,
                     t.nombre,
                     t.apellidos,
@@ -168,7 +172,9 @@ class Asistencia
                 FROM registro_asistencia ra
                 INNER JOIN trabajadores t ON ra.trabajador_id = t.id
                 LEFT JOIN cargos c ON CAST(t.cargos_id AS UNSIGNED) = c.id
+                LEFT JOIN departamentos d ON t.departamento_id = d.id AND d.empresa_id = {$this->app->empresa_id}
                 WHERE t.trabajador_eliminado = '0'
+                AND (d.empresa_id = {$this->app->empresa_id} OR t.departamento_id IS NULL)
                 ORDER BY ra.fecha DESC, ra.hora_entrada DESC";
 
             $data = $this->db->fetchAll($sql);

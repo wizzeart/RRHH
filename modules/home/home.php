@@ -215,7 +215,7 @@ global $data, $page;
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Departamento</th>
+                                <th>Nombre</th>
                                 <th>Salario (CUP/Hora)</th>
                             </tr>
                         </thead>
