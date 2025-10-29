@@ -495,7 +495,7 @@ function imageFormatter(value, row) {
 function formatoTipoHorario(value, row) {
     //button check
     if (value == '0') {
-        return '<button data-id="' + row.id + '" class="btn btn-danger btn-icon icon-sm fa fa-remove toggle-status"></button>';
+        return '<button data-id="' + row.id + '" class="btn btn-warning btn-icon icon-sm fa fa-remove toggle-status"></button>';
     } else {
         return '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-check toggle-status"></button>';
     }
