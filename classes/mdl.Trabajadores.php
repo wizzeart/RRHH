@@ -1121,6 +1121,7 @@ class Trabajador {
                     c.nombre as cargo_nombre,
                     t.provincia_id,
                     t.municipio_id,
+                    t.huella_dactilar,
                     d.nombre as departamento_nombre,
                     COALESCE(p.nombre, 'Sin provincia') as provincia_nombre,
                     COALESCE(m.nombre, 'Sin municipio') as municipio_nombre,

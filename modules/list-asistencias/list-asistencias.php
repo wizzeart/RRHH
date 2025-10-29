@@ -170,6 +170,7 @@
               <th data-field="carnet_identidad" data-sortable="true" data-width="100">CI</th>
               <th data-field="nombre" data-sortable="true" data-width="150">Nombre</th>
               <th data-field="apellidos" data-sortable="true" data-width="150">Apellidos</th>
+              <th data-field="huella_dactilar" data-width="150" data-formatter="formatoHuellaDactilar" data-align="center">Huella Dactilar</th>
               <th data-field="tipo_horario" data-formatter="formatoTipoHorario" data-align="center">Horario Regular</th>
               <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoHorasMes">
                 Horas / Total Horas Mes

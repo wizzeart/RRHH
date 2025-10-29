@@ -497,3 +497,13 @@ function formatoTipoHorario(value, row) {
         return '<button data-id="' + row.id + '" class="btn btn-success btn-icon icon-sm fa fa-check toggle-status"></button>';
     }
 }
+
+function formatoHuellaDactilar(value, row) {
+    if (!value) {
+        //no tiene huella dactilar (ponerle pendiente)
+        return '<span class="label label-danger fa fa-remove rounded"> </span>';        
+    } else {
+        //tiene huella dactilar (ponerle listado)
+        return '<span class="label label-success fa fa-check rounded"> </span>';
+    }
+}
