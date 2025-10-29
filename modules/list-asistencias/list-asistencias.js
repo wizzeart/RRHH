@@ -46,12 +46,16 @@ function formatoNombreCompleto(value, row) {
 
 // Formateador para la columna de ausencia
 function formatoAusencia(value, row) {
-    if (value || row.ausencia == 1) {
+
+    if (row.ausencia == 1) {
         let tooltip = '';
         if (row.justificacion) {
             tooltip = ` data-toggle="tooltip" data-placement="top" title="${row.justificacion}"`;
         }
         return `<span class="label label-danger"${tooltip}>AUSENTE</span><br><small>${row.tipo_ausencia || ''}</small>`;
+    }
+    else if (row.ausencia == 2) {
+        return '<span class="label label-warning">ESPECIAL</span>';
     }
     else if (row.tardanza == 1) {
         return '<span class="label label-success">PRESENTE</span><br><small>Tardanza</small>';

@@ -17,11 +17,17 @@ class ActualizarAsistencia {
             
             // 1. Actualizar registros existentes para el día actual
             $sql_update = 
-               "UPDATE registro_asistencia LEFT JOIN trabajadores t ON t.id = registro_asistencia.trabajador_id
+               "UPDATE registro_asistencia 
+                LEFT JOIN trabajadores t ON t.id = registro_asistencia.trabajador_id
                 SET 
-                    tardanza = IF(hora_entrada IS NOT NULL AND hora_entrada > '09:00:00' AND hora_entrada < '13:00:00', 1, 0),
-                    ausencia = IF((hora_entrada IS NOT NULL AND hora_entrada >= '13:00:00') OR (hora_entrada IS NULL), 1, 0)
-                WHERE fecha = '{$fecha_actual}' AND t.trabajador_eliminado = 0 AND (t.tipo_horario = 1 OR t.tipo_horario IS NULL)";
+                    tardanza = IF(t.tipo_horario = 0, 0, 
+                               IF(hora_entrada IS NOT NULL AND hora_entrada > '09:00:00' AND hora_entrada < '13:00:00', 1, 0)),
+                    ausencia = CASE 
+                              WHEN t.tipo_horario = 0 THEN 2
+                              WHEN (hora_entrada IS NOT NULL AND hora_entrada >= '13:00:00') OR (hora_entrada IS NULL) THEN 1
+                              ELSE 0
+                              END
+                WHERE fecha = '{$fecha_actual}' AND t.trabajador_eliminado = 0";
 
             
             $this->db->directExec($sql_update);
