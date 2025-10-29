@@ -173,17 +173,14 @@ function formatoHoras(value, row) {
         const entradaSegundos = timeStringToSeconds(row.hora_entrada);
         const salidaSegundos = timeStringToSeconds(row.hora_salida);
         
-        // Calculate difference in seconds
-        let diffSegundos = salidaSegundos - entradaSegundos;
-        
+        const almuerzoInicio = 12 * 3600;
+        const almuerzoFin = 13 * 3600;
 
-        // If the result is negative, the times might be on different days
-        if (diffSegundos < 0) {
-            // Add 24 hours if the end time is on the next day
-            diffSegundos += 86400; // 24 hours in seconds
-            
-            
-        }
+        // Calcular solapamiento (en segundos)
+        const overlap = Math.max(0, Math.min(salidaSegundos, almuerzoFin) - Math.max(entradaSegundos, almuerzoInicio));
+
+        // Diferencia total menos la hora de almuerzo si aplica
+        let diffSegundos = (salidaSegundos - entradaSegundos) - overlap;
         
         const horasDecimal = (diffSegundos / 3600).toFixed(1);
         return parseFloat(horasDecimal) + ' h'; 

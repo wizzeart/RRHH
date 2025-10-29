@@ -1134,7 +1134,19 @@ class Trabajador {
                     LEFT JOIN (
                         SELECT 
                             trabajador_id,
-                            SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada)))) AS horas_trabajadas
+                            SEC_TO_TIME(
+                                SUM(
+                                    GREATEST(
+                                        0,
+                                        TIME_TO_SEC(TIMEDIFF(hora_salida, hora_entrada))
+                                        - GREATEST(
+                                            0,
+                                            LEAST(TIME_TO_SEC(hora_salida), TIME_TO_SEC('13:00:00'))
+                                            - GREATEST(TIME_TO_SEC(hora_entrada), TIME_TO_SEC('12:00:00'))
+                                        )
+                                    )
+                                )
+                            ) AS horas_trabajadas
                         FROM 
                             registro_asistencia
                         WHERE 
