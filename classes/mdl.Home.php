@@ -87,7 +87,7 @@ class Home {
                     } catch (Exception $e) { $quickStats['totalBajasTrabajadores'] = 0; }
 
                     // Obtener lista de trabajadores (id, nombre, apellidos, cargos_id, cargo)
-                    $workersSql = "SELECT t.id, t.nombre, t.apellidos, t.cargos_id, c.nombre AS cargo
+                    $workersSql = "SELECT t.id,t.carnet_identidad, t.nombre, t.apellidos, t.cargos_id, c.nombre AS cargo
                                    FROM trabajadores t
                                    LEFT JOIN cargos c ON c.id = t.cargos_id
                                    LEFT JOIN departamentos d ON d.id = t.departamento_id
@@ -99,7 +99,7 @@ class Home {
                     $workers = $this->db->fetchAll($workersSql);
 
                     // Obtener lista de cargos
-                    $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY nombre";
+                    $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY id DESC";
                     $cargos = $this->db->fetchAll($cargosSql);
 
                     $quickStats['totalCargos'] = count($cargos);
@@ -107,10 +107,23 @@ class Home {
                     // Intentar obtener departamentos si existe la tabla 'departamentos'
                     $departamentos = [];
                     try {
-                        $depSql = "SELECT d.id, d.nombre FROM departamentos d
+                       $depSql = "SELECT 
+                            d.id, 
+                            d.nombre, 
+                            COUNT(t.id) AS cantidad
+                        FROM 
+                            departamentos d
                         LEFT JOIN empresa e ON e.id = d.empresa_id
-                        WHERE e.id = {$this->app->empresa_id}
-                        ORDER BY nombre";
+                        LEFT JOIN trabajadores t ON t.departamento_id = d.id 
+                            AND t.trabajador_eliminado = '0'
+                        WHERE 
+                            e.id = {$this->app->empresa_id}
+                        GROUP BY 
+                            d.id, d.nombre
+                        HAVING 
+                            cantidad > 0
+                        ORDER BY 
+                            d.id DESC";
                         $departamentos = $this->db->fetchAll($depSql);
                     } catch (Exception $e) {
                         // Si no existe tabla departamentos, construir lista a partir de cargos (por departamento_id)

@@ -100,7 +100,7 @@ $(document).ready(function() {
                 return;
             }
             cargos.forEach(c => {
-                const row = `<tr><td>${c.id||''}</td><td>${escapeHtml(c.nombre||'')}</td><td>${escapeHtml(c.salario||'')}</td></tr>`;
+                const row = `<tr><td>${escapeHtml(c.nombre||'')}</td><td class="text-center">${escapeHtml(c.salario||'')}</td></tr>`;
                 $tbody.append(row);
             });
         }
@@ -114,7 +114,7 @@ $(document).ready(function() {
                 return;
             }
             departamentos.forEach(d => {
-                const row = `<tr><td>${d.id||''}</td><td>${escapeHtml(d.nombre||'')}</td></tr>`;
+                const row = `<tr><td>${escapeHtml(d.nombre||'')}</td><td class="text-center">${d.cantidad||'0'}</td></tr>`;
                 $tbody.append(row);
             });
         }

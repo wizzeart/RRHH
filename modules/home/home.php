@@ -214,9 +214,9 @@ global $data, $page;
                     <table class="table table-striped" id="cargos-list">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <!-- <th>ID</th> -->
                                 <th>Nombre</th>
-                                <th>Salario (CUP/Hora)</th>
+                                <th class="text-center">Salario (CUP/Hora)</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -236,8 +236,8 @@ global $data, $page;
                     <table class="table table-striped" id="departamentos-list">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Nombre</th>
+                                <th class="text-center">Cantidad de Trabajadores</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
