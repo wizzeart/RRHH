@@ -74,7 +74,8 @@ $(document).ready(function() {
                 return;
             }
 
-            workers.forEach(w => {
+            const maxRows = 10;
+            workers.slice(0, maxRows).forEach(w => {
                 const id = w.id || '';
                 const nombre = (w.nombre || '').toString();
                 const apellidos = (w.apellidos || '').toString();

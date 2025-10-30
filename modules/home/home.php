@@ -179,7 +179,7 @@ global $data, $page;
     <div class="col-md-12">
         <div class="panel">
             <div class="panel-heading">
-                <h3 class="panel-title">Lista de Trabajadores</h3>
+                <h3 class="panel-title">Últimos Trabajadores</h3>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">

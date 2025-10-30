@@ -30,7 +30,9 @@ class Home {
                     FROM trabajadores t
                     LEFT JOIN departamentos d ON d.id = t.departamento_id
                     WHERE t.trabajador_eliminado = 0
-                    AND d.empresa_id = {$this->app->empresa_id}";
+                    AND d.empresa_id = {$this->app->empresa_id}
+                    ORDER BY t.id DESC
+                    ";
                     
                     $result = $this->db->fetchRow($sql);
                     
@@ -91,7 +93,7 @@ class Home {
                                    LEFT JOIN departamentos d ON d.id = t.departamento_id
                                    WHERE t.trabajador_eliminado = 0
                                    AND d.empresa_id = {$this->app->empresa_id}
-                                   ORDER BY t.apellidos, t.nombre
+                                   ORDER BY t.id DESC
                                    LIMIT 1000"; // limit para evitar respuestas enormes
 
                     $workers = $this->db->fetchAll($workersSql);
