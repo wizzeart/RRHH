@@ -60,7 +60,7 @@ function formatoNombreCompleto(value, row) {
 // Formateador para la columna de ausencia
 function formatoAusencia(value, row) {
 
-    if (row.ausencia == 1) {
+    if (row.ausencia == 1 || row.tipo_ausencia != null) {
         let tooltip = '';
         if (row.justificacion) {
             tooltip = ` data-toggle="tooltip" data-placement="top" title="${row.justificacion}"`;
