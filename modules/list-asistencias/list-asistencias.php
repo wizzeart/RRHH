@@ -18,57 +18,62 @@
             <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
           </div>
           <div class="panel-body">
-          <div class="form-control">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="row">
-                  <!-- Fecha desde -->
-                  <div class="col-md-2">
-                    <div class="form-group">
-                      <label>Fecha desde</label>
-                      <input type="date" class="form-control" id="fecha-desde" value="<?php echo date('Y-m-01'); ?>">
+            <div class="form-control">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="row">
+                    <!-- Fecha desde -->
+                    <div class="col-md-2">
+                      <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" class="form-control" id="fecha-desde" value="<?php
+                                                                                        $fechaDesde_ = date('Y-m-d', strtotime('-1 day'));
+                                                                                        echo $fechaDesde_;
+
+                                                                                        ?>">
+                      </div>
+                    </div>
+                    <div class="col-md-2 hidden">
+                      <div class="form-group">
+                        <!-- Fecha hasta -->
+                        <label>Fecha hasta</label>
+                        <input type="date" class="form-control" id="fecha-hasta" value="<?php
+                                                                                        echo date('Y-m-d', strtotime('-1 day')); ?>" disabled>
+                      </div>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="form-group">
+                        <label>Estado</label>
+                        <select class="form-control" id="filtro-estado">
+                          <option value="">Todos</option>
+                          <option value="1">Presente</option>
+                          <option value="2">Ausente</option>
+                        </select>
+                      </div>
+                    </div>
+                    <!-- Tipo de ausencia -->
+                    <div class="col-md-2" id="filtro-tipo-ausencia-container" hidden>
+                      <div class="form-group">
+                        <label>Tipo de Ausencia</label>
+                        <select class="form-control" id="filtro-tipo-ausencia">
+                          <option value="">Todos los tipos</option>
+                          <option value="Injustificada">Injustificada</option>
+                          <option value="Justificada">Justificada</option>
+                          <option value="Enfermedad">Enfermedad</option>
+                          <option value="Vacaciones">Vacaciones</option>
+                          <option value="Licencia de Maternidad">Licencia de Maternidad</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-2">
-                    <div class="form-group">
-                      <!-- Fecha hasta -->
-                      <label>Fecha hasta</label>
-                      <input type="date" class="form-control" id="fecha-hasta" value="<?php echo date('Y-m-d'); ?>">
-                    </div>
-                  </div>
-                  <div class="col-md-2">
-                    <div class="form-group">
-                      <label>Estado</label>
-                      <select class="form-control" id="filtro-estado">
-                        <option value="">Todos</option>
-                        <option value="1">Presente</option>
-                        <option value="2">Ausente</option>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Tipo de ausencia -->
-                  <div class="col-md-2" id="filtro-tipo-ausencia-container">
-                    <div class="form-group">
-                      <label>Tipo de Ausencia</label>
-                      <select class="form-control" id="filtro-tipo-ausencia">
-                        <option value="">Todos los tipos</option>
-                        <option value="Injustificada">Injustificada</option>
-                        <option value="Justificada">Justificada</option>
-                        <option value="Enfermedad">Enfermedad</option>
-                        <option value="Vacaciones">Vacaciones</option>
-                        <option value="Licencia de Maternidad">Licencia de Maternidad</option>
-                      </select>
-                    </div>
+                  <div class="col-sm-2">
+                    <button id="btn-filtrar" class="btn btn-primary">
+                      <i class="fa fa-search"></i> Filtrar
+                    </button>
                   </div>
                 </div>
-                <div class="col-sm-2">
-                  <button id="btn-filtrar" class="btn btn-primary">
-                    <i class="fa fa-search"></i> Filtrar
-                  </button>
-                </div>
-              </div>
-              <!-- Buscador de Trabajador -->
-              <!-- <div class="col-md-3">
+                <!-- Buscador de Trabajador -->
+                <!-- <div class="col-md-3">
                 <div class="form-group">
                   <label>Buscar Trabajador</label>
                   <div class="input-group">
@@ -83,9 +88,9 @@
                   <div id="resultados-busqueda" class="suggestions-dropdown" style="display: none; position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px;"></div>
                 </div>
               </div> -->
-              <!-- Estado de asistencia -->
+                <!-- Estado de asistencia -->
+              </div>
             </div>
-          </div>
           </div>
         </div>
         <table
@@ -113,7 +118,7 @@
               <th data-field="carnet_identidad" data-sortable="true">
                 CI
               </th>
-              <th data-field="nombre" data-sortable="true" >
+              <th data-field="nombre" data-sortable="true">
                 Nombre
               </th>
               <th data-field="apellidos" data-sortable="true">
@@ -153,37 +158,49 @@
             <h3 class="panel-title">Control de Asistencia</h3>
           </div>
           <div class="panel-body">
-        <table 
-          id="table-panel-registro"
-          data-toggle="table"
-          data-url="api-app.php?module=trabajadores&method=list"
-          data-search="true"
-          data-show-refresh="true"
-          data-show-toggle="false"
-          data-show-columns="false"
-          data-sort-name="id"
-          data-page-list="[20, 50, 100]"
-          data-page-size="50"
-          data-pagination="true" data-show-pagination-switch="true">
-          <thead>
-            <tr>
-              <th data-field="carnet_identidad" data-sortable="true" data-width="100">CI</th>
-              <th data-field="nombre" data-sortable="true" data-width="150">Nombre</th>
-              <th data-field="apellidos" data-sortable="true" data-width="150">Apellidos</th>
-              <th data-field="huella_dactilar" data-width="150" data-formatter="formatoHuellaDactilar" data-align="center">Huella Dactilar</th>
-              <th data-field="tipo_horario" data-formatter="formatoTipoHorario" data-align="center">Horario Regular</th>
-              <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoHorasMes">
-                Horas / Total Horas Mes
-              </th>
-              <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoPorcentajeHorasMes">
-                Porcentaje de Horas Mes
-              </th>
-            </tr>
-          </thead>
-        </table>
-            
+            <div class="form-control">
+              <div class="row">
+                <div class="col-md-3">
+                  <label for="mes-seleccionado">Seleccionar mes:</label>
+                  <input
+                    type="month"
+                    id="mes-seleccionado"
+                    class="form-control"
+                    value="<?php echo date('Y-m'); ?>">
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+          <table
+            id="table-panel-registro"
+            data-toggle="table"
+            data-url="api-app.php?module=trabajadores&method=list"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="false"
+            data-show-columns="false"
+            data-sort-name="id"
+            data-page-list="[20, 50, 100]"
+            data-page-size="50"
+            data-pagination="true" data-show-pagination-switch="true">
+            <thead>
+              <tr>
+                <th data-field="carnet_identidad" data-sortable="true" data-width="100">CI</th>
+                <th data-field="nombre" data-sortable="true" data-width="150">Nombre</th>
+                <th data-field="apellidos" data-sortable="true" data-width="150">Apellidos</th>
+                <th data-field="huella_dactilar" data-width="150" data-formatter="formatoHuellaDactilar" data-align="center">Huella Dactilar</th>
+                <th data-field="tipo_horario" data-formatter="formatoTipoHorario" data-align="center">Horario Regular</th>
+                <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoHorasMes">
+                  Horas / Total Horas Mes
+                </th>
+                <th data-field="horas_trabajadas_mes" data-align="center" data-width="100" data-formatter="formatoPorcentajeHorasMes">
+                  Porcentaje de Horas Mes
+                </th>
+
+              </tr>
+            </thead>
+          </table>
       </div>
     </div>
   </div>

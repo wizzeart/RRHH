@@ -1106,8 +1106,15 @@ class Trabajador {
         $data = array();
         
         // Primero probamos sin JOIN para confirmar que funciona
+       if(!empty($param['mes'])){
+         $mesSeleccionado = $param['mes']; // formato: YYYY-MM
+         list($anio, $mes) = explode('-', $mesSeleccionado);
+       }
+       else{
+         $mesSeleccionado = date('Y-m');
+         list($anio, $mes) = explode('-', $mesSeleccionado);
+       }
        
-        
         // Si funciona sin JOIN, probamos con JOIN
             $sqlWithJoin = "SELECT 
                     t.id,
@@ -1151,8 +1158,8 @@ class Trabajador {
                         FROM 
                             registro_asistencia
                         WHERE 
-                            MONTH(fecha) = MONTH(CURDATE())
-                            AND YEAR(fecha) = YEAR(CURDATE())
+                            MONTH(fecha) = {$mes}
+                            AND YEAR(fecha) = {$anio}
                             AND hora_entrada IS NOT NULL
                             AND hora_salida IS NOT NULL
                         GROUP BY 

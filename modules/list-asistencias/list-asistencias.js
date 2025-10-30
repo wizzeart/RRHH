@@ -33,6 +33,19 @@ $(document).ready(function () {
         });
     });
 
+    $('#mes-seleccionado').on('change', function() {
+        const mes = $(this).val(); // formato: YYYY-MM
+        //gets
+        $.ajax({
+            url: 'api-app.php?module=trabajadores&method=list&mes=' + mes,
+            type: 'GET',
+            dataType: 'json',
+            success: function (d) {
+                $('#table-panel-registro').bootstrapTable('load', d);
+            }
+        });
+    });
+    
     
 
     // Handler for 'view' (eye) button - show modal with full worker info
@@ -236,7 +249,7 @@ $('#filtro-estado').change(function() {
 function buildFilterUrl() {
     var params = [];
     var fechaDesde = $('#fecha-desde').val();
-    var fechaHasta = $('#fecha-hasta').val();
+    var fechaHasta = $('#fecha-desde').val();
     var trabajador = $('#filtrar-trabajador').val();
     var estado = $('#filtro-estado').val();
     var tipoAusencia = $('#filtro-tipo-ausencia').val();
