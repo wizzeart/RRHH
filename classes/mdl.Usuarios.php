@@ -218,12 +218,14 @@ class Usuario {
 
     private function _list($param) {
         $data = array();
-        $sql = "select a.*"
-                . ",b.xrol"
-                . " from " .  "usuarios a"
-                . " left join " .  "roles b on a.xrol_id=b.xrol_id"
-                . " where a.xeliminado=0"
-                . " order by a.xusuario_id";
+        $sql = "SELECT a.*,
+                b.xrol
+                FROM usuarios a
+                LEFT JOIN roles b ON a.xrol_id=b.xrol_id
+                WHERE a.xeliminado=0
+                ORDER BY 
+                a.xrol_id ASC,
+                a.xusuario_id DESC";
         //print($sql);
         //die();
         $data = $this->db->fetchAll($sql);
