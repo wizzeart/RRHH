@@ -344,7 +344,7 @@ class Bolsas_empleos {
 
     private function _list($param) {
         $data = array();
-        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, b.telefono, b.fecha_registro, b.observaciones
+        $sql = "SELECT b.id, b.nombre, b.apellidos, b.segundos_apellidos, b.ci_bolsa_empleo, b.curriculum, c.nombre as cargo_postulado, c.id as cargo_postulado_id, b.telefono, b.fecha_registro, b.observaciones
                  FROM bolsa_empleo b
                  LEFT JOIN cargos c ON b.cargo_postulado_id = c.id
                  WHERE (b.empresa_id = {$this->app->empresa_id} OR b.empresa_id IS NULL)

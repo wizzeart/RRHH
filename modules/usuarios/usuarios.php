@@ -71,7 +71,11 @@
                                     <select id="f-rol" name="xrol_id" class="form-control" data-placeholder="Selecciona un rol" required>
                                         <option value="">Selecciona un rol</option>
                                         <?php foreach ($data_form['roles'] as $k => $v) { ?>
-                                            <option value="<?php print($v['xrol_id']) ?>"><?php print($v['xrol']) ?></option>
+                                            <?php if ($v['xrol_id'] == $data['xrol_id']) { ?>
+                                                <option value="<?php print($v['xrol_id']) ?>" selected><?php print($v['xrol']) ?></option>
+                                            <?php } else { ?>
+                                                <option value="<?php print($v['xrol_id']) ?>"><?php print($v['xrol']) ?></option>
+                                            <?php } ?>
                                         <?php } ?>
                                     </select>
                                     <small class="help-block">Indica el rol del usuario</small>

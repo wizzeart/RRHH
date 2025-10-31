@@ -57,7 +57,11 @@ class Home {
                         $quickStats['totalContratos'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['totalContratos'] = 0; }
                     try {
-                        $row = $this->db->fetchRow("SELECT COUNT(*) AS val FROM departamentos where empresa_id = {$this->app->empresa_id}");
+                        $row = $this->db->fetchRow("SELECT COUNT(DISTINCT d.id) AS val
+                                                    FROM departamentos d
+                                                    INNER JOIN trabajadores t ON t.departamento_id = d.id
+                                                    WHERE d.empresa_id = {$this->app->empresa_id}
+                                                    AND t.trabajador_eliminado = 0");
                         $quickStats['departamentos'] = $row ? (int)$row['val'] : 0;
                     } catch (Exception $e) { $quickStats['departamentos'] = 0; }
                     try {
@@ -99,7 +103,7 @@ class Home {
                     $workers = $this->db->fetchAll($workersSql);
 
                     // Obtener lista de cargos
-                    $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY id DESC";
+                    $cargosSql = "SELECT id, nombre, descripcion, salario FROM cargos ORDER BY salario DESC";
                     $cargos = $this->db->fetchAll($cargosSql);
 
                     $quickStats['totalCargos'] = count($cargos);
@@ -123,7 +127,7 @@ class Home {
                         HAVING 
                             cantidad > 0
                         ORDER BY 
-                            d.id DESC";
+                            cantidad DESC";
                         $departamentos = $this->db->fetchAll($depSql);
                     } catch (Exception $e) {
                         // Si no existe tabla departamentos, construir lista a partir de cargos (por departamento_id)
