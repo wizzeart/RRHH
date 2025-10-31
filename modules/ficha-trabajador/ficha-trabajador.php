@@ -394,6 +394,9 @@
                         <h3 class="panel-title">Recursos Asignados</h3>
                     </div>
                     <div class="panel-body">
+                        <div class="form-control">
+                                <button id="btn-add-new-recurso" class="btn btn-mint" alt="Asignar Recurso" title="Asignar Recurso"><i class="fa fa-plus fa-lg"></i>  Asignar Recurso</button>
+                            </div>
                         <table
                             id="table-recursos"
                             data-toggle="table"
@@ -771,6 +774,7 @@
 </div>
 <!-- llamar a add-doc.php -->
 <?php include 'add-doc.php'; ?>
+<?php include 'add-rec.php'; ?>
 
 <!-- Modal para detalles del recurso -->
 <div class="modal fade" id="trabajadorModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">

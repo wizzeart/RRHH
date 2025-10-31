@@ -249,7 +249,9 @@ class List_recursos {
             //'fecha_entrega_a_rh' => $param['fecha_entrega_a_rh']
         );
 
-        $data['action'] = $param['action'];
+        if(isset($param['action'])) {
+            $data['action'] = $param['action'];
+        }
 
         // Remover campos que no pertenecen a la tabla bolsa_empleo
         unset($insert['module']);

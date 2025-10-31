@@ -203,7 +203,7 @@
 </li>
 
 <!--NEW MENU ENTREGA DE RECURSOS-->
-<!-- <li class="list-divider"></li>
+<li class="list-divider"></li>
 <li class="<?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('active-link') ?>">
     <a href="?module=list-recursos">
         <i class="fa fa-cube"></i>
@@ -211,4 +211,4 @@
             <strong>Asignación de Recursos</strong>
         </span>
     </a>
-</li> -->
+</li>

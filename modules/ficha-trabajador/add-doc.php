@@ -19,8 +19,8 @@
                         <input class="form-control" type="file" id="file_doc" name="file_doc" required>
                     </div>
                     <div class="mt-3 text-center">
-                        <button id="btn-save-doc" type="submit" class="btn btn-primary ml-2">Guardar</button>
-                        <button type="button" class="btn btn-secondary ml-2" data-dismiss="modal">Cancelar</button>
+                        <button id="btn-save-doc" type="submit" class="btn btn-primary ml-2"><i class="fa fa-check"></i> Guardar</button>
+                        <button type="button" class="btn btn-secondary ml-2" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                     </div>
                 </form>
             </div>

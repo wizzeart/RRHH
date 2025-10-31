@@ -1,4 +1,4 @@
-<div class="panel">
+<div class="panel hidden">
     <div class="form-control">
         <button id="btn-add-new" class="btn btn-mint btn-icon " alt="Asignar Recurso" title="Asignar Recurso"><span class="icon-lg fa fa-plus"></span> Asignar Recurso</button>
     </div>

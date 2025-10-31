@@ -139,6 +139,52 @@ $(document).ready(function () {
         $('#documentoModal').modal('show');  
     });
 
+    $('#btn-add-new-recurso').on('click', function () {
+        $('#recursoModal2').modal('show');
+    });
+    $('#recursoForm').on('submit', function(e) {
+        $('#btn-save-recurso').prop('disabled', true);
+        e.preventDefault();
+        var recurso = $('#f-recurso').val();
+        var marca = $('#f-marca').val();
+        var modelo = $('#f-modelo').val();
+        var color = $('#f-color').val();
+        var otros_recursos = $('#f-otros').val();
+        var fecha_entrega_a_t = $('#f-fecha-entrega').val();
+        var fecha_entrega_a_rh = $('#f-fecha-rh').val();
+        var trabajador_id = $('#f-id').val();
+        var formData = new FormData();
+        formData.append('trabajador_id', trabajador_id);
+        formData.append('nombre', recurso);
+        formData.append('marca', marca);
+        formData.append('modelo', modelo);
+        formData.append('color', color);
+        formData.append('otros_recursos', otros_recursos);
+        formData.append('fecha_entrega_a_t', fecha_entrega_a_t);
+        formData.append('fecha_entrega_a_rh', fecha_entrega_a_rh);
+        formData.append('module', 'gestion-recursos');
+        formData.append('method', 'save');
+        //ponerle hidden a la seccion que aparece en el modal
+        
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#recursoForm')[0].reset();
+                $('#recursoModal2').modal('hide');
+                notify('success', 'Recurso agregado', 'El recurso se ha agregado correctamente');
+                $('#table-recursos').bootstrapTable('refresh');
+                $('#btn-save-recurso').prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                notify('danger', 'Error', 'Hubo un error al agregar el recurso');
+                $('#btn-save-recurso').prop('disabled', false);
+            }
+        });
+    });
 
     $('#docForm').on('submit', function(e) {
         $('#btn-save-doc').prop('disabled', true);
@@ -624,6 +670,76 @@ $(document).ready(function () {
         $('#modalBody2').html(html);
         $('#recursoModal').modal('show');
     });
+    $('#table-recursos, #table-asignados, #table-retornados').on('click', '.delete-recurso', function () {
+        var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
+        if ($btn.length === 0) return;
+        
+        var id = $(this).data('id');
+        
+        if (confirm('¿Estás seguro de dar de baja a este registro?')) {
+            var rowIndex = $btn.parent().parent().parent().data('index');
+            var cmd = 'module=gestion-recursos&method=del&id=' + id + '&row=' + rowIndex;
+            $.ajax({url: 'api-app.php', type: 'GET', data: cmd, dataType: 'json',
+                success: function (d) {
+                    if (d.status == 1) {
+                        $('tr[data-index="' + d.row + '"]').fadeOut('slow');
+                        // Mostrar notificación de éxito
+                        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                            $.niftyNoty({
+                                type: 'success',
+                                container: 'floating',
+                                title: 'Dado de Baja',
+                                message: 'El registro ha sido dado de baja correctamente con fecha de hoy.',
+                                timer: 3000,
+                                closeBtn: true,
+                                focus: true
+                            });
+                        } else {
+                            alert('Registro eliminado correctamente.');
+                        }
+                        $('#table-todos').bootstrapTable('refresh');
+                        $('#table-asignados').bootstrapTable('refresh');
+                        $('#table-retornados').bootstrapTable('refresh');
+                    } else {
+                        // Mostrar notificación de error
+                        if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                            $.niftyNoty({
+                                type: 'danger',
+                                container: 'floating',
+                                title: 'Error',
+                                message: 'No se pudo dar de baja al registro.',
+                                timer: 3000,
+                                closeBtn: true,
+                                focus: true
+                            });
+                        } else {
+                            alert('Error al eliminar el registro.');
+                        }
+                    }
+                },
+                error: function() {
+                    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+                        $.niftyNoty({
+                            type: 'danger',
+                            container: 'floating',
+                            title: 'Error',
+                            message: 'Error de conexión al dar de baja al registro.',
+                            timer: 3000,
+                            closeBtn: true,
+                            focus: true
+                        });
+                    } else {
+                        alert('Error de conexión.');
+                    }
+                }
+            });
+        }
+    });
+    $('#table-recursos').on('click', '.edit-recurso', function() {
+        $('#recursoModal2').modal('show');
+    });
+    
+    
 
     // Event listener para eliminar documento
     $('body').on('click', '.delete-document', function() {
@@ -663,6 +779,8 @@ function formatoPedido(value, row) {
 function formatoToolbar2(value, row) {
     var html = '<div class="btn-group">';
     
+    html += '<button class="btn btn-info btn-icon icon-sm fa fa-edit edit-recurso" ';
+    html += 'data-id="' + row.id + '" title="Editar"> </button> ';
     // Botón de ver detalles
     html += '<button class="btn btn-success btn-icon icon-sm fa fa-eye view-recurso" ';
     html += 'data-id="' + row.id + '" title="Ver detalles"></button> ';
@@ -671,7 +789,8 @@ function formatoToolbar2(value, row) {
     html += '<button class="btn btn-warning btn-icon icon-sm fa fa-download download-recurso" ';
     html += 'data-id="' + row.id + '" title="Descargar"></button>';
     
-    
+    html += '<button class="btn btn-danger btn-icon icon-sm fa fa-trash delete-recurso" ';
+    html += 'data-id="' + row.id + '" title="Eliminar"></button>';
     html += '</div>';
     return html;
 }
