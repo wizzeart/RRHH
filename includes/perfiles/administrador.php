@@ -62,7 +62,7 @@
     </a>
 </li>
 <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('active-link') ?>">
+<li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-th"></i>
         <span class="menu-title">
@@ -85,9 +85,9 @@
         <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
             <a href="?module=list-cargos">Cargos</a>
         </li>
-        <li class="<?php if (in_array($_GET['module'], array('historial'))) print('active-link') ?>">
+        <!-- <li class="<?php if (in_array($_GET['module'], array('historial'))) print('active-link') ?>">
             <a href="?module=historial">Historial</a>
-        </li>
+        </li> -->
         
     </ul>
 </li>
