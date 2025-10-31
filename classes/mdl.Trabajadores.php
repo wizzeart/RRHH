@@ -720,8 +720,24 @@ class Trabajador {
                 }
 
                 if ($result) {
-                    // Obtener el ID del trabajador insertado
                     $lastId = $this->db->last_id();
+                    if (isset($param['bolsa_empleo_id'])) {
+                        $sql = "SELECT * FROM bolsa_empleo WHERE id=:id";
+                        $get = $this->db->fetchAll($sql, array('id' => $param['bolsa_empleo_id']));
+                        if ($get[0]['curriculum']) {
+                            try {
+                                $this->db->insert('documentos_trabajador', array('trabajador_id' => $lastId, 'tipo' => 'cv', 'archivo' => $get[0]['curriculum'], 'fecha_upload' => date('Y-m-d H:i:s')));
+                                try {
+                                    $this->db->del('bolsa_empleo', array('id' => $param['bolsa_empleo_id']));
+                                } catch (Exception $ex) {
+                                    error_log('Error al eliminar el cv: ' . $ex->getMessage());
+                                }
+                            } catch (Exception $ex) {
+                                error_log('Error al insertar el cv: ' . $ex->getMessage());
+                            }
+                        }
+                    }
+                    // Obtener el ID del trabajador insertado
                     
                     if ($lastId) {
                         // Guardar información bancaria si se proporcionó
