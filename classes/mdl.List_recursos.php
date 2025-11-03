@@ -27,6 +27,10 @@ class List_recursos {
                 $data = $this->_list_id($param);
                 print(json_encode($data));
                 break;
+            case 'get':
+                $data = $this->_get($param);
+                print(json_encode($data));
+                break;
             case 'del':
                 $this->_del($param);
                 break;
@@ -34,6 +38,16 @@ class List_recursos {
                 $this->_save($param);
                 break;
         }
+    }
+    private function _get($param)
+    {
+        $data = array();
+        $sql = "SELECT r.*, CONCAT(t.nombre, ' ', t.apellidos) as nombre_trabajador FROM recursos r LEFT JOIN trabajadores t ON r.trabajador_id = t.id WHERE r.id = :id";
+        $params = array(
+            'id' => $param['id']
+        );
+        $data = $this->db->fetchAll($sql, $params);
+        return $data;
     }
 
     private function _list_id($param)
@@ -107,7 +121,7 @@ class List_recursos {
 
         $id_recurso = intval($param['id']);
         // Obtener datos del recurso y del trabajador
-        $sql = "SELECT r.*, t.nombre as nombre_trabajador, t.apellidos, t.cargos_id, c.nombre as cargo_nombre 
+        $sql = "SELECT r.*, t.nombre as nombre_trabajador, t.apellidos, t.apellidos_segundos, t.cargos_id, c.nombre as cargo_nombre 
         FROM recursos r 
         LEFT JOIN trabajadores t ON r.trabajador_id = t.id 
         LEFT JOIN cargos c ON t.cargos_id = c.id 
@@ -149,7 +163,7 @@ class List_recursos {
             'id="dias"></span>' => 'id="dias"><b><u>' . $fecha_actual->format('d') . '</u></b></span>',
             'id="mes"></span>' => 'id="mes"><b><u>' . $meses[intval($fecha_actual->format('m'))] . '</u></b></span>',
             'id="ano"></span>' => 'id="ano"><b><u>' . $fecha_actual->format('Y') . '</u></b></span>',
-            'id="trabajador_nombre"></span>' => 'id="trabajador_nombre"><b><u>' . htmlspecialchars($recurso[0]['nombre_trabajador'] . ' ' . $recurso[0]['apellidos']) . '</u></b></span>',
+            'id="trabajador_nombre"></span>' => 'id="trabajador_nombre"><b><u>' . htmlspecialchars($recurso[0]['nombre_trabajador'] . ' ' . $recurso[0]['apellidos'] . ' ' . $recurso[0]['apellidos_segundos']) . '</u></b></span>',
             'id="recurso"></span>' => 'id="recurso"><b><u>' . htmlspecialchars($recurso[0]['nombre'] ?? '') . '</u></b></span>',
             'id="marca"></span>' => 'id="marca"><b><u>' . htmlspecialchars($recurso[0]['marca'] ?? '') . '</u></b></span>',
             'id="modelo"></span>' => 'id="modelo"><b><u>' . htmlspecialchars($recurso[0]['modelo'] ?? '') . '</u></b></span>',
@@ -352,9 +366,12 @@ class List_recursos {
                 // Filtrar solo los campos válidos
                 $update_filtered = array_intersect_key($insert, array_flip($campos_validos));
 
-                $update_filtered['fecha_entrega_a_rh'] = $param['fecha_entrega_a_rh'];
-                if (isset($param['fecha_entrega_a_rh'])) {
+                if (isset($param['fecha_entrega_a_rh'])&&$param['fecha_entrega_a_rh'] != '') {
                     $update_filtered['estado'] = 0;
+                    $update_filtered['fecha_entrega_a_rh'] = $param['fecha_entrega_a_rh'];
+                }
+                else{
+                    $update_filtered['estado'] = 1;
                 }
 
                 // Debug log before update

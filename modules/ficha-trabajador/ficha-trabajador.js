@@ -140,6 +140,9 @@ $(document).ready(function () {
     });
 
     $('#btn-add-new-recurso').on('click', function () {
+        $('#recursoForm')[0].reset();
+        $('#trabajador-rec-nombre').addClass('hidden');
+        $('#fecha-rh-section').addClass('hidden');
         $('#recursoModal2').modal('show');
     });
     $('#recursoForm').on('submit', function(e) {
@@ -153,7 +156,12 @@ $(document).ready(function () {
         var fecha_entrega_a_t = $('#f-fecha-entrega').val();
         var fecha_entrega_a_rh = $('#f-fecha-rh').val();
         var trabajador_id = $('#f-id').val();
+        var id_recurso = $('#f-id-rec').val();
         var formData = new FormData();
+        if(id_recurso){
+            formData.append('id', id_recurso);
+            formData.append('action', 'update');
+        }
         formData.append('trabajador_id', trabajador_id);
         formData.append('nombre', recurso);
         formData.append('marca', marca);
@@ -175,12 +183,12 @@ $(document).ready(function () {
             success: function(response) {
                 $('#recursoForm')[0].reset();
                 $('#recursoModal2').modal('hide');
-                notify('success', 'Recurso agregado', 'El recurso se ha agregado correctamente');
+                notify('success', 'Recurso agregado', 'El recurso se ha agregado/actualizado correctamente');
                 $('#table-recursos').bootstrapTable('refresh');
                 $('#btn-save-recurso').prop('disabled', false);
             },
             error: function(xhr, status, error) {
-                notify('danger', 'Error', 'Hubo un error al agregar el recurso');
+                notify('danger', 'Error', 'Hubo un error al agregar/actualizar el recurso');
                 $('#btn-save-recurso').prop('disabled', false);
             }
         });
@@ -653,7 +661,7 @@ $(document).ready(function () {
         
         // Agregar detalles del recurso
         html += addRow('Recurso', rowData.nombre);
-        html += addRow('Trabajador', rowData.nombre_trabajador || 'No asignado');
+       // html += addRow('Trabajador', rowData.nombre_trabajador || 'No asignado');
         html += addRow('Estado', formatoEstado(rowData.estado, rowData));
         html += addRow('Fecha de Entrega', formatoFecha(rowData.fecha_entrega_a_t));
         html += addRow('Fecha de Devolución', formatoFecha(rowData.fecha_entrega_a_rh) || 'Pendiente');
@@ -670,7 +678,7 @@ $(document).ready(function () {
         $('#modalBody2').html(html);
         $('#recursoModal').modal('show');
     });
-    $('#table-recursos, #table-asignados, #table-retornados').on('click', '.delete-recurso', function () {
+    $('#table-recursos').on('click', '.delete-recurso', function () {
         var $btn = $(this).is('button') ? $(this) : $(this).closest('button[data-id]');
         if ($btn.length === 0) return;
         
@@ -736,7 +744,30 @@ $(document).ready(function () {
         }
     });
     $('#table-recursos').on('click', '.edit-recurso', function() {
-        $('#recursoModal2').modal('show');
+        var id = $(this).data('id');
+        $.ajax({
+            url: 'api-app.php',
+            type: 'GET',
+            data: 'module=gestion-recursos&method=get&id=' + id,
+            dataType: 'json',
+            success: function(d) {
+                d = d[0];
+                $('#f-trabajador_id-rec').val(d.trabajador_id);
+                $('#f-trabajador-rec-nombre').val(d.nombre_trabajador);
+                $('#trabajador-rec-nombre').addClass('hidden');
+                $('#fecha-rh-section').removeClass('hidden');
+                $('#f-id-rec').val(d.id);
+                $('#f-recurso').val(d.nombre);
+                $('#f-marca').val(d.marca);
+                $('#f-modelo').val(d.modelo);
+                $('#f-color').val(d.color);
+                $('#f-otros').val(d.otros_recursos);
+                $('#f-fecha-entrega').val(d.fecha_entrega_a_t);
+                $('#f-fecha-rh').val(d.fecha_entrega_a_rh);
+                $('#recursoModal2').modal('show');
+            }
+        });
+
     });
     
     

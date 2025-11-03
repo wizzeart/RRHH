@@ -413,6 +413,11 @@
                             data-show-pagination-switch="true">
                             <thead>
                                 <tr>
+                                    <!--<th data-field="id" id="f-id-rec" data-sortable="true" data-visible="false">ID</th>-->
+                                    <th data-field="marca" data-sortable="true" data-visible="false">Marca</th>
+                                    <th data-field="modelo" data-sortable="true" data-visible="false">Modelo</th>
+                                    <th data-field="color" data-sortable="true" data-visible="false">Color</th>
+                                    <th data-field="otros_recursos" data-sortable="true" data-visible="false">Otros Recursos</th>
                                     <th data-field="nombre" data-sortable="true">Recurso</th>
                                     <th data-field="estado" data-sortable="true" data-formatter="formatoEstado">Estado</th>
                                     <th data-field="fecha_entrega_a_t" data-sortable="true" data-formatter="formatoFecha">Fecha Entrega</th>

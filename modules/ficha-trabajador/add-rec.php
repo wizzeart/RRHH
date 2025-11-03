@@ -11,12 +11,28 @@
 
             <div class="modal-body" id="modalRecursoBody2">
                 <form id="recursoForm" enctype="multipart/form-data" method="POST">
+
                     <div class="row">
                         <!-- ID oculto -->
                         <div class="col-md-3 d-none hidden">
                             <div class="form-group">
-                                <label for="f-id">Código del Trabajador</label>
-                                <input type="text" id="f-trabajador_id" name="trabajador_id" class="form-control" disabled>
+                                <label for="f-trabajador_id-rec">Código del Trabajador</label>
+                                <input type="text" id="f-trabajador_id-rec" name="trabajador_id" class="form-control" disabled>
+                            </div>
+                        </div>
+
+                        <div id="trabajador-rec-nombre" class="col-md-3 d-none">
+                            <div class="form-group">
+                                <label for="f-trabajador-rec-nombre">Trabajador</label>
+                                <input type="text" id="f-trabajador-rec-nombre" name="trabajador_id" class="form-control" disabled>
+                            </div>
+                        </div>
+
+                        <!-- ID oculto -->
+                        <div class="col-md-3 d-none hidden">
+                            <div class="form-group">
+                                <label for="f-id-rec">Código del Recurso</label>
+                                <input type="text" id="f-id-rec" name="id_rec" class="form-control" disabled>
                             </div>
                         </div>
 

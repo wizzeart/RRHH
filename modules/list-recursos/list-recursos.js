@@ -60,6 +60,58 @@ function descargar_acta(idRecurso) {
 }
 
 $(document).ready(function () {
+    $('#recursoForm').on('submit', function(e) {
+        $('#btn-save-recurso').prop('disabled', true);
+        e.preventDefault();
+        var recurso = $('#f-recurso').val();
+        var marca = $('#f-marca').val();
+        var modelo = $('#f-modelo').val();
+        var color = $('#f-color').val();
+        var otros_recursos = $('#f-otros').val();
+        var fecha_entrega_a_t = $('#f-fecha-entrega').val();
+        var fecha_entrega_a_rh = $('#f-fecha-rh').val();
+        if($('#f-trabajador_id-rec').val()){
+            var trabajador_id = $('#f-trabajador_id-rec').val();
+        }else{
+            var trabajador_id = $('#f-id').val();
+        }
+        var id_recurso = $('#f-id-rec').val();
+        var formData = new FormData();
+        if(id_recurso){
+            formData.append('id', id_recurso);
+            formData.append('action', 'update');
+        }
+        formData.append('trabajador_id', trabajador_id);
+        formData.append('nombre', recurso);
+        formData.append('marca', marca);
+        formData.append('modelo', modelo);
+        formData.append('color', color);
+        formData.append('otros_recursos', otros_recursos);
+        formData.append('fecha_entrega_a_t', fecha_entrega_a_t);
+        formData.append('fecha_entrega_a_rh', fecha_entrega_a_rh);
+        formData.append('module', 'gestion-recursos');
+        formData.append('method', 'save');
+        //ponerle hidden a la seccion que aparece en el modal
+        
+        $.ajax({
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#recursoForm')[0].reset();
+                $('#recursoModal2').modal('hide');
+                notify('success', 'Recurso agregado', 'El recurso se ha agregado/actualizado correctamente');
+                $('#table-todos, #table-asignados, #table-retornados').bootstrapTable('refresh');
+                $('#btn-save-recurso').prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                notify('danger', 'Error', 'Hubo un error al agregar/actualizar el recurso');
+                $('#btn-save-recurso').prop('disabled', false);
+            }
+        });
+    });
     // Botón para agregar nuevo recurso
     $('#btn-add-new').click(function () {
         location.href = 'index.php?module=gestion-recursos&method=new';
@@ -117,8 +169,30 @@ $(document).ready(function () {
     });
 
     // Manejador para el botón de editar
-    $('#table-todos, #table-asignados, #table-retornados').on('click', '.edit-recurso', function () {
-        location.href = 'index.php?module=gestion-recursos&id=' + $(this).data('id');
+    $('#table-todos, #table-asignados, #table-retornados').on('click', '.edit-recurso', function() {
+        var id = $(this).data('id');
+        $.ajax({
+            url: 'api-app.php',
+            type: 'GET',
+            data: 'module=gestion-recursos&method=get&id=' + id,
+            dataType: 'json',
+            success: function(d) {
+                d = d[0];
+                $('#f-trabajador_id-rec').val(d.trabajador_id);
+                $('#f-trabajador-rec-nombre').val(d.nombre_trabajador);
+                $('#trabajador-rec-nombre').removeClass('d-none');
+                $('#f-id-rec').val(d.id);
+                $('#f-recurso').val(d.nombre);
+                $('#f-marca').val(d.marca);
+                $('#f-modelo').val(d.modelo);
+                $('#f-color').val(d.color);
+                $('#f-otros').val(d.otros_recursos);
+                $('#f-fecha-entrega').val(d.fecha_entrega_a_t);
+                $('#f-fecha-rh').val(d.fecha_entrega_a_rh);
+                $('#recursoModal2').modal('show');
+            }
+        });
+
     });
 
     // Manejador para el botón de eliminar
@@ -193,3 +267,20 @@ $(document).ready(function () {
         return text ? text.toString().toLowerCase() : '';
     };
 });
+
+function notify(type, title, message, timer) {
+    if ($.niftyNoty && typeof $.niftyNoty === 'function') {
+      $.niftyNoty({
+        type: type || 'info',
+        container: 'floating',
+        title: title || '',
+        message: message || '',
+        timer: timer != null ? timer : 3000,
+        closeBtn: true,
+        focus: true
+      });
+    } else {
+      var text = (title ? (title + ': ') : '') + (message || '');
+      try { alert(text); } catch(e) { console.warn('Notify:', text); }
+    }
+  }
