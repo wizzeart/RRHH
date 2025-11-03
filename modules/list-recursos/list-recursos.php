@@ -110,6 +110,8 @@
     </div>
 </div>
 
+<?php include_once('modules/ficha-trabajador/add-rec.php'); ?>
+
 <!-- Modal para detalles del recurso -->
 <div class="modal fade" id="recursoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
