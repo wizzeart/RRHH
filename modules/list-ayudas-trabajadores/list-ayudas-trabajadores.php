@@ -1,19 +1,18 @@
 <div class="panel">
     <div class="panel-heading">
         <h3 class="panel-title"><?php print($page['subtitle']); ?></h3>
-                   
     </div>
-    
-        
-
-            <div class="tab-content">
-                <div id="tab-listado" class="tab-pane fade active in">
-                    
-                        <div class="panel-heading">
-                           <ul class="nav nav-tabs">
+    <div class="panel-body">
+        <div class="tab-base">
+            <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-listado">Listado</a></li>
                 <li><a data-toggle="tab" href="#tab-registrar">Registrar Ayuda</a></li>
             </ul>
+            <div class="tab-content">
+                <div id="tab-listado" class="tab-pane fade active in">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Ayudas registradas</h4>
                         </div>
                         <div class="panel-body">
                             <table 
@@ -40,10 +39,13 @@
                                 </thead>
                             </table>
                         </div>
-                    
+                    </div>
                 </div>
                 <div id="tab-registrar" class="tab-pane fade">
-                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Registrar nueva ayuda</h4>
+                        </div>
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-4">
@@ -68,7 +70,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label class="control-label" for="f-valor">Valor <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" min="0" id="f-valor" class="form-control" placeholder="0.00">
+                                        <input type="number" step="10" min="0" id="f-valor" class="form-control" placeholder="0.00">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -101,14 +103,13 @@
                                 <button id="btn-guardar-ayuda" class="btn btn-primary">
                                     <i class="fa fa-save"></i> Guardar
                                 </button>
-                                
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-       
-
+        </div>
+    </div>
 </div>
 
 <script>
@@ -164,10 +165,7 @@
             success: function(res){
                 if(res.status==1){
                     notifyRaw('success','Ayudas','Ayuda guardada correctamente',3000, $);
-                    $('#btn-limpiar-ayuda').click();
-                    // Cambiar a la pestaña de listado
                     $('a[href=#tab-listado]').tab('show');
-                    // Forzar un refresh completo de la tabla
                     setTimeout(function() { 
                         var $table = $('#table-ayudas');
                         $table.bootstrapTable('refresh', {
@@ -230,7 +228,6 @@
                 success: function(r){
                     if (r && r.status==1) {
                         notifyRaw('success','Ayudas','Ayuda eliminada',2500, $);
-                        // Refrescar la tabla después de eliminar
                         setTimeout(function() { $('#table-ayudas').bootstrapTable('refresh'); }, 300);
                     } else {
                         notifyRaw('danger','Error', (r&&r.msg)||'No se pudo eliminar',4000, $);
@@ -242,46 +239,13 @@
     };
     }
 
-    // Función para refrescar la tabla
-    // function refreshTable() {
-    //     $('#table-ayudas').bootstrapTable('refresh');
-    // }
-
-    // Esperar a jQuery y luego inicializar
     waitForJQ(function($) { 
         initHandlers($);
-        
-        // Inicializar la tabla manualmente
         var $table = $('#table-ayudas');
-        
-        // Forzar la carga inicial de la tabla
-        $table.bootstrapTable();
-        
-        // Configurar el evento para cuando la tabla termine de cargar
-        $table.on('load-success.bs.table', function (e, data) {
-            console.log('Tabla de ayudas cargada correctamente', data);
-        });
-        
-        // Configurar el evento para errores
-        $table.on('load-error.bs.table', function (e, status, res) {
-            console.error('Error al cargar la tabla:', status, res);
-
-        });
-        
-        // Refrescar la tabla cuando se cambie a la pestaña de listado
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            if ($(e.target).attr('href') === '#tab-listado') {
-                $table.bootstrapTable('refresh');
-            }
-        });
-        
-        // Forzar un refresh después de que todo esté listo
-        setTimeout(function() {
-            $table.bootstrapTable('refresh');
-        }, 100);
+        // No llamar a bootstrapTable() porque ya se inicializa con data-toggle="table"
+        $table.on('load-success.bs.table', function (e, data) { console.log('Tabla de ayudas cargada', data); });
+        $table.on('load-error.bs.table', function (e, status, res) { console.error('Error al cargar la tabla de ayudas:', status, res); });
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) { if ($(e.target).attr('href') === '#tab-listado') { $table.bootstrapTable('refresh'); } });
     });
-    
-    // Hacer la función refreshTable disponible globalmente
-    window.refreshAyudasTable = refreshTable;
 })();
 </script>

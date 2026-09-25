@@ -67,8 +67,11 @@
                         if ($app->rol == '2') {//TRABAJADORES
                             require_once(INCLUDES . '/perfiles/trabajador.php');
                         }
-                        if ($app->rol == '3') {//DESARROLLADORES
-                            require_once(INCLUDES . '/perfiles/desarrollador.php');
+                        if ($app->rol == '3') {//INVENTARIO
+                            require_once(INCLUDES . '/perfiles/inventario.php');
+                        }
+                        if ($app->rol == '4') {//JEFE DE AREA
+                            require_once(INCLUDES . '/perfiles/jefe_de_area.php');
                         }
 
                         ?>         

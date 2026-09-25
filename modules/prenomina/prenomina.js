@@ -54,17 +54,17 @@ $(document).ready(function(){
   // formatters used in the table
   window.currencyFormatter = function(value){
     var num = Number(value||0);
-    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'CUP', minimumFractionDigits: 2 }).format(num);
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'CUP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
   };
   window.number2Formatter = function(value){
     var num = Number(value||0);
-    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
   };
 
   // Editable hours input
   window.hoursInputFormatter = function(value, row){
-    var v = (value == null || value === '') ? 192 : value;
-    return '<input type="number" step="0.01" min="0" class="form-control input-sm prenom-horas" data-id="'+ row.id +'" value="'+ v +'" style="width:110px; text-align:right;" />';
+    var v = (value == null || value === '') ? 192 : parseInt(value);
+    return '<input type="text" pattern="[0-9]*" inputmode="numeric" maxlength="3" class="prenom-horas" data-id="'+ row.id +'" value="'+ v +'" style="width:80px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px; font-size:14px; font-weight:bold;" />';
   };
 
   // Recalculate dependent fields when hours change
@@ -72,13 +72,26 @@ $(document).ready(function(){
     var horas = Number(row.horas || 0);
     var tarifa = Number(row.tarifa || 0);
     var ausencias = Number(row.ausencias || 0);
-    var a_cobrar = horas * tarifa;
+    var a_cobrar = Math.trunc(horas * tarifa);
     var sal_dev = a_cobrar;
     var salario_neto = a_cobrar;
-    var seg_social = +(a_cobrar * 0.05).toFixed(2);
-    var ing_pers = +(a_cobrar * 0.0375).toFixed(2);
-    var ausenciasCosto = +(ausencias * 8 * tarifa).toFixed(2);
-    var salario_pagar = +(a_cobrar - (seg_social + ing_pers + ausenciasCosto)).toFixed(2);
+    var seg_social = Math.trunc(a_cobrar * 0.05);
+    
+    // Calcular ing_pers_3 e ing_pers_5 según rangos salariales
+    var ing_pers_3 = 0;
+    var ing_pers_5 = 0;
+    
+    if (salario_neto >= 3260 && salario_neto <= 9510) {
+        // Rango 3260-9510: 3% fijo del rango completo
+        ing_pers_3 = Math.trunc((9510 - 3260) * 0.03);
+    } else if (salario_neto > 9510) {
+        // Sobre 9510: 3% fijo + 5% del exceso
+        ing_pers_3 = Math.trunc((9510 - 3260) * 0.03);
+        ing_pers_5 = Math.trunc((salario_neto - 9510) * 0.05);
+    }
+    
+    var ausenciasCosto = Math.trunc(ausencias * 8 * tarifa);
+    var salario_pagar = Math.trunc(a_cobrar - (seg_social + ing_pers_3 + ing_pers_5 + ausenciasCosto));
     
     return {
       horas: horas,
@@ -86,16 +99,24 @@ $(document).ready(function(){
       sal_dev: sal_dev,
       salario_neto: salario_neto,
       seg_social: seg_social,
-      ing_pers: ing_pers,
+      ing_pers_3: ing_pers_3,
+      ing_pers_5: ing_pers_5,
       salario_pagar: salario_pagar,
       ausenciasCosto: ausenciasCosto
     };
   }
 
-  $(document).on('change input', '#table-prenomina .prenom-horas', function(){
+  $(document).on('input', '#table-prenomina .prenom-horas', function(){
+    var $inp = $(this);
+    // Only allow integers
+    var value = $inp.val().replace(/[^0-9]/g, '');
+    $inp.val(value);
+  });
+
+  $(document).on('change', '#table-prenomina .prenom-horas', function(){
     var $inp = $(this);
     var id = $inp.data('id');
-    var horas = Number($inp.val() || 0);
+    var horas = parseInt($inp.val() || 0, 10);
     var $table = $('#table-prenomina');
     var row = $table.bootstrapTable('getRowByUniqueId', id);
     if (!row) return;
@@ -131,15 +152,13 @@ $(document).ready(function(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ year: year, month: month, rows: rows })
     }).then(function(r){ 
-      return r.text(); // Cambiar a text() primero para manejar errores HTML
+      return r.text();
     }).then(function(responseText){
       var resp;
       try {
         resp = JSON.parse(responseText);
       } catch (e) {
         console.error('Respuesta no es JSON válido:', responseText);
-        console.error('Error de parsing:', e);
-        // Mostrar los primeros 500 caracteres de la respuesta para debug
         var preview = responseText.length > 500 ? responseText.substring(0, 500) + '...' : responseText;
         alert('Error del servidor: Respuesta inválida\n\nRespuesta recibida:\n' + preview);
         return;
@@ -147,21 +166,8 @@ $(document).ready(function(){
       
       if (resp && resp.status === 1) {
         alert('Guardado correcto. Filas afectadas: ' + (resp.affected || 0));
-        // Exportar a Excel del tab actual
-        var $active = $('#tabs-prenomina li.active a');
-        var tabName = $active.length ? $active.data('tab') : '';
-        var url = 'api-app.php?module=prenomina&method=export-excel&year=' + year + '&month=' + month + (tabName ? ('&tab=' + encodeURIComponent(tabName)) : '');
-        
-        // Crear un iframe oculto para la descarga para evitar errores de parsing
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        
-        // Remover el iframe después de un tiempo
-        setTimeout(function() {
-          document.body.removeChild(iframe);
-        }, 5000);
+        // Recargar la tabla
+        $('#table-prenomina').bootstrapTable('refresh');
       } else if (resp && resp.error) {
         alert('Error: ' + resp.error);
       } else {
@@ -170,5 +176,33 @@ $(document).ready(function(){
     }).catch(function(err){
       alert('Error de red al guardar: ' + err);
     });
+  });
+
+  // Exportar Excel: separado del botón guardar
+  $(document).on('click', '#btn-prenom-export', function(e){
+    e.preventDefault();
+    
+    var year = parseInt($('#prenom-year').val(), 10) || new Date().getFullYear();
+    var month = parseInt($('#prenom-month').val(), 10) || (new Date().getMonth()+1);
+    var $active = $('#tabs-prenomina li.active a');
+    var tabName = $active.length ? $active.data('tab') : 'Todos';
+    
+    console.log('Exportando Excel para:', { year: year, month: month, tab: tabName });
+    
+    // Construir URL de exportación
+    var url = 'api-app.php?module=prenomina&method=export-excel&year=' + year + '&month=' + month;
+    if (tabName) {
+      url += '&tab=' + encodeURIComponent(tabName);
+    }
+    
+    console.log('URL de exportación:', url);
+    
+    // Abrir en nueva ventana para forzar descarga
+    window.location.href = url;
+    
+    // Alternativa con timeout para mostrar mensaje
+    setTimeout(function() {
+      console.log('Exportación iniciada. Si no se descarga el archivo, revise la consola del navegador.');
+    }, 1000);
   });
 });

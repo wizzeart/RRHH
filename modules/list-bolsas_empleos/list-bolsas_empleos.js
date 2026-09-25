@@ -13,24 +13,24 @@ $(document).ready(function () {
         } else {
             // Fallback simple para garantizar feedback al usuario
             var text = (title ? (title + ': ') : '') + (message || '');
-            try { alert(text); } catch(e) { console.warn('Notify:', text); }
+            try { alert(text); } catch (e) { console.warn('Notify:', text); }
         }
     }
     // Manejar clic en el botón de observaciones
     $('#table-panel').on('click', '.btn-observaciones', function () {
         var id = $(this).data('id');
         var observaciones = $(this).data('observaciones') || '';
-        
+
         // Actualizar el formulario del modal
         $('#observacion_id').val(id);
         $('#observacion_texto').val(observaciones);
-        
+
         // Mostrar el modal
         $('#modalObservaciones').modal('show');
     });
-    
+
     // Manejar clic en el botón de guardar observación
-    $('#btnGuardarObservacion').click(function() {
+    $('#btnGuardarObservacion').click(function () {
         var id = $('#observacion_id').val();
         var observaciones = $('#observacion_texto').val();
         formData = new FormData();
@@ -41,9 +41,9 @@ $(document).ready(function () {
         formData.append('observaciones', observaciones);
         // Enviar la petición para guardar
         $.ajax({
-            url: 'api-app.php', 
-            type: 'POST', 
-            data: formData, 
+            url: 'api-app.php',
+            type: 'POST',
+            data: formData,
             processData: false,
             contentType: false,
             dataType: 'json',
@@ -51,33 +51,33 @@ $(document).ready(function () {
                 if (d.status == 1) {
                     $('#modalObservaciones').modal('hide');
                     $('#table-panel').bootstrapTable('refresh');
-                    
+
                     // Mostrar mensaje de éxito
                     notify('success', 'Éxito', 'Las observaciones han sido guardadas correctamente.', 3000);
-                } 
+                }
                 else {
                     notify('danger', 'Error', 'Error al guardar las observaciones: ' + (d.message || 'Error desconocido'), 3000);
                 }
             },
             error: function (xhr, status, error) {
                 var errorMsg = 'Error al guardar las observaciones: ' + (error || 'Error desconocido');
-    if (xhr.responseText) {
-        try {
-            var jsonResponse = JSON.parse(xhr.responseText);
-            errorMsg = jsonResponse.message || errorMsg;
-        } catch (e) {
-            // If not JSON, show the response text directly
-            errorMsg += '\n' + xhr.responseText.substring(0, 200);
-        }
-    }
-    notify('danger', 'Error', errorMsg, 3000);
+                if (xhr.responseText) {
+                    try {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        errorMsg = jsonResponse.message || errorMsg;
+                    } catch (e) {
+                        // If not JSON, show the response text directly
+                        errorMsg += '\n' + xhr.responseText.substring(0, 200);
+                    }
+                }
+                notify('danger', 'Error', errorMsg, 3000);
             }
         });
     });
     $('#btn-add-new').click(function () {
         location.href = 'index.php?module=bolsas_empleos';
     });
-  
+
 
     // Handler for curriculum download/view button
     $('#table-panel').on('click', '.fa.fa-download', function () {
@@ -85,7 +85,7 @@ $(document).ready(function () {
         var idx = $tr.data('index');
         var allData = $('#table-panel').bootstrapTable('getData');
         var rowData;
-        
+
         if (typeof idx !== 'undefined' && allData && allData[idx]) {
             rowData = allData[idx];
         } else {
@@ -94,12 +94,12 @@ $(document).ready(function () {
                 rowData = allData.find(function (r) { return r.id == id; });
             }
         }
-        
+
         if (!rowData || !rowData.curriculum || rowData.curriculum === '') {
             alert('No hay currículum disponible para esta postulación.');
             return;
         }
-        
+
         // Abrir el currículum en una nueva ventana/pestaña
         window.open(rowData.curriculum, '_blank');
     });
@@ -139,8 +139,8 @@ $(document).ready(function () {
     });
 
     $('#table-panel').on('click', '.btn-del', function () {
-        
-                    
+
+
         var $tr = $(this).closest('tr');
         var idx = $tr.data('index');
         var allData = $('#table-panel').bootstrapTable('getData');
@@ -157,22 +157,23 @@ $(document).ready(function () {
             alert('No se pudo obtener los datos de la postulación.');
             return;
         }
-        
+
         if (!confirm('¿Está seguro de eliminar esta postulación?')) {
             return;
         }
-        
+
 
         var params = new URLSearchParams();
         params.set('module', 'bolsas_empleos');
         params.set('id', rowData.id || '');
         params.set('method', 'del');
         params.set('row', idx || '');
-        $.ajax({url: 'api-app.php', type: 'GET', data: params.toString(), dataType: 'json',
+        $.ajax({
+            url: 'api-app.php', type: 'GET', data: params.toString(), dataType: 'json',
             success: function (d) {
                 if (d.status == 1) {
                     $('#table-panel').bootstrapTable('refresh');
-                    
+
                 }
             }
         });
@@ -224,10 +225,17 @@ function formatoObservaciones(value, row) {
     var btnClass = hasObservations ? 'btn-success' : 'btn-danger';
     var iconClass = hasObservations ? 'fa-check' : 'fa-remove';
     var title = hasObservations ? 'Ver/Editar observaciones' : 'Agregar observaciones';
-    
+
     return '<button data-id="' + row.id + '" ' +
-           'data-observaciones="' + (value || '') + '" ' +
-           'class="btn ' + btnClass + ' btn-icon icon-sm fa ' + iconClass + ' btn-observaciones" ' +
-           'title="' + title + '"></button>';
+        'data-observaciones="' + (value || '') + '" ' +
+        'class="btn ' + btnClass + ' btn-icon icon-sm fa ' + iconClass + ' btn-observaciones" ' +
+        'title="' + title + '"></button>';
 }
-        
+
+// Formateador para nombre completo (sin enlace)
+function formatoNombreCompleto(value, row) {
+    var nombre = row.nombre || '';
+    var apellidos = row.apellidos || '';
+    var nombreCompleto = (nombre + ' ' + apellidos).trim();
+    return nombreCompleto || value;
+}

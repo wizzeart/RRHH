@@ -64,7 +64,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="control-label" for="f-monto">Monto <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" min="0" id="f-monto" class="form-control" placeholder="0.00">
+                                        <input type="number" step="10" min="0" id="f-monto" class="form-control" placeholder="0.00">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -237,12 +237,10 @@
     waitForJQ(function($) { 
         initHandlers($);
         var $table = $('#table-deudas');
-        $table.bootstrapTable();
+        // No llamar a bootstrapTable() porque ya se inicializa con data-toggle="table"
         $table.on('load-success.bs.table', function (e, data) { console.log('Tabla de deudas cargada', data); });
         $table.on('load-error.bs.table', function (e, status, res) { console.error('Error al cargar la tabla de deudas:', status, res); });
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) { if ($(e.target).attr('href') === '#tab-listado') { $table.bootstrapTable('refresh'); } });
-        setTimeout(function() { $table.bootstrapTable('refresh'); }, 100);
     });
-    window.refreshDeudasTable = refreshTable;
 })();
 </script>

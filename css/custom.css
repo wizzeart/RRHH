@@ -87,15 +87,91 @@ a[title*="Añadir nueva"],
 .rounded {
     border-radius: 20px;
 }
-/* CLASES PARA BORDES REDONDEADOS */
 
-/* CLASES PARA FONDOS */
 .bg-custom {
     background-image: url('../img/Untitled.png') !important;
     background-size:cover  !important;
     background-position: absolute !important;
     background-repeat: no-repeat !important;
 }
+
+.btn,
+button,
+.btn-group .btn,
+.btn-group-vertical .btn,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    border-radius: 999px !important;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.18);
+}
+
+select,
+select.form-control,
+.form-control[type="date"],
+input[type="date"],
+.bootstrap-select .btn {
+    border-radius: 999px !important;
+}
+
+input,
+textarea,
+select,
+.form-control,
+.input-group-addon,
+.input-group-btn .btn {
+    border-radius: 20px !important;
+}
+
+.datepicker,
+.datepicker-dropdown,
+.datepicker-inline {
+    border-radius: 24px !important;
+    overflow: hidden;
+}
+
+.nav-tabs,
+.nav-pills,
+.tab-content,
+.nav-tabs > li > a,
+.nav-pills > li > a {
+    border-radius: 3px !important;
+    overflow: hidden;
+}
+
+.panel,
+.panel-body {
+    border-radius: 20px !important;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.modal-content,
+.modal-header,
+.modal-body,
+.modal-footer,
+.modal-dialog {
+    border-radius: 24px !important;
+    overflow: hidden;
+}
+
+.table,
+.table-responsive,
+.table-bordered,
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    border-radius: 5px !important;
+}
+.table,
+.table-responsive,
+.table-bordered {
+    overflow: hidden;
+}
+
 /* CLASES PARA FONDOS */
 
 /* CLASES PARA LOGIN */
@@ -166,4 +242,171 @@ a[title*="Añadir nueva"],
 .brand-icon {
     -webkit-transition: all 0.3s ease !important;
     transition: all 0.3s ease !important;
+}
+
+/* Responsive Nav Tabs Global Fix */
+@media (max-width: 768px) {
+    /* Adjust panel heading to fit tabs */
+    .panel-heading {
+        height: auto !important;
+        padding-bottom: 0px;
+    }
+    
+    /* Make panel control full width and remove float */
+    .panel-control {
+        float: none !important;
+        position: relative;
+        height: auto !important;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Make tabs scrollable horizontally */
+    .nav-tabs {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid #ddd;
+        white-space: nowrap;
+        width: 100%;
+        scrollbar-width: thin; /* Firefox */
+    }
+
+    /* Hide scrollbar for cleaner look if desired, or keep it */
+    .nav-tabs::-webkit-scrollbar {
+        height: 6px;
+    }
+    .nav-tabs::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+
+    .nav-tabs > li {
+        float: none !important;
+        display: inline-block;
+        flex: 0 0 auto;
+    }
+    
+    .nav-tabs > li > a {
+        margin-right: 0;
+        border-radius: 4px 4px 0 0;
+        padding: 10px 15px;
+    }
+
+    /* Adjust title visibility if needed, or put it above tabs */
+    .panel-title {
+        display: block;
+        padding: 10px 15px;
+        position: relative;
+        width: 100%;
+    }
+}
+
+#container.empresa-theme-2 .navbar-content {
+    box-shadow: inset -4px 0 0 0 #ebaa4b;
+}
+
+#container.empresa-theme-3 .navbar-content {
+    box-shadow: inset -4px 0 0 0 #8dba60;
+}
+
+#container.empresa-theme-2 .navbar-company-display i.text-primary {
+    color: #ebaa4b !important;
+}
+
+#container.empresa-theme-3 .navbar-company-display i.text-primary {
+    color: #8dba60 !important;
+}
+
+#container.empresa-theme-2 #mainnav-menu > li > a.hover {
+    box-shadow: inset 4px 0 0 0 #ebaa4b;
+}
+
+#container.empresa-theme-3 #mainnav-menu > li > a.hover {
+    box-shadow: inset 4px 0 0 0 #8dba60;
+}
+
+#container.empresa-theme-2 #mainnav-menu > .active-link > a,
+#container.empresa-theme-2 #mainnav-menu > .active-link > a:hover {
+    box-shadow: inset 4px 0 0 0 #ebaa4b;
+}
+
+#container.empresa-theme-3 #mainnav-menu > .active-link > a,
+#container.empresa-theme-3 #mainnav-menu > .active-link > a:hover {
+    box-shadow: inset 4px 0 0 0 #8dba60;
+}
+
+#container.empresa-theme-2 #mainnav-menu ul .active-link a,
+#container.empresa-theme-2 .menu-popover .sub-menu ul .active-link a {
+    box-shadow: inset 4px 0 0 0 #ebaa4b;
+}
+
+#container.empresa-theme-3 #mainnav-menu ul .active-link a,
+#container.empresa-theme-3 .menu-popover .sub-menu ul .active-link a {
+    box-shadow: inset 4px 0 0 0 #8dba60;
+}
+
+#container.empresa-theme-2.mainnav-sm #mainnav-menu a:hover {
+    box-shadow: inset 4px 0 0 0 #ebaa4b;
+}
+
+#container.empresa-theme-3.mainnav-sm #mainnav-menu a:hover {
+    box-shadow: inset 4px 0 0 0 #8dba60;
+}
+
+#container.empresa-theme-2.mainnav-sm #mainnav-menu > .active-link > a,
+#container.empresa-theme-2.mainnav-sm #mainnav-menu > .active-sub > a,
+#container.empresa-theme-2.mainnav-sm #mainnav-menu > .active-link a:hover,
+#container.empresa-theme-2.mainnav-sm #mainnav-menu > .active-sub a:hover {
+    background-color: #ebaa4b;
+}
+
+#container.empresa-theme-3.mainnav-sm #mainnav-menu > .active-link > a,
+#container.empresa-theme-3.mainnav-sm #mainnav-menu > .active-sub > a,
+#container.empresa-theme-3.mainnav-sm #mainnav-menu > .active-link a:hover,
+#container.empresa-theme-3.mainnav-sm #mainnav-menu > .active-sub a:hover {
+    background-color: #8dba60;
+}
+
+#container.empresa-theme-2 #mainnav,
+#container.empresa-theme-2 #mainnav .nano-content {
+    background-color: #ebaa4b;
+}
+
+#container.empresa-theme-3 #mainnav,
+#container.empresa-theme-3 #mainnav .nano-content {
+    background-color: #8dba60;
+}
+
+#container.empresa-theme-2 #mainnav-menu a,
+#container.empresa-theme-3 #mainnav-menu a {
+    color: #ffffff;
+}
+
+#container.empresa-theme-2 #mainnav .list-header,
+#container.empresa-theme-3 #mainnav .list-header {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+#container.empresa-theme-2 #mainnav-menu > li > a:hover,
+#container.empresa-theme-3 #mainnav-menu > li > a:hover {
+    color: #ffffff;
+}
+
+#container.empresa-theme-2 #mainnav-menu > li > a.hover,
+#container.empresa-theme-3 #mainnav-menu > li > a.hover {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+#container.empresa-theme-2 #mainnav-menu > .active,
+#container.empresa-theme-3 #mainnav-menu > .active {
+    background-color: rgba(0, 0, 0, 0.16);
+}
+
+#container.empresa-theme-2 #mainnav-menu > .active .active,
+#container.empresa-theme-3 #mainnav-menu > .active .active {
+    background-color: rgba(0, 0, 0, 0.10);
 }

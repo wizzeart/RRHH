@@ -13,9 +13,24 @@ $(document).ready(function () {
             });
         } else {
             var text = (title ? (title + ': ') : '') + (message || '');
-            try { alert(text); } catch(e) { console.warn('Notify:', text); }
+            try { alert(text); } catch (e) { console.warn('Notify:', text); }
         }
     }
+
+    // Event listener para cambio de empresa
+    $(document).on('empresaChanged', function (e, empresaId) {
+        console.log('Empresa cambió a:', empresaId);
+
+        // Actualizar tabla de cuentas
+        $('#table-cuentas').bootstrapTable('refreshOptions', {
+            url: 'api-app.php?module=cuentas&method=list&empresa_id=' + empresaId
+        });
+
+        // Actualizar tabla de bancos
+        $('#table-bancos').bootstrapTable('refreshOptions', {
+            url: 'api/list-cuentas-data.php?empresa_id=' + empresaId
+        });
+    });
 
     // Botón de actualizar
     $('#btn-refresh').click(function () {
@@ -41,7 +56,7 @@ function accionesFormatter(value, row, index) {
         '<button type="button" class="btn btn-success btn-editar" title="Ver detalles">',
         '<i class="fa fa-eye"></i>',
         '</button>',
-       
+
         '</div>'
     ].join('');
 }
@@ -51,11 +66,11 @@ window.accionesEvents = {
     'click .btn-editar': function (e, value, row, index) {
         // Mostrar detalles de la cuenta bancaria
         var mensaje = '<strong>Trabajador:</strong> ' + row.nombre_completo + '<br>' +
-                     '<strong>CI:</strong> ' + row.carnet_identidad + '<br>' +
-                     '<strong>Estado:</strong> ' + row.estatus_display + '<br><br>' +
-                     '<strong>Tarjeta de Salario:</strong> ' + row.tarjeta_display + '<br>' +
-                     '<strong>Cuenta Estándar:</strong> ' + row.cuenta_display;
-        
+            '<strong>CI:</strong> ' + row.carnet_identidad + '<br>' +
+            '<strong>Estado:</strong> ' + row.estatus_display + '<br><br>' +
+            '<strong>Tarjeta de Salario:</strong> ' + row.tarjeta_display + '<br>' +
+            '<strong>Cuenta Estándar:</strong> ' + row.cuenta_display;
+
         // Usar modal si está disponible, si no, alert
         if (typeof bootbox !== 'undefined') {
             bootbox.alert({
@@ -93,4 +108,11 @@ function cuentaFormatter(value, row, index) {
         return '<span class="text-muted"><em>' + value + '</em></span>';
     }
     return '<strong>' + value + '</strong>';
+}
+
+function formatoNombreLink(value, row, index) {
+    if (row.trabajador_id) {
+        return '<a href="index.php?module=ficha-trabajador&id=' + row.trabajador_id + '" style="cursor: pointer; color: inherit; text-decoration: none;" onmouseover="this.style.textDecoration=\'underline\'; this.style.color=\'#337ab7\';" onmouseout="this.style.textDecoration=\'none\'; this.style.color=\'inherit\';">' + value + '</a>';
+    }
+    return value;
 }

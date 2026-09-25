@@ -1,203 +1,221 @@
 <?php
-class Contrato {
+class Contrato
+{
     var $app;
     var $db;
     var $action;
 
-    public function __construct($app) {
+    public function __construct($app)
+    {
         $this->app = $app;
         $this->db = $app->db;
         $action = 'insert';
     }
 
-    public function save_anterior() {
-        $response = array('status' => 0, 'msg' => '', 'id' => 0);
-        $connection = $this->db->conn;
-        
-        try {
-            // Log inicial
-            error_log("=== Inicio save_anterior ===");
-            error_log("POST: " . print_r($_POST, true));
-            if (isset($_FILES['archivo_contrato'])) {
-                error_log("Archivo: " . print_r($_FILES['archivo_contrato'], true));
-            }
 
+
+    // Método nuevo para guardar contratos sin archivo - usado por el botón btn-guardar-contrato2
+    private function _save_nuevo($param)
+    {
+        $response = array('status' => 0, 'msg' => '', 'id' => 0);
+
+        try {
             // Validar campos requeridos
-            if (!isset($_POST['trabajador_id']) || empty($_POST['trabajador_id'])) {
+            if (!isset($param['trabajador_id']) || empty($param['trabajador_id'])) {
                 throw new Exception('El trabajador es requerido');
             }
-            
-            // Validar que trabajador_id sea numérico
-            if (!is_numeric($_POST['trabajador_id'])) {
-                throw new Exception('ID de trabajador inválido');
-            }
 
-            if (!isset($_POST['tipo_contrato']) || empty($_POST['tipo_contrato'])) {
+            if (!isset($param['tipo_contrato']) || empty($param['tipo_contrato'])) {
                 throw new Exception('El tipo de contrato es requerido');
             }
 
-            // Validar que el tipo de contrato sea 1 (indeterminado) o 2 (determinado)
-            if (!in_array($_POST['tipo_contrato'], ['1', '2'], true)) {
-                throw new Exception('Tipo de contrato inválido. Debe ser 1 (indeterminado) o 2 (determinado)');
-            }
-
-            if (!isset($_POST['fecha_inicio']) || empty($_POST['fecha_inicio'])) {
+            if (!isset($param['fecha_inicio']) || empty($param['fecha_inicio'])) {
                 throw new Exception('La fecha de inicio es requerida');
             }
-            
-            // Validar que si es contrato determinado (tipo 2) tenga fecha fin
-            if ($_POST['tipo_contrato'] === '2' && empty($_POST['fecha_fin'])) {
-                throw new Exception('Para contratos determinados la fecha de fin es requerida');
+
+            if (!isset($param['salario']) || empty($param['salario'])) {
+                throw new Exception('El salario es requerido');
             }
 
-            // Verificar duplicado antes de insertar
-            $sqlCheck = "SELECT id FROM contratos WHERE trabajador_id = :trabajador_id AND tipo = :tipo AND fecha_inicio = :fecha_inicio ";
-            $paramsCheck = [
-                ':trabajador_id' => $_POST['trabajador_id'],
-                ':tipo' => $_POST['tipo_contrato'],
-                ':fecha_inicio' => $_POST['fecha_inicio']
-            ];
-            if ($_POST['tipo_contrato'] === '2') {
-                $sqlCheck .= " AND fecha_fin = :fecha_fin ";
-                $paramsCheck[':fecha_fin'] = $_POST['fecha_fin'];
-            } else {
-                $sqlCheck .= " AND (fecha_fin IS NULL OR fecha_fin = '') ";
-            }
-            $stmtCheck = $this->db->conn->prepare($sqlCheck);
-            $stmtCheck->execute($paramsCheck);
-           
-
-            // Validar archivo
-            if (!isset($_FILES['archivo_contrato'])) {
-                throw new Exception('No se recibió ningún archivo');
+            if (!isset($param['cargo']) || empty($param['cargo'])) {
+                throw new Exception('El cargo es requerido');
             }
 
-            $archivo = $_FILES['archivo_contrato'];
 
-            if ($archivo['error'] !== UPLOAD_ERR_OK) {
-                $errorMessages = array(
-                    UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por PHP',
-                    UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo permitido por el formulario',
-                    UPLOAD_ERR_PARTIAL => 'El archivo se subió parcialmente',
-                    UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo',
-                    UPLOAD_ERR_NO_TMP_DIR => 'Falta la carpeta temporal',
-                    UPLOAD_ERR_CANT_WRITE => 'Error al escribir el archivo',
-                    UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida'
-                );
-                $errorMsg = isset($errorMessages[$archivo['error']]) ? 
-                           $errorMessages[$archivo['error']] : 
-                           'Error desconocido al subir el archivo';
-                throw new Exception($errorMsg);
+            // Validar que trabajador_id sea numérico
+            if (!is_numeric($param['trabajador_id'])) {
+                throw new Exception('ID de trabajador inválido');
             }
 
-            if (!is_uploaded_file($archivo['tmp_name'])) {
-                throw new Exception('El archivo no se subió correctamente');
+            // Validar que el tipo de contrato sea 1 (indeterminado), 2 (determinado), 3 (suplemento) o 4 (servicios)
+            if (!in_array($param['tipo_contrato'], ['1', '2', '3', '4'], true)) {
+                throw new Exception('Tipo de contrato inválido');
             }
 
-            $mimeType = mime_content_type($archivo['tmp_name']);
-            if ($mimeType === false) {
-                throw new Exception('No se pudo determinar el tipo de archivo');
+            // Calcular fecha_fin automáticamente si es determinado (tipo 2)
+            $fecha_fin = null;
+            if ($param['tipo_contrato'] == '2') {
+                $fecha_inicio_obj = new DateTime($param['fecha_inicio']);
+                $fecha_inicio_obj->modify('+3 months');
+                $fecha_fin = $fecha_inicio_obj->format('Y-m-d');
             }
+            // No se pudo registrar la devolución:
+            // Warning: file_put_contents(debug_recursos.log): Failed to open stream:
+            //  Permission denied in /var/www/allnovu-team.allnovu.com/allnovu-team/classes/mdl.List_recursos.php 
+            //  on line 317
 
-            $allowedTypes = array(
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            );
-
-            if (!in_array($mimeType, $allowedTypes)) {
-                throw new Exception('Tipo de archivo no permitido. Solo se permiten archivos PDF y Word');
-            }
-
-            if ($archivo['size'] > 10 * 1024 * 1024) {
-                throw new Exception('El archivo no debe superar los 10MB');
-            }
-
+            // Warning: file_put_contents(debug_recursos.log): Failed to open stream: Permission denied in
+            //  /var/www/allnovu-team.allnovu.com/allnovu-team/classes/mdl.List_recursos.php on line 468
+            // {"status":1,"msg_title":"Operaci\u00f3n exitosa","msg":"Registro actualizado correctamente",
+            //     "action":"update","id":"50","date":"05-12-2025 22:34:12"}
             // Iniciar transacción
             $this->db->conn->beginTransaction();
 
-            // Preparar la consulta de inserción
-            $sql = "INSERT INTO contratos (trabajador_id, tipo, fecha_inicio, fecha_fin, firma_digital) 
-                   VALUES (:trabajador_id, :tipo, :fecha_inicio, :fecha_fin, :firma_digital)";
-            
+            // IMPORTANTE: Desactivar contratos anteriores del trabajador
+            // Si es un suplemento (tipo 3), solo desactivar otros suplementos anteriores
+            // Si es otro tipo de contrato, desactivar todos los contratos anteriores
+            // También guardamos la fecha en que se desactivaron en fecha_fin
+            if ($param['tipo_contrato'] == '3') {
+                // Solo desactivar suplementos anteriores
+                $sqlUpdate = "UPDATE contratos SET es_actual = 0, fecha_fin = CURDATE() WHERE trabajador_id = :trabajador_id AND es_actual = 1 AND tipo = '3'";
+            } else {
+                // Desactivar todos los contratos anteriores
+                $sqlUpdate = "UPDATE contratos SET es_actual = 0, fecha_fin = CURDATE() WHERE trabajador_id = :trabajador_id AND es_actual = 1";
+            }
+            $stmtUpdate = $this->db->conn->prepare($sqlUpdate);
+            if (!$stmtUpdate) {
+                throw new Exception('Error al preparar la consulta de actualización: ' . implode(', ', $this->db->conn->errorInfo()));
+            }
+
+            if (!$stmtUpdate->execute([':trabajador_id' => $param['trabajador_id']])) {
+                throw new Exception('Error al desactivar contratos anteriores: ' . implode(', ', $stmtUpdate->errorInfo()));
+            }
+
+            // Preparar la consulta de inserción del nuevo contrato
+            $sql = "INSERT INTO contratos (trabajador_id, tipo, fecha_inicio, fecha_fin, salario, cargo_id, es_actual) 
+                   VALUES (:trabajador_id, :tipo, :fecha_inicio, :fecha_fin, :salario, :cargo_id, :es_actual)";
+
             $params = array(
-                ':trabajador_id' => $_POST['trabajador_id'],
-                ':tipo' => $_POST['tipo_contrato'],
-                ':fecha_inicio' => $_POST['fecha_inicio'],
-                ':fecha_fin' => $_POST['tipo_contrato'] === '2' ? $_POST['fecha_fin'] : null,
-                ':firma_digital' => 0
+                ':trabajador_id' => $param['trabajador_id'],
+                ':tipo' => $param['tipo_contrato'],
+                ':fecha_inicio' => $param['fecha_inicio'],
+                ':fecha_fin' => $fecha_fin,
+                ':salario' => $param['salario'],
+                ':cargo_id' => $param['cargo'],
+                ':es_actual' => 1 // El nuevo contrato siempre es el activo
             );
-            
+
             error_log("SQL a ejecutar: " . $sql);
             error_log("Parámetros: " . print_r($params, true));
-            
+
             $stmt = $this->db->conn->prepare($sql);
             if (!$stmt) {
                 throw new Exception('Error al preparar la consulta: ' . implode(', ', $this->db->conn->errorInfo()));
             }
-            
-            // Ejecutar la consulta una sola vez
+
+            // Ejecutar la consulta
             if (!$stmt->execute($params)) {
                 throw new Exception('Error al ejecutar la consulta: ' . implode(', ', $stmt->errorInfo()));
             }
+
             // Obtener el ID del contrato insertado
             $contratoId = $this->db->conn->lastInsertId();
             if (!$contratoId) {
                 throw new Exception('Error al obtener el ID del contrato insertado');
             }
 
-            // Definir extensión según mime type
-            $extension = $mimeType === 'application/pdf' ? 'pdf' : 
-                       ($mimeType === 'application/msword' ? 'doc' : 'docx');
-            
-            // Crear directorio si no existe
-            $uploadDir = __DIR__ . '/../uploads/contratos';
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            // Mover archivo
-            $nombreArchivo = $contratoId . '.' . $extension;
-            $rutaArchivo = $uploadDir . '/' . $nombreArchivo;
-            $rutaRelativa = 'uploads/contratos/' . $nombreArchivo;
-
-            if (!move_uploaded_file($archivo['tmp_name'], $rutaArchivo)) {
-                throw new Exception('Error al guardar el archivo');
-            }
-
-            // Actualizar ruta del archivo en la base de datos
-            $sqlUpdate = "UPDATE contratos SET archivo_contrato = :ruta WHERE id = :id";
-            $updateParams = array(
-                ':ruta' => $rutaRelativa,
-                ':id' => $contratoId
-            );
-            
-            error_log("SQL Update: " . $sqlUpdate);
-            error_log("Parámetros Update: " . print_r($updateParams, true));
-
-            $stmtUpdate = $this->db->conn->prepare($sqlUpdate);
-            if (!$stmtUpdate) {
-                throw new Exception('Error al preparar la consulta de actualización');
-            }
-
-            if (!$stmtUpdate->execute($updateParams)) {
-                throw new Exception('Error al actualizar la ruta del archivo: ' . implode(', ', $stmtUpdate->errorInfo()));
-            }
-
             // Confirmar transacción
             $this->db->conn->commit();
 
             $response['status'] = 1;
-            $response['msg'] = 'Contrato guardado correctamente';
+            if ($param['tipo_contrato'] == '3') {
+                $response['msg'] = 'Suplemento guardado correctamente. Los suplementos anteriores han sido desactivados.';
+            } else {
+                $response['msg'] = 'Contrato guardado correctamente. Los contratos anteriores han sido desactivados.';
+            }
             $response['id'] = $contratoId;
-
         } catch (Exception $e) {
             // Revertir transacción si hay error
             if ($this->db->conn && $this->db->conn->inTransaction()) {
                 $this->db->conn->rollBack();
             }
-            
-            error_log("Error en save_anterior: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            error_log("Error en _save_nuevo: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            $response['status'] = 0;
+            $response['msg'] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
+    // Listar contratos por trabajador
+    private function _list_id($param)
+    {
+        try {
+            if (!isset($param['trabajador_id']) || empty($param['trabajador_id'])) {
+                return array();
+            }
+
+            $sql = "SELECT c.*, cg.nombre AS cargo_nombre  
+                    FROM contratos c
+                    LEFT JOIN cargos cg ON cg.id = c.cargo_id
+                    WHERE c.trabajador_id = :trabajador_id
+                    ORDER BY c.id DESC";
+
+            $result = $this->db->fetchAll($sql, array('trabajador_id' => $param['trabajador_id']));
+
+            return $result ? $result : array();
+        } catch (Exception $e) {
+            error_log("Error en _list_id: " . $e->getMessage());
+            return array();
+        }
+    }
+
+    // Eliminar contrato
+    private function _del($param)
+    {
+        $response = array('status' => 0, 'msg' => '');
+
+        try {
+            if (!isset($param['id']) || empty($param['id'])) {
+                throw new Exception('ID de contrato no especificado');
+            }
+
+            // Verificar que el contrato existe
+            $sql = "SELECT id, trabajador_id, es_actual FROM contratos WHERE id = :id";
+            $contrato = $this->db->fetchRow($sql, array('id' => $param['id']));
+
+            if (!$contrato) {
+                throw new Exception('El contrato no existe');
+            }
+
+            // No permitir eliminar el contrato activo sin antes asignar otro
+            if ($contrato['es_actual'] == 1) {
+                // Verificar si hay otros contratos para este trabajador
+                $sqlCount = "SELECT COUNT(*) as total FROM contratos WHERE trabajador_id = :trabajador_id AND id != :id";
+                $count = $this->db->fetchRow($sqlCount, array('trabajador_id' => $contrato['trabajador_id'], 'id' => $param['id']));
+
+                if ($count && $count['total'] > 0) {
+                    throw new Exception('No se puede eliminar el contrato activo. Primero debe asignar otro contrato como activo.');
+                }
+            }
+
+            // Eliminar el contrato
+            $sqlDel = "DELETE FROM contratos WHERE id = :id";
+            $stmt = $this->db->conn->prepare($sqlDel);
+
+            if (!$stmt) {
+                throw new Exception('Error al preparar la consulta de eliminación');
+            }
+
+            if (!$stmt->execute(array(':id' => $param['id']))) {
+                throw new Exception('Error al eliminar el contrato');
+            }
+
+            $response['status'] = 1;
+            $response['msg'] = 'Contrato eliminado correctamente';
+        } catch (Exception $e) {
+            error_log("Error en _del: " . $e->getMessage());
             $response['status'] = 0;
             $response['msg'] = $e->getMessage();
         }
@@ -206,8 +224,9 @@ class Contrato {
     }
 
     // Renderiza la vista PHP del contrato único con variables pasadas desde el formulario
-    private function _render_contrato_unico($param) {
-        $resp = array('status'=>0, 'html'=>'');
+    private function _render_contrato_unico($param)
+    {
+        $resp = array('status' => 0, 'html' => '');
         try {
             $tplPath = __DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php';
             if (!file_exists($tplPath)) {
@@ -215,7 +234,7 @@ class Contrato {
                 $tplPath = realpath(__DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php');
             }
             if (!file_exists($tplPath)) {
-                print(json_encode(array('status'=>0, 'msg'=>'Plantilla no encontrada')));
+                print(json_encode(array('status' => 0, 'msg' => 'Plantilla no encontrada')));
                 return;
             }
 
@@ -248,16 +267,13 @@ class Contrato {
             if (strcasecmp($tipo_contrato_texto, 'Tiempo Determinado') === 0) {
                 $var23 = '_X_';
                 $var7  = '___';
-                
             } elseif (strcasecmp($tipo_contrato_texto, 'Tiempo Indeterminado') === 0) {
                 $var23 = '___';
                 $var7  = '_X_';
-                
             } else {
                 // Fallback: si viene un texto libre, no marcamos X y dejamos mostrar texto si la plantilla lo contempla
                 $var23 = '___';
                 $var7  = '___';
-                
             }
 
             // Modalidad con tres marcadores: presencial ($var24), a distancia ($var25), teletrabajo ($var26)
@@ -265,9 +281,15 @@ class Contrato {
             $var26 = '___';
             $var99 = '___';
             if ($modalidad_trabajo_texto !== '') {
-                if (stripos($modalidad_trabajo_texto, 'presencial') !== false) { $var24 = '_X_'; }
-                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var99 = '_X_'; }
-                if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
+                if (stripos($modalidad_trabajo_texto, 'presencial') !== false) {
+                    $var24 = '_X_';
+                }
+                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) {
+                    $var99 = '_X_';
+                }
+                if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) {
+                    $var26 = '_X_';
+                }
             }
             $var31 = '_____________'; // mensual
             // Frecuencia de pago/trabajo: tres marcadores (semanal, quincenal, mensual)
@@ -276,9 +298,13 @@ class Contrato {
             $var29 = '(_)'; // mensual
             if (!empty($param['frecuencia_trabajo'])) {
                 $freq = strtolower(trim($param['frecuencia_trabajo']));
-                if ($freq === 'semanal') { $var27 = '(X)'; }
-                else if ($freq === 'quincenal') { $var28 = '(X)'; }
-                else if ($freq === 'mensual') { $var29 = '(X)'; }
+                if ($freq === 'semanal') {
+                    $var27 = '(X)';
+                } else if ($freq === 'quincenal') {
+                    $var28 = '(X)';
+                } else if ($freq === 'mensual') {
+                    $var29 = '(X)';
+                }
             }
             // Mantener compatibilidad con plantilla previa
             $var8 = $modalidad_trabajo_texto; // etiqueta modalidad si se imprime como texto
@@ -298,7 +324,9 @@ class Contrato {
             } else {
                 $var18 = '';
                 if (!empty($regimen_descanso)) {
-                    if (preg_match('/\d+/', $regimen_descanso, $m)) { $var18 = $m[0]; }
+                    if (preg_match('/\d+/', $regimen_descanso, $m)) {
+                        $var18 = $m[0];
+                    }
                 }
             }
             $var19 = $salario_base; // salario
@@ -310,19 +338,24 @@ class Contrato {
             ob_start();
             include $tplPath;
             $html = ob_get_clean();
-            print(json_encode(array('status'=>1, 'html'=>$html)));
+            print(json_encode(array('status' => 1, 'html' => $html)));
         } catch (Exception $e) {
-            print(json_encode(array('status'=>0, 'msg'=>'Error al renderizar plantilla')));
+            print(json_encode(array('status' => 0, 'msg' => 'Error al renderizar plantilla')));
         }
     }
 
     // Igual que _render_contrato_unico pero devuelve HTML en lugar de imprimir JSON
-    private function _render_contrato_unico_html($param) {
+    private function _render_contrato_unico_html($param)
+    {
         $html = '';
         try {
             $tplPath = __DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php';
-            if (!file_exists($tplPath)) { $tplPath = realpath(__DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php'); }
-            if (!file_exists($tplPath)) { return ''; }
+            if (!file_exists($tplPath)) {
+                $tplPath = realpath(__DIR__ . '/../docs/contrato-unico/ContratoDeTrabajo.php');
+            }
+            if (!file_exists($tplPath)) {
+                return '';
+            }
 
             // Reutilizar el mismo mapeo de variables
             $nombre = isset($param['trabajador_nombre']) ? $param['trabajador_nombre'] : '';
@@ -345,21 +378,42 @@ class Contrato {
             $var4 = '';
             $var5 = $municipio_nombre;
             $var6 = $provincia_nombre;
-            if (strcasecmp($tipo_contrato_texto, 'Tiempo Determinado') === 0) { $var23 = '_X_'; $var7  = '___'; }
-            elseif (strcasecmp($tipo_contrato_texto, 'Tiempo Indeterminado') === 0) { $var23 = '___'; $var7  = '_X_'; }
-            else { $var23 = '___'; $var7  = '___'; }
-            $var24 = '___'; $var25 = '___'; $var26 = '___';
-            if ($modalidad_trabajo_texto !== '') {
-                if (stripos($modalidad_trabajo_texto, 'presencial') !== false) { $var24 = '_X_'; }
-                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) { $var25 = '_X_'; }
-                if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) { $var26 = '_X_'; }
+            if (strcasecmp($tipo_contrato_texto, 'Tiempo Determinado') === 0) {
+                $var23 = '_X_';
+                $var7  = '___';
+            } elseif (strcasecmp($tipo_contrato_texto, 'Tiempo Indeterminado') === 0) {
+                $var23 = '___';
+                $var7  = '_X_';
+            } else {
+                $var23 = '___';
+                $var7  = '___';
             }
-            $var27 = '(_)'; $var28 = '(_)'; $var29 = '(_)';
+            $var24 = '___';
+            $var25 = '___';
+            $var26 = '___';
+            if ($modalidad_trabajo_texto !== '') {
+                if (stripos($modalidad_trabajo_texto, 'presencial') !== false) {
+                    $var24 = '_X_';
+                }
+                if (stripos($modalidad_trabajo_texto, 'distancia') !== false || stripos($modalidad_trabajo_texto, 'remoto') !== false) {
+                    $var25 = '_X_';
+                }
+                if (stripos($modalidad_trabajo_texto, 'teletrabajo') !== false || stripos($modalidad_trabajo_texto, 'tele-trabajo') !== false) {
+                    $var26 = '_X_';
+                }
+            }
+            $var27 = '(_)';
+            $var28 = '(_)';
+            $var29 = '(_)';
             if (!empty($param['frecuencia_trabajo'])) {
                 $freq = strtolower(trim($param['frecuencia_trabajo']));
-                if ($freq === 'semanal') { $var27 = '(X)'; }
-                else if ($freq === 'quincenal') { $var28 = '(X)'; }
-                else if ($freq === 'mensual') { $var29 = '(X)'; }
+                if ($freq === 'semanal') {
+                    $var27 = '(X)';
+                } else if ($freq === 'quincenal') {
+                    $var28 = '(X)';
+                } else if ($freq === 'mensual') {
+                    $var29 = '(X)';
+                }
             }
             $var8 = $modalidad_trabajo_texto;
             $var9 = $modalidad_trabajo_texto;
@@ -371,8 +425,16 @@ class Contrato {
             $var15 = isset($param['hora_desde_h']) ? $param['hora_desde_h'] : '';
             $var16 = isset($param['hora_hasta_h']) ? $param['hora_hasta_h'] : '';
             $var17 = isset($param['hora_hasta_m']) ? $param['hora_hasta_m'] : '';
-            if (isset($param['descanso_dias']) && $param['descanso_dias'] !== '') { $var18 = $param['descanso_dias']; }
-            else { $var18 = ''; if (!empty($regimen_descanso)) { if (preg_match('/\d+/', $regimen_descanso, $m)) { $var18 = $m[0]; } } }
+            if (isset($param['descanso_dias']) && $param['descanso_dias'] !== '') {
+                $var18 = $param['descanso_dias'];
+            } else {
+                $var18 = '';
+                if (!empty($regimen_descanso)) {
+                    if (preg_match('/\d+/', $regimen_descanso, $m)) {
+                        $var18 = $m[0];
+                    }
+                }
+            }
             $var19 = $salario_base;
             $var20 = isset($param['extra1']) ? $param['extra1'] : '';
             $var21 = isset($param['extra2']) ? $param['extra2'] : '';
@@ -382,15 +444,22 @@ class Contrato {
             ob_start();
             include $tplPath;
             $html = ob_get_clean();
-        } catch (Exception $e) { $html = ''; }
+        } catch (Exception $e) {
+            $html = '';
+        }
         return $html;
     }
 
     // Genera PDF únicamente con contrato_id: carga datos desde BD y usa la misma plantilla de vista previa
-    private function _generatePdfById($param) {
-        $response = array('status'=>0,'msg'=>'','file_url'=>'');
+    private function _generatePdfById($param)
+    {
+        $response = array('status' => 0, 'msg' => '', 'file_url' => '');
         $cid = isset($param['contrato_id']) ? intval($param['contrato_id']) : 0;
-        if ($cid <= 0) { $response['msg']='contrato_id inválido'; print(json_encode($response)); return; }
+        if ($cid <= 0) {
+            $response['msg'] = 'contrato_id inválido';
+            print(json_encode($response));
+            return;
+        }
         try {
             // Intento 1: con columna departamento_id en contratos
             try {
@@ -408,7 +477,7 @@ class Contrato {
                      LEFT JOIN municipio m ON m.id=t.municipio_id
                      LEFT JOIN departamentos d ON d.id=c.departamento_id
                      WHERE c.id = :id",
-                    array('id'=>$cid)
+                    array('id' => $cid)
                 );
             } catch (Exception $eJoin) {
                 // Intento 2: sin columna departamento_id
@@ -424,12 +493,18 @@ class Contrato {
                      LEFT JOIN provincia p ON p.id=t.provincia_id
                      LEFT JOIN municipio m ON m.id=t.municipio_id
                      WHERE c.id = :id",
-                    array('id'=>$cid)
+                    array('id' => $cid)
                 );
                 // agregar alias vacío para compatibilidad
-                if ($row) { $row['departamento_nombre'] = ''; }
+                if ($row) {
+                    $row['departamento_nombre'] = '';
+                }
             }
-            if (!$row) { $response['msg']='Contrato no encontrado'; print(json_encode($response)); return; }
+            if (!$row) {
+                $response['msg'] = 'Contrato no encontrado';
+                print(json_encode($response));
+                return;
+            }
 
             // Mapear a los mismos parámetros de plantilla usados en la vista previa
             $tipoTexto = ($row['tipo'] == '1' ? 'Tiempo Determinado' : ($row['tipo'] == '2' ? 'Tiempo Indeterminado' : ''));
@@ -444,7 +519,7 @@ class Contrato {
                 'trabajador_ci' => $row['carnet_identidad'] ?? '',
                 'cargo_nombre' => $row['cargo_nombre'] ?? '',
                 'tipo_contrato_texto' => $tipoTexto,
-                'modalidad_trabajo_texto' => ($mt==='1' ? 'Presencial' : ($mt==='2' ? 'A distancia' : ($mt==='3' ? 'Teletrabajo' : ''))),
+                'modalidad_trabajo_texto' => ($mt === '1' ? 'Presencial' : ($mt === '2' ? 'A distancia' : ($mt === '3' ? 'Teletrabajo' : ''))),
                 'ubicacion_laboral_texto' => $row['departamento_nombre'] ?? '',
                 'regimen_descanso' => $row['regimen_descanso'] ?? '',
                 'salario_base' => $row['salario_base'] ?? '',
@@ -457,19 +532,24 @@ class Contrato {
 
             // Render a HTML con la misma plantilla
             $html = $this->_render_contrato_unico_html($payload);
-            if (!$html) { $response['msg']='No se pudo renderizar la plantilla'; print(json_encode($response)); return; }
+            if (!$html) {
+                $response['msg'] = 'No se pudo renderizar la plantilla';
+                print(json_encode($response));
+                return;
+            }
 
             // Generar PDF con el núcleo reutilizable
-            $resp = $this->_generatePdfCore(array('html'=>$html, 'tipo'=>'contrato', 'contrato_id'=>$cid));
+            $resp = $this->_generatePdfCore(array('html' => $html, 'tipo' => 'contrato', 'contrato_id' => $cid));
             print(json_encode($resp));
         } catch (Exception $e) {
-            $response['msg']='Error: '.$e->getMessage();
+            $response['msg'] = 'Error: ' . $e->getMessage();
             print(json_encode($response));
         }
     }
 
     // Lista de trabajadores para poblar el select del formulario
-    private function _list_trabajadores() {
+    private function _list_trabajadores()
+    {
         try {
             $sql = "SELECT id, nombre, apellidos, apellidos_segundos
                     FROM trabajadores
@@ -482,7 +562,8 @@ class Contrato {
     }
 
     // Lista de departamentos para poblar el select
-    private function _list_departamentos() {
+    private function _list_departamentos()
+    {
         try {
             $sql = "SELECT id, nombre FROM departamentos ORDER BY nombre";
             return $this->db->fetchAll($sql);
@@ -491,7 +572,354 @@ class Contrato {
         }
     }
 
-    public function api($param) {
+    private function _resolve_doc_path($path)
+    {
+        if (!isset($path) || $path === null) {
+            return null;
+        }
+
+        $path = trim((string)$path);
+        if ($path === '') {
+            return null;
+        }
+
+        if (strpos($path, '://') !== false) {
+            return null;
+        }
+
+        $path = str_replace('\\', '/', $path);
+
+        if (file_exists($path)) {
+            return $path;
+        }
+
+        $root = dirname(dirname(__FILE__));
+        if (substr($path, 0, 1) === '/') {
+            $candidate = $root . $path;
+        } else {
+            $candidate = $root . '/' . ltrim($path, '/');
+        }
+
+        if (file_exists($candidate)) {
+            return $candidate;
+        }
+
+        return null;
+    }
+
+    private function _get_cargo_funciones_path($cargoId)
+    {
+        if (!$cargoId) {
+            return null;
+        }
+
+        try {
+            $row = $this->db->fetchRow(
+                "SELECT funciones_path FROM cargos WHERE id = :cargo_id",
+                array('cargo_id' => $cargoId)
+            );
+            if ($row && isset($row['funciones_path'])) {
+                return $row['funciones_path'];
+            }
+        } catch (Exception $e) {
+        }
+
+        return null;
+    }
+
+    private function _merge_docx_files($inputFiles, $outputFile, $sectionBreakType = 'nextPage')
+    {
+        if (!is_array($inputFiles) || count($inputFiles) === 0) {
+            throw new Exception('No hay documentos para unir');
+        }
+
+        if (!class_exists('ZipArchive')) {
+            throw new Exception('ZipArchive no está disponible en el servidor');
+        }
+
+        foreach ($inputFiles as $f) {
+            if (!file_exists($f)) {
+                throw new Exception('No se encontró el documento: ' . $f);
+            }
+        }
+
+        // Copiamos el primer archivo como base del resultado
+        if (!@copy($inputFiles[0], $outputFile)) {
+            throw new Exception('No se pudo crear el documento combinado');
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($outputFile) !== true) {
+            throw new Exception('No se pudo abrir el documento base para unir');
+        }
+
+        // Leemos los archivos internos críticos del DOCX base
+        $documentXml = $zip->getFromName('word/document.xml');
+        $relsXml = $zip->getFromName('word/_rels/document.xml.rels');
+        $contentTypesXml = $zip->getFromName('[Content_Types].xml');
+
+        if ($documentXml === false || $relsXml === false || $contentTypesXml === false) {
+            $zip->close();
+            throw new Exception('Estructura de documento inválida para unión (faltan archivos internos)');
+        }
+
+        $appendFiles = array_slice($inputFiles, 1);
+        foreach ($appendFiles as $i => $fileToAppend) {
+            $chunkId = $i + 1;
+            $chunkName = "word/chunk{$chunkId}.docx";
+
+            // Añadimos el documento a anexar como una parte nueva dentro del ZIP
+            $zip->addFile($fileToAppend, $chunkName);
+
+            $rid = "rIdChunk{$chunkId}";
+
+            // Registramos la relación de tipo AltChunk
+            $relEntry = '<Relationship Id="' . $rid . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/aFChunk" Target="chunk' . $chunkId . '.docx"/>';
+            $relsXml = str_replace('</Relationships>', $relEntry . '</Relationships>', $relsXml);
+
+            // Registramos el ContentType para la nueva parte
+            $ctEntry = '<Override PartName="/' . $chunkName . '" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>';
+            $contentTypesXml = str_replace('</Types>', $ctEntry . '</Types>', $contentTypesXml);
+
+            // Preparamos el salto de página/sección según se haya solicitado
+            $breakXml = '';
+            if ($sectionBreakType === 'continuous') {
+                $breakXml = '<w:p><w:pPr><w:sectPr><w:type w:val="continuous"/></w:sectPr></w:pPr></w:p>';
+            } else {
+                // Usar un salto de página simple en lugar de un salto de sección nextPage
+                // para evitar la página en blanco extra que a veces generan los section breaks complejos
+                $breakXml = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+            }
+
+            // El tag altChunk le dice a Word que inserte el contenido del archivo referenciado aquí
+            $altChunkTag = $breakXml . '<w:altChunk r:id="' . $rid . '"/>';
+
+            // Insertamos el tag de mezcla antes del cierre del cuerpo del documento
+            $documentXml = str_replace('</w:body>', $altChunkTag . '</w:body>', $documentXml);
+        }
+
+        // Guardamos los cambios en el archivo resultante
+        $zip->addFromString('word/document.xml', $documentXml);
+        $zip->addFromString('word/_rels/document.xml.rels', $relsXml);
+        $zip->addFromString('[Content_Types].xml', $contentTypesXml);
+        $zip->close();
+    }
+
+    private function _generate($param)
+    {
+        $response = array('status' => 0, 'msg' => '');
+
+        try {
+            $autoloadPath = dirname(dirname(__FILE__)) . '/vendor/autoload.php';
+            if (!file_exists($autoloadPath)) {
+                throw new Exception('No se encontró el archivo autoload.php de Composer');
+            }
+            require_once $autoloadPath;
+
+            if (!isset($param['trabajador_id']) || empty($param['trabajador_id'])) {
+                throw new Exception('El ID del trabajador es requerido');
+            }
+
+            $trabajador = $this->_get_trabajador_data($param);
+            if (empty($trabajador) || !isset($trabajador['data']['nombre'])) {
+                throw new Exception('No se encontraron datos del trabajador');
+            }
+            $trabajador = $trabajador['data'];
+
+            $contratoData = null;
+
+            // Si viene contract_id, buscamos ESE contrato específico
+            if (isset($param['contract_id']) && !empty($param['contract_id'])) {
+                $sqlExacto = "SELECT salario, fecha_inicio, cargo_id, tipo FROM contratos WHERE id = :id AND trabajador_id = :tid";
+                $contratoData = $this->db->fetchRow($sqlExacto, ['id' => $param['contract_id'], 'tid' => $param['trabajador_id']]);
+
+                if ($contratoData) {
+                    // Sobrescribir el tipo de contrato con el del registro
+                    $param['tipo_contrato'] = $contratoData['tipo'];
+                }
+            }
+
+            // Si no se encontró o no se pasó ID, buscamos el ACTIVO (comportamiento default)
+            if (!$contratoData) {
+                // Obtener datos del contrato activo
+                $contratoData = $this->db->fetchRow(
+                    "SELECT salario, fecha_inicio, cargo_id, tipo FROM contratos WHERE trabajador_id = :trabajador_id AND es_actual = 1",
+                    array('trabajador_id' => $param['trabajador_id'])
+                );
+            }
+
+            if (!$contratoData) {
+                throw new Exception('No se encontró un contrato válido (ni específico ni activo) para este trabajador');
+            }
+
+            // Obtener nombre del cargo desde cargo_id del contrato
+            if ($contratoData['cargo_id']) {
+                $cargo = $this->db->fetchRow(
+                    "SELECT nombre FROM cargos WHERE id = :cargo_id",
+                    array('cargo_id' => $contratoData['cargo_id'])
+                );
+                if ($cargo) {
+                    $trabajador['cargo_nombre'] = $cargo['nombre'];
+                }
+            }
+
+            // Sobrescribir salario con el del contrato
+            $trabajador['salario'] = $contratoData['salario'] ?? 'No especificado';
+
+            // Usar fecha_inicio del contrato si no viene en los parámetros
+            if (!isset($param['fecha_inicio']) || empty($param['fecha_inicio'])) {
+                $param['fecha_inicio'] = $contratoData['fecha_inicio'];
+            }
+
+            $isIndeeHD = false;
+            $isCustodio = ($trabajador['empresa_id'] == '3' || $param['tipo_contrato'] == '4');
+            // Los custodios usan siempre el contrato de servicios (sin suplemento ni tipo determinado/indeterminado)
+            $isSuplemento = !$isCustodio && ($param['tipo_contrato'] == '3');
+
+            if ($isCustodio) {
+                $templatePath = dirname(dirname(__FILE__)) . '/docs/templates_contratos/CONTRATO_DE_SERVICIOS_CUSTODIOS_IML.docx';
+            } elseif ($trabajador['empresa_id'] == '1') {
+                if ($param['tipo_contrato'] == '3') {
+                    $templatePath = dirname(dirname(__FILE__)) . '/docs/templates_contratos/SUPLEMENTO_AL_CONTRATO_DE_TRABAJO_IML.docx';
+                } else {
+                    $templatePath = dirname(dirname(__FILE__)) . '/docs/templates_contratos/CONTRATO_DE_TRABAJO__IML_v2.docx';
+                }
+            } else {
+                $isIndeeHD = true;
+                if ($param['tipo_contrato'] == '3') {
+                    $templatePath = dirname(dirname(__FILE__)) . '/docs/templates_contratos/SUPLEMENTO_AL_CONTRATO_DE_TRABAJO_Indee_HD.docx';
+                } else {
+                    $templatePath = dirname(dirname(__FILE__)) . '/docs/templates_contratos/CONTRATO_DE_TRABAJO__Indee_HD_S.R.L.docx';
+                }
+            }
+
+            if (!file_exists($templatePath)) {
+                throw new Exception("No se encontró la plantilla: $templatePath");
+            }
+
+            // Carpeta temporal
+            $tempDir = sys_get_temp_dir() . '/contratos_tmp/';
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0777, true);
+            }
+
+            // Nombre del archivo generado
+            $outputFilename = 'Contrato_' . $trabajador['nombre'] . '_' . $trabajador['apellidos'] . '_' . date('YmdHis') . '.docx';
+            $outputPath = $tempDir . $outputFilename;
+
+
+            // Cargar PLANTILLA, NO el archivo copiado
+            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
+
+
+
+
+
+            $fecha_parts = explode('-', $param['fecha_inicio']);
+            $dia = $fecha_parts[2];
+            $mes = $fecha_parts[1];
+            $anno = $fecha_parts[0];
+
+            // Variables
+            $templateVars = array(
+                'NOMBRE_COMPLETO' => $trabajador['nombre'] . ' ' . $trabajador['apellidos'] .
+                    (!empty($trabajador['apellidos_segundos']) ? ' ' . $trabajador['apellidos_segundos'] : ''),
+                'NOMBRE' => $trabajador['nombre'],
+                'APELLIDOS' => $trabajador['apellidos'],
+                'APELLIDOS_SEGUNDOS' => $trabajador['apellidos_segundos'] ?? '',
+                'CI' => $trabajador['carnet_identidad'] ?? '',
+                'DIRECCION' => $trabajador['direccion'] ?? '',
+                'PROVINCIA' => $trabajador['provincia_nombre'] ?? '',
+                'MUNICIPIO' => $trabajador['municipio_nombre'] ?? '',
+                'CARGO' => $trabajador['cargo_nombre'] ?? '',
+                'FECHA_DIA' => $dia ?? '',
+                'FECHA_MES' => $mes ?? '',
+                'FECHA_ANNO' => $anno ?? '',
+                'SALARIO' => $trabajador['salario'] ?? 'No especificado',
+                'ES_DETERMINADO' => $param['tipo_contrato'] == '2' ? 'X' : '',
+                'ES_INDETERMINADO' => $param['tipo_contrato'] == '1' ? 'X' : '',
+                'DIRECCION_UBICACION' => $param['direccion_ubicacion'] ?? ''
+            );
+
+            if ($isCustodio) {
+                $banco = $this->db->fetchRow(
+                    "SELECT numero_tarjeta_salario, numero_cuenta_estandar FROM bancos WHERE trabajador_id = :tid",
+                    array('tid' => $param['trabajador_id'])
+                );
+                $ubic = $this->db->fetchRow(
+                    "SELECT u.nombre FROM trabajadores t LEFT JOIN ubicaciones u ON u.id = t.ubicacion WHERE t.id = :tid",
+                    array('tid' => $param['trabajador_id'])
+                );
+                $meses = array('', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre');
+                $blank = '__________';
+                $templateVars = array(
+                    'NOMBRE_COMPLETO' => $templateVars['NOMBRE_COMPLETO'],
+                    'CI' => $templateVars['CI'] ?: $blank,
+                    'DIRECCION' => $templateVars['DIRECCION'] ?: $blank,
+                    'MUNICIPIO' => $templateVars['MUNICIPIO'] ?: $blank,
+                    'PROVINCIA' => $templateVars['PROVINCIA'] ?: $blank,
+                    'BANCO' => $blank,
+                    'TARJETA_SALARIO' => $blank,
+                    'CUENTA_ESTANDAR' => !empty($banco['numero_cuenta_estandar']) ? $banco['numero_cuenta_estandar'] : $blank,
+                    'PROYECTO_NO' => $blank,
+                    'DIRECCION_UBICACION' => !empty($ubic['nombre']) ? $ubic['nombre'] : $blank,
+                    'FECHA_DIA' => $dia,
+                    'FECHA_MES' => $meses[(int)$mes] ?? $mes,
+                    'FECHA_ANNO' => $anno
+                );
+            }
+
+            foreach ($templateVars as $k => $v) {
+                $templateProcessor->setValue($k, $v);
+            }
+
+            // Guardar archivo generado
+            $templateProcessor->saveAs($outputPath);
+
+            $docsToMerge = array($outputPath);
+
+            if (!$isSuplemento && !$isCustodio) {
+                $cargoFuncionesPath = $this->_get_cargo_funciones_path($contratoData['cargo_id'] ?? null);
+                $cargoDocPath = $this->_resolve_doc_path($cargoFuncionesPath);
+                if ($cargoDocPath) {
+                    $docsToMerge[] = $cargoDocPath;
+                }
+            }
+
+            $finalPath = $outputPath;
+            if (count($docsToMerge) > 1) {
+                $mergedPath = $tempDir . 'FULL_' . $outputFilename;
+                $this->_merge_docx_files($docsToMerge, $mergedPath, 'continuous' );
+                $finalPath = $mergedPath;
+                if (file_exists($outputPath)) {
+                    @unlink($outputPath);
+                }
+            }
+
+            // DESCARGA
+            if (ob_get_level()) ob_end_clean();
+
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            header('Content-Disposition: attachment; filename="' . $outputFilename . '"');
+            header('Content-Length: ' . filesize($finalPath));
+
+            readfile($finalPath);
+            unlink($finalPath);
+            if ($anexo2GeneratedPath && file_exists($anexo2GeneratedPath)) {
+                @unlink($anexo2GeneratedPath);
+            }
+            exit;
+        } catch (Exception $e) {
+            $response['msg'] = 'Error al generar el contrato: ' . $e->getMessage();
+            if (!headers_sent()) header('Content-Type: application/json');
+            echo json_encode($response);
+        }
+    }
+
+
+    public function api($param)
+    {
         try {
             if (!isset($param['method'])) {
                 throw new Exception('Método no especificado');
@@ -505,9 +933,7 @@ class Contrato {
             $response = null;
 
             switch ($param['method']) {
-                case 'save-anterior':
-                    $response = $this->save_anterior();
-                    break;
+
                 case 'list':
                     $response = $this->_list($param);
                     break;
@@ -532,6 +958,9 @@ class Contrato {
                 case 'save':
                     $response = $this->_save($param);
                     break;
+                case 'save-nuevo':
+                    $response = $this->_save_nuevo($param);
+                    break;
                 case 'generatePdfFromHtml':
                     $response = $this->_generatePdfFromHtml($param);
                     break;
@@ -543,6 +972,9 @@ class Contrato {
                     break;
                 case 'generatePdfWithFpdf':
                     $response = $this->_generatePdfWithFpdf($param);
+                    break;
+                case 'generate':
+                    $response = $this->_generate($param);
                     break;
                 case 'del':
                     $response = $this->_del($param);
@@ -566,7 +998,8 @@ class Contrato {
         }
     }
 
-    public function controlador($param) {
+    public function controlador($param)
+    {
         global $data, $action, $page, $data_form;
         switch ($param['module']) {
             case 'list-contratos':
@@ -587,7 +1020,7 @@ class Contrato {
                 } catch (Exception $e) {
                     $data_form['trabajadores'] = array();
                 }
-                
+
                 // Cargar departamentos para el select de ubicación laboral
                 try {
                     $data_form['departamentos'] = $this->app->get_list_departamentos();
@@ -597,24 +1030,31 @@ class Contrato {
                     }
                 } catch (Exception $e) {
                     // Fallback en caso de error usando App
-                    try { $data_form['departamentos'] = $this->db->fetchAll("SELECT id, nombre FROM departamentos ORDER BY nombre"); }
-                    catch(Exception $e2) { $data_form['departamentos'] = array(); }
+                    try {
+                        $data_form['departamentos'] = $this->db->fetchAll("SELECT id, nombre FROM departamentos ORDER BY nombre");
+                    } catch (Exception $e2) {
+                        $data_form['departamentos'] = array();
+                    }
                 }
-                
+
                 if (isset($param['id'])) {
                     $page['title'] = 'Editar Contrato';
                     $action = 'update';
                     $val = array('id' => $param['id']);
                     $sql = "SELECT * FROM contratos WHERE id=:id";
                     $row = $this->db->fetchRow($sql, $val);
-                    if ($row) { $data = $row; $page['subtitle'] = 'Contrato: ' . $row['id']; }
+                    if ($row) {
+                        $data = $row;
+                        $page['subtitle'] = 'Contrato: ' . $row['id'];
+                    }
                 }
                 break;
         }
     }
 
     // Devuelve plantilla HTML según tipo (lee de /docs)
-    private function _getTemplate($param) {
+    private function _getTemplate($param)
+    {
         $tipo = isset($param['tipo']) ? $param['tipo'] : '';
         $map = array(
             'Contrato por Tiempo Indeterminado' => BASE . '/docs/contrato-de-trabajo-indeterminado/contrato-de-trabajo-indeterminado.html',
@@ -634,13 +1074,17 @@ class Contrato {
     }
 
     // Núcleo de generación de PDF: retorna array (no imprime)
-    private function _generatePdfCore($param) {
-        $response = array('status'=>0,'msg'=>'', 'file_url'=>'');
+    private function _generatePdfCore($param)
+    {
+        $response = array('status' => 0, 'msg' => '', 'file_url' => '');
         $html = isset($param['html']) ? $param['html'] : '';
         $tipo = isset($param['tipo']) ? $param['tipo'] : 'contrato';
         $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
 
-        if (empty($html)) { $response['msg'] = 'HTML no proporcionado'; return $response; }
+        if (empty($html)) {
+            $response['msg'] = 'HTML no proporcionado';
+            return $response;
+        }
 
         // Cargar mPDF (si está disponible) o hacer fallback a TCPDF
         $loadedPdfEngine = null;
@@ -651,8 +1095,15 @@ class Contrato {
             __DIR__ . '/../plugins/mpdf/vendor/autoload.php',
             __DIR__ . '/../plugins/mpdf/autoload.php'
         );
-        foreach ($autoloads as $auto) { if (file_exists($auto)) { @require_once($auto); break; } }
-        if (class_exists('Mpdf\\Mpdf')) { $loadedPdfEngine = 'mpdf'; }
+        foreach ($autoloads as $auto) {
+            if (file_exists($auto)) {
+                @require_once($auto);
+                break;
+            }
+        }
+        if (class_exists('Mpdf\\Mpdf')) {
+            $loadedPdfEngine = 'mpdf';
+        }
 
         // 2) Si no hay mPDF, intentar TCPDF
         if ($loadedPdfEngine === null) {
@@ -664,7 +1115,13 @@ class Contrato {
                 (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/plugins/tcpdf/tcpdf_include.php' : null)
             );
             $loaded = false;
-            foreach ($tcpdfIncludes as $inc) { if ($inc && file_exists($inc)) { @require_once($inc); $loaded = true; break; } }
+            foreach ($tcpdfIncludes as $inc) {
+                if ($inc && file_exists($inc)) {
+                    @require_once($inc);
+                    $loaded = true;
+                    break;
+                }
+            }
             if (!$loaded) {
                 $tcpdfPaths = array(
                     BASE . '/plugins/tcpdf/tcpdf.php',
@@ -673,17 +1130,27 @@ class Contrato {
                     __DIR__ . '/../tcpdf/tcpdf.php',
                     (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/plugins/tcpdf/tcpdf.php' : null)
                 );
-                foreach ($tcpdfPaths as $p) { if ($p && file_exists($p)) { @require_once($p); break; } }
+                foreach ($tcpdfPaths as $p) {
+                    if ($p && file_exists($p)) {
+                        @require_once($p);
+                        break;
+                    }
+                }
             }
-            if (class_exists('TCPDF')) { $loadedPdfEngine = 'tcpdf'; }
+            if (class_exists('TCPDF')) {
+                $loadedPdfEngine = 'tcpdf';
+            }
         }
 
-        if ($loadedPdfEngine === null) { $response['msg']='mPDF/TCPDF no disponible'; return $response; }
+        if ($loadedPdfEngine === null) {
+            $response['msg'] = 'mPDF/TCPDF no disponible';
+            return $response;
+        }
 
         // Preparar HTML y CSS embebido
         $html2 = $html;
         $inlinedCss = '';
-        $fetchContent = function($href) {
+        $fetchContent = function ($href) {
             if (preg_match('#^https?://#i', $href)) {
                 $ctx = @file_get_contents($href);
                 if ($ctx !== false) return $ctx;
@@ -701,11 +1168,17 @@ class Contrato {
             } else {
                 if (substr($href, 0, 1) === '/' && isset($_SERVER['DOCUMENT_ROOT'])) {
                     $fs = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $href;
-                    if (is_file($fs) && is_readable($fs)) { $ctx = @file_get_contents($fs); if ($ctx !== false) return $ctx; }
+                    if (is_file($fs) && is_readable($fs)) {
+                        $ctx = @file_get_contents($fs);
+                        if ($ctx !== false) return $ctx;
+                    }
                 }
                 if (defined('BASE')) {
                     $fs2 = rtrim(BASE, '/\\') . '/' . ltrim($href, '/');
-                    if (is_file($fs2) && is_readable($fs2)) { $ctx = @file_get_contents($fs2); if ($ctx !== false) return $ctx; }
+                    if (is_file($fs2) && is_readable($fs2)) {
+                        $ctx = @file_get_contents($fs2);
+                        if ($ctx !== false) return $ctx;
+                    }
                 }
             }
             return false;
@@ -714,12 +1187,17 @@ class Contrato {
             $cssHrefs = $m[1];
             foreach ($cssHrefs as $href) {
                 $cssContent = $fetchContent($href);
-                if ($cssContent && is_string($cssContent)) { $inlinedCss .= "\n/* inlined: $href */\n" . $cssContent . "\n"; }
+                if ($cssContent && is_string($cssContent)) {
+                    $inlinedCss .= "\n/* inlined: $href */\n" . $cssContent . "\n";
+                }
             }
             if ($inlinedCss !== '') {
                 $html2 = preg_replace('/<link[^>]+rel=["\']stylesheet["\'][^>]*href=["\']([^"\']+\.css)["\'][^>]*>/i', '', $html2);
-                if (stripos($html2, '</head>') !== false) { $html2 = str_ireplace('</head>', "<style>" . $inlinedCss . "</style></head>", $html2); }
-                else { $html2 = "<style>" . $inlinedCss . "</style>" . $html2; }
+                if (stripos($html2, '</head>') !== false) {
+                    $html2 = str_ireplace('</head>', "<style>" . $inlinedCss . "</style></head>", $html2);
+                } else {
+                    $html2 = "<style>" . $inlinedCss . "</style>" . $html2;
+                }
             }
         }
 
@@ -727,7 +1205,9 @@ class Contrato {
         $scheme = (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http'));
         $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
         $baseHref = '';
-        if ($host) { $baseHref = $scheme . '://' . $host . '/'; }
+        if ($host) {
+            $baseHref = $scheme . '://' . $host . '/';
+        }
         if ($baseHref !== '') {
             if (stripos($html2, '<base ') === false) {
                 if (stripos($html2, '<head') !== false && stripos($html2, '</head>') !== false) {
@@ -743,9 +1223,11 @@ class Contrato {
             $baseRoot = defined('BASE') ? rtrim(BASE, '/\\') : rtrim($_SERVER['DOCUMENT_ROOT'] ?? __DIR__ . '/..', '/\\');
             $upload_rel = 'uploads/contratos/';
             $upload_dir_fs = $baseRoot . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $upload_rel);
-            if (!file_exists($upload_dir_fs)) { @mkdir($upload_dir_fs, 0777, true); }
+            if (!file_exists($upload_dir_fs)) {
+                @mkdir($upload_dir_fs, 0777, true);
+            }
             $fileId = $contrato_id ? $contrato_id : time();
-            $safeTipo = preg_replace('/[^a-z0-9_\-]/i','',str_replace(' ','_',substr($tipo,0,50)));
+            $safeTipo = preg_replace('/[^a-z0-9_\-]/i', '', str_replace(' ', '_', substr($tipo, 0, 50)));
             $fileName = 'contrato_' . $fileId . '_' . $safeTipo . '.pdf';
             $fullPath = rtrim($upload_dir_fs, '/\\') . DIRECTORY_SEPARATOR . $fileName;
 
@@ -754,11 +1236,15 @@ class Contrato {
                 $mpdf->WriteHTML($html2);
                 $mpdf->Output($fullPath, 'F');
             } else {
-                if (!defined('PDF_PAGE_ORIENTATION')) define('PDF_PAGE_ORIENTATION','P');
-                if (!defined('PDF_UNIT')) define('PDF_UNIT','mm');
-                if (!defined('PDF_PAGE_FORMAT')) define('PDF_PAGE_FORMAT','A4');
+                if (!defined('PDF_PAGE_ORIENTATION')) define('PDF_PAGE_ORIENTATION', 'P');
+                if (!defined('PDF_UNIT')) define('PDF_UNIT', 'mm');
+                if (!defined('PDF_PAGE_FORMAT')) define('PDF_PAGE_FORMAT', 'A4');
                 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-                if (defined('PDF_CREATOR')) { $pdf->SetCreator(PDF_CREATOR); } else { $pdf->SetCreator('Sistema'); }
+                if (defined('PDF_CREATOR')) {
+                    $pdf->SetCreator(PDF_CREATOR);
+                } else {
+                    $pdf->SetCreator('Sistema');
+                }
                 $pdf->SetAuthor('Sistema');
                 $pdf->SetTitle('Contrato - ' . $tipo);
                 $pdf->SetSubject('Contrato de Trabajo');
@@ -767,9 +1253,15 @@ class Contrato {
                 $pdf->setPrintFooter(false);
                 $pdf->SetMargins(10, 10, 10);
                 $pdf->AddPage();
-                if (method_exists($pdf, 'SetFont')) { $pdf->SetFont('dejavusans','',10); }
-                if (method_exists($pdf, 'SetAutoPageBreak')) { $pdf->SetAutoPageBreak(true, 10); }
-                if (method_exists($pdf, 'setImageScale')) { $pdf->setImageScale(1.25); }
+                if (method_exists($pdf, 'SetFont')) {
+                    $pdf->SetFont('dejavusans', '', 10);
+                }
+                if (method_exists($pdf, 'SetAutoPageBreak')) {
+                    $pdf->SetAutoPageBreak(true, 10);
+                }
+                if (method_exists($pdf, 'setImageScale')) {
+                    $pdf->setImageScale(1.25);
+                }
                 // Si no hay soporte de GD/Imagick, evitar PNG con alpha: usar JPG local de fallback para el logo si existe
                 if (!extension_loaded('gd') && !class_exists('Imagick')) {
                     $fallbackRel = '/img/logo-pdf.jpg'; // coloca aquí un JPG sin transparencia
@@ -786,20 +1278,30 @@ class Contrato {
                 }
                 // Intentar respetar imágenes y estilos tal cual (solo eliminar imágenes si falla el render)
                 $html_for_tcpdf = $html2;
-                try { $pdf->writeHTML($html_for_tcpdf, true, false, true, false, ''); }
-                catch (\Throwable $e) {
+                try {
+                    $pdf->writeHTML($html_for_tcpdf, true, false, true, false, '');
+                } catch (\Throwable $e) {
                     $html_retry = preg_replace('/<img[^>]*>/i', '', $html_for_tcpdf);
                     $html_retry = preg_replace('/url\(.*?\)/i', '/* img removed */', $html_retry);
                     $html_retry = preg_replace('/<image[^>]*>/i', '', $html_retry);
-                    if (stripos($html_retry, '<image') !== false) { $html_retry = preg_replace('/<svg[\s\S]*?<\/svg>/i', '', $html_retry); }
+                    if (stripos($html_retry, '<image') !== false) {
+                        $html_retry = preg_replace('/<svg[\s\S]*?<\/svg>/i', '', $html_retry);
+                    }
                     $pdf->writeHTML($html_retry, true, false, true, false, '');
                 }
                 $pdf->Output($fullPath, 'F');
             }
 
             $fileUrl = rtrim('/', '/') . '/' . $upload_rel . $fileName;
-            $response['status']=1; $response['file_url'] = $fileUrl; $response['msg']='PDF generado correctamente';
-            if ($contrato_id) { try { $this->db->update('contratos', array('archivo_contrato'=>$fileUrl), array('id'=>$contrato_id)); } catch(Exception $e) { } }
+            $response['status'] = 1;
+            $response['file_url'] = $fileUrl;
+            $response['msg'] = 'PDF generado correctamente';
+            if ($contrato_id) {
+                try {
+                    $this->db->update('contratos', array('archivo_contrato' => $fileUrl), array('id' => $contrato_id));
+                } catch (Exception $e) {
+                }
+            }
         } catch (Exception $e) {
             $response['msg'] = 'Error al generar PDF: ' . $e->getMessage();
         }
@@ -807,13 +1309,15 @@ class Contrato {
     }
 
     // Genera PDF a partir del HTML enviado (ya con valores reemplazados) y imprime JSON (API existente)
-    private function _generatePdfFromHtml($param) {
+    private function _generatePdfFromHtml($param)
+    {
         $resp = $this->_generatePdfCore($param);
         print(json_encode($resp));
     }
 
     // Nuevo método API: misma estructura de respuesta que _save() de List_recursos
-    private function _savePdfContrato($param) {
+    private function _savePdfContrato($param)
+    {
         // Log opcional similar a List_recursos::_save
         $log = date('Y-m-d H:i:s') . " - savePdfContrato params:\n";
         $log .= "POST: " . print_r($param, true) . "\n";
@@ -828,27 +1332,36 @@ class Contrato {
 
         // Validación mínima
         if (!isset($param['html']) || trim((string)$param['html']) === '') {
-            $data['status'] = 0; $data['msg_title'] = 'Validación'; $data['msg'] = 'HTML no proporcionado'; print(json_encode($data)); return;
+            $data['status'] = 0;
+            $data['msg_title'] = 'Validación';
+            $data['msg'] = 'HTML no proporcionado';
+            print(json_encode($data));
+            return;
         }
 
         // Generar PDF usando el núcleo reutilizable
         $resp = $this->_generatePdfCore($param);
         if (!$resp['status']) {
-            $data['status'] = 0; $data['msg_title'] = 'Error'; $data['msg'] = $resp['msg'];
+            $data['status'] = 0;
+            $data['msg_title'] = 'Error';
+            $data['msg'] = $resp['msg'];
         } else {
             $data['file_url'] = $resp['file_url'];
         }
 
         // Si viene contrato_id, incluirlo en la respuesta
-        if (isset($param['contrato_id']) && $param['contrato_id'] !== '') { $data['id'] = intval($param['contrato_id']); }
+        if (isset($param['contrato_id']) && $param['contrato_id'] !== '') {
+            $data['id'] = intval($param['contrato_id']);
+        }
 
         print(json_encode($data));
     }
 
 
     // Genera PDF usando la librería FPDF (texto plano a partir de plantilla PHP)
-    private function _generatePdfWithFpdf($param) {
-        $response = array('status'=>0,'msg'=>'', 'file_url'=>'');
+    private function _generatePdfWithFpdf($param)
+    {
+        $response = array('status' => 0, 'msg' => '', 'file_url' => '');
         $tipo = isset($param['tipo']) ? $param['tipo'] : '';
         $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
         $contrato_id = isset($param['contrato_id']) && $param['contrato_id'] !== '' ? intval($param['contrato_id']) : null;
@@ -867,15 +1380,26 @@ class Contrato {
             'Suplemento' => BASE . '/docs/suplemento/suplemento-al-contrato-de-trabajo.php'
         );
         $path = isset($map[$tipo]) ? $map[$tipo] : null;
-        if (!$path || !file_exists($path)) { $response['msg']='Plantilla no encontrada'; print(json_encode($response)); return; }
+        if (!$path || !file_exists($path)) {
+            $response['msg'] = 'Plantilla no encontrada';
+            print(json_encode($response));
+            return;
+        }
 
         // Make template variables available: extras keys + trabajador data
         $tplData = array();
-        foreach ($extras as $k=>$v) { $tplData[$k] = $v; }
+        foreach ($extras as $k => $v) {
+            $tplData[$k] = $v;
+        }
         if ($trabajador_id) {
-            try { $trab = $this->db->fetchRow("SELECT nombre, apellidos, carnet_identidad FROM trabajadores WHERE id = :id", array('id'=>$trabajador_id));
-                if ($trab) { $tplData['trabajador_nombre'] = trim(($trab['nombre'] ?? '') . ' ' . ($trab['apellidos'] ?? '')); $tplData['trabajador_ci'] = $trab['carnet_identidad'] ?? ''; }
-            } catch(Exception $e) { /* ignore */ }
+            try {
+                $trab = $this->db->fetchRow("SELECT nombre, apellidos, carnet_identidad FROM trabajadores WHERE id = :id", array('id' => $trabajador_id));
+                if ($trab) {
+                    $tplData['trabajador_nombre'] = trim(($trab['nombre'] ?? '') . ' ' . ($trab['apellidos'] ?? ''));
+                    $tplData['trabajador_ci'] = $trab['carnet_identidad'] ?? '';
+                }
+            } catch (Exception $e) { /* ignore */
+            }
         }
 
         // Render template into HTML string by capturing include output and replacing named placeholders
@@ -885,9 +1409,11 @@ class Contrato {
         // include template in separate scope
         try {
             include $path;
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             ob_end_clean();
-            $response['msg'] = 'Error al procesar plantilla: ' . $e->getMessage(); print(json_encode($response)); return;
+            $response['msg'] = 'Error al procesar plantilla: ' . $e->getMessage();
+            print(json_encode($response));
+            return;
         }
         $html = ob_get_clean();
 
@@ -895,21 +1421,29 @@ class Contrato {
         if (isset($tplData['formas_pago']) && is_array($tplData['formas_pago'])) {
             $mapFormas = array('1' => 'A sueldo', '2' => 'Por tarifa horaria', '3' => 'Por resultados', '4' => 'A Destajo');
             $pieces = array();
-            foreach ($tplData['formas_pago'] as $f) { $pieces[] = isset($mapFormas[$f]) ? $mapFormas[$f] : $f; }
+            foreach ($tplData['formas_pago'] as $f) {
+                $pieces[] = isset($mapFormas[$f]) ? $mapFormas[$f] : $f;
+            }
             $tplData['formas_pago'] = implode(', ', $pieces);
         }
         // Also set common aliases
-        if (isset($tplData['cargo_nombre'])) { $tplData['cargo'] = $tplData['cargo_nombre']; }
+        if (isset($tplData['cargo_nombre'])) {
+            $tplData['cargo'] = $tplData['cargo_nombre'];
+        }
 
         // Replace placeholders like {{DE_NOMBRE}} etc with extras (if appear)
-        foreach ($tplData as $k=>$v) {
+        foreach ($tplData as $k => $v) {
             $ph = '{{' . strtoupper($k) . '}}';
             $html = str_replace($ph, $v, $html);
         }
 
         // Load FPDF
         $fpdfPath = __DIR__ . '/fpdf/fpdf.php';
-        if (!file_exists($fpdfPath)) { $response['msg'] = 'FPDF no encontrado en classes/fpdf/'; print(json_encode($response)); return; }
+        if (!file_exists($fpdfPath)) {
+            $response['msg'] = 'FPDF no encontrado en classes/fpdf/';
+            print(json_encode($response));
+            return;
+        }
         require_once($fpdfPath);
 
         // Very simple approach: strip tags and write lines to PDF
@@ -920,7 +1454,7 @@ class Contrato {
         try {
             $pdf = new FPDF();
             $pdf->AddPage();
-            $pdf->SetFont('Arial','',12);
+            $pdf->SetFont('Arial', '', 12);
             $maxWidth = 190; // approx mm
             $pdf->SetAutoPageBreak(true, 10);
             // split text into words and assemble lines
@@ -931,95 +1465,39 @@ class Contrato {
                 if ($pdf->GetStringWidth($test) > $maxWidth) {
                     $pdf->Cell(0, 6, utf8_decode(trim($line)), 0, 1);
                     $line = $w;
-                } else { $line = $test; }
+                } else {
+                    $line = $test;
+                }
             }
             if (trim($line) !== '') $pdf->Cell(0, 6, utf8_decode(trim($line)), 0, 1);
 
-            $upload_dir = 'uploads/contratos/'; if (!file_exists($upload_dir)) { @mkdir($upload_dir, 0777, true); }
+            $upload_dir = 'uploads/contratos/';
+            if (!file_exists($upload_dir)) {
+                @mkdir($upload_dir, 0777, true);
+            }
             $fileId = $contrato_id ? $contrato_id : time();
             $fileName = 'contrato_fpdf_' . $fileId . '.pdf';
             $fullPath = rtrim($upload_dir, '/\\') . '/' . $fileName;
             $pdf->Output('F', $fullPath);
 
-            $response['status'] = 1; $response['file_url'] = $fullPath; $response['msg'] = 'OK';
-            if ($contrato_id) { try { $this->db->update('contratos', array('archivo_contrato'=>$fullPath), array('id'=>$contrato_id)); } catch(Exception $e) { }
+            $response['status'] = 1;
+            $response['file_url'] = $fullPath;
+            $response['msg'] = 'OK';
+            if ($contrato_id) {
+                try {
+                    $this->db->update('contratos', array('archivo_contrato' => $fullPath), array('id' => $contrato_id));
+                } catch (Exception $e) {
+                }
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $response['msg'] = 'Error FPDF: ' . $e->getMessage();
         }
 
         print(json_encode($response));
     }
 
-    // Eliminar contrato: borrar registro y archivo asociado (si existe)
-    private function _del($param) {
-        $resp = array('status' => 1, 'msg' => 'Contrato eliminado', 'id' => null);
-        try {
-            if (!isset($param['id']) || intval($param['id']) <= 0) {
-                throw new Exception('ID de contrato no proporcionado');
-            }
-            $id = intval($param['id']);
-            $resp['id'] = $id;
-
-            // Obtener ruta de archivo desde BD
-            $row = $this->db->fetchRow("SELECT archivo_contrato FROM contratos WHERE id = :id", array('id' => $id));
-            if ($row && !empty($row['archivo_contrato'])) {
-                $archivo = $row['archivo_contrato'];
-                $fsPath = null;
-                // Si es URL absoluta, tomar el path
-                if (preg_match('/^https?:\/\//i', $archivo)) {
-                    $u = parse_url($archivo);
-                    $path = isset($u['path']) ? $u['path'] : '';
-                    if (!empty($path)) {
-                        if (isset($_SERVER['DOCUMENT_ROOT'])) {
-                            $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $path;
-                        } elseif (defined('BASE')) {
-                            $fsPath = rtrim(BASE, '/\\') . $path;
-                        }
-                    }
-                } elseif (substr($archivo, 0, 1) === '/') {
-                    // ruta absoluta en servidor
-                    if (isset($_SERVER['DOCUMENT_ROOT'])) {
-                        $fsPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $archivo;
-                    } elseif (defined('BASE')) {
-                        $fsPath = rtrim(BASE, '/\\') . $archivo;
-                    }
-                } else {
-                    // ruta relativa: construir desde BASE o DOCUMENT_ROOT
-                    $baseRoot = defined('BASE') ? rtrim(BASE, '/\\') : (isset($_SERVER['DOCUMENT_ROOT']) ? rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') : __DIR__ . '/../');
-                    $fsPath = $baseRoot . DIRECTORY_SEPARATOR . str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $archivo);
-                }
-
-                if ($fsPath && file_exists($fsPath)) {
-                    @unlink($fsPath);
-                }
-            }
-
-            // Eliminar registro en la BD
-            $ok = $this->db->del('contratos', array('id' => $id));
-            if (!$ok) {
-                throw new Exception('No se pudo eliminar el registro de la base de datos');
-            }
-
-            // Registrar historial si es posible
-            try {
-                $history = array(
-                    'xentity' => 'CONTRATO',
-                    'xaction' => 'DEL-CONTRATO',
-                    'xid' => $id,
-                    'xobs' => 'Contrato eliminado: ' . $id
-                );
-                if (method_exists($this->app, 'add_history')) { $this->app->add_history($history); }
-            } catch (Exception $e) { }
-
-        } catch (Exception $e) {
-            $resp['status'] = 0;
-            $resp['msg'] = $e->getMessage();
-        }
-        return $resp;
-    }
-
-    private function _list($param) {
+    private function _list($param)
+    {
         $data = array();
         try {
             $sql = "SELECT c.*, t.nombre, t.apellidos, CONCAT(t.nombre, ' ', t.apellidos) as trabajador_nombre
@@ -1033,38 +1511,31 @@ class Contrato {
         return $data;
     }
 
-    private function _list_id($param) {
-        $data = array();
-        try {
-            $sql = "SELECT c.*
-                    FROM contratos c
-                    LEFT JOIN trabajadores t ON t.id = c.trabajador_id
-                    WHERE c.trabajador_id=:id
-                    ORDER BY c.id DESC";
-            $data = $this->db->fetchAll($sql, array('id' => $param['trabajador_id']));
-        } catch (Exception $e) {
-            $data = array();
-        }
-        return $data;
-    }
-    
     // Nuevo método para obtener datos completos del trabajador
-    private function _get_trabajador_data($param) {
+    private function _get_trabajador_data($param)
+    {
         $trabajador_id = isset($param['trabajador_id']) ? intval($param['trabajador_id']) : 0;
         $data = array('status' => 0, 'data' => array());
-        if ($trabajador_id <= 0) { $data['msg'] = 'ID de trabajador inválido'; return $data; }
+        if ($trabajador_id <= 0) {
+            $data['msg'] = 'ID de trabajador inválido';
+            return $data;
+        }
 
         // Primer intento: tablas en singular (provincia, municipio)
+        // NOTA: el salario ahora se obtiene del contrato activo, no de cargos
         $sqlSingular = "SELECT 
                             t.id, t.nombre, t.apellidos, t.apellidos_segundos, t.direccion, t.carnet_identidad,
                             t.cargos_id, t.provincia_id, t.municipio_id,
                             c.nombre as cargo_nombre,
                             p.nombre as provincia_nombre,
-                            m.nombre as municipio_nombre
+                            m.nombre as municipio_nombre,
+                            COALESCE(ct.salario, 0) as salario,
+                            t.empresa_id as empresa_id
                         FROM trabajadores t
                         LEFT JOIN cargos c ON t.cargos_id = c.id
                         LEFT JOIN provincia p ON t.provincia_id = p.id
                         LEFT JOIN municipio m ON t.municipio_id = m.id
+                        LEFT JOIN contratos ct ON ct.trabajador_id = t.id AND ct.es_actual = 1
                         WHERE t.id = :id AND t.trabajador_eliminado = '0'";
         // Segundo intento: tablas en plural (provincias, municipios)
         $sqlPlural = "SELECT 
@@ -1072,11 +1543,14 @@ class Contrato {
                             t.cargos_id, t.provincia_id, t.municipio_id,
                             c.nombre as cargo_nombre,
                             p.nombre as provincia_nombre,
-                            m.nombre as municipio_nombre
+                            m.nombre as municipio_nombre,
+                            COALESCE(ct.salario, 0) as salario,
+                            t.empresa_id as empresa_id
                         FROM trabajadores t
                         LEFT JOIN cargos c ON t.cargos_id = c.id
                         LEFT JOIN provincias p ON t.provincia_id = p.id
                         LEFT JOIN municipios m ON t.municipio_id = m.id
+                        LEFT JOIN contratos ct ON ct.trabajador_id = t.id AND ct.es_actual = 1
                         WHERE t.id = :id AND t.trabajador_eliminado = '0'";
 
         $trabajador = null;
@@ -1105,7 +1579,9 @@ class Contrato {
                 'provincia_nombre' => $trabajador['provincia_nombre'] ?? 'Sin provincia',
                 'municipio_id' => $trabajador['municipio_id'] ?? '',
                 'municipio_nombre' => $trabajador['municipio_nombre'] ?? 'Sin municipio',
-                'carnet_identidad' => $trabajador['carnet_identidad'] ?? ''
+                'carnet_identidad' => $trabajador['carnet_identidad'] ?? '',
+                'salario' => $trabajador['salario'] ?? '',
+                'empresa_id' => $trabajador['empresa_id'] ?? '',
             );
         } else {
             $data['msg'] = 'Trabajador no encontrado';
@@ -1113,8 +1589,9 @@ class Contrato {
         return $data;
     }
 
-    private function _save($param) {
-        $data = array('status'=>1, 'msg_title'=>'Éxito', 'msg'=>'Contrato guardado correctamente');
+    private function _save($param)
+    {
+        $data = array('status' => 1, 'msg_title' => 'Éxito', 'msg' => 'Contrato guardado correctamente');
 
         try {
             // Iniciar transacción
@@ -1137,6 +1614,14 @@ class Contrato {
                 throw new Exception('El tipo de contrato es obligatorio');
             }
 
+            // Calcular fecha_fin automáticamente si es determinado (tipo 2)
+            $fecha_fin_auto = null;
+            if ($tipo_contrato == '2') {
+                $fecha_inicio_obj = new DateTime($fecha_inicio);
+                $fecha_inicio_obj->modify('+3 months');
+                $fecha_fin_auto = $fecha_inicio_obj->format('Y-m-d');
+            }
+
             // Verificar duplicado antes de insertar
             $sqlCheck = "SELECT id FROM contratos WHERE trabajador_id = :trabajador_id AND tipo = :tipo AND fecha_inicio = :fecha_inicio ";
             $paramsCheck = [
@@ -1156,31 +1641,38 @@ class Contrato {
                 throw new Exception('Ya existe un contrato igual para este trabajador, tipo y fecha.');
             }
 
-        // Las validaciones ya se hicieron arriba
+            // Las validaciones ya se hicieron arriba
 
-        // Manejo de uploads (solo firma, el contrato se genera como PDF automáticamente)
-        $upload_dir = 'uploads/contratos/';
-        if (!file_exists($upload_dir)) { @mkdir($upload_dir, 0777, true); }
-        $archivo_contrato_path = null; // será el PDF generado
-        $firma_digital_path = null;
+            // Manejo de uploads (solo firma, el contrato se genera como PDF automáticamente)
+            $upload_dir = 'uploads/contratos/';
+            if (!file_exists($upload_dir)) {
+                @mkdir($upload_dir, 0777, true);
+            }
+            $archivo_contrato_path = null; // será el PDF generado
+            $firma_digital_path = null;
 
-        if (isset($_FILES['archivo_contrato']) && $_FILES['archivo_contrato']['error'] === UPLOAD_ERR_OK) {
-            $name = uniqid('contrato_') . '_' . basename($_FILES['archivo_contrato']['name']);
-            $path = $upload_dir . $name;
-            if (move_uploaded_file($_FILES['archivo_contrato']['tmp_name'], $path)) { $archivo_contrato_path = $path; }
-        }
-        if (isset($_FILES['firma_digital']) && $_FILES['firma_digital']['error'] === UPLOAD_ERR_OK) {
-            $name = uniqid('firma_') . '_' . basename($_FILES['firma_digital']['name']);
-            $path = $upload_dir . $name;
-            if (move_uploaded_file($_FILES['firma_digital']['tmp_name'], $path)) { $firma_digital_path = $path; }
-        }
+            if (isset($_FILES['archivo_contrato']) && $_FILES['archivo_contrato']['error'] === UPLOAD_ERR_OK) {
+                $name = uniqid('contrato_') . '_' . basename($_FILES['archivo_contrato']['name']);
+                $path = $upload_dir . $name;
+                if (move_uploaded_file($_FILES['archivo_contrato']['tmp_name'], $path)) {
+                    $archivo_contrato_path = $path;
+                }
+            }
+            if (isset($_FILES['firma_digital']) && $_FILES['firma_digital']['error'] === UPLOAD_ERR_OK) {
+                $name = uniqid('firma_') . '_' . basename($_FILES['firma_digital']['name']);
+                $path = $upload_dir . $name;
+                if (move_uploaded_file($_FILES['firma_digital']['tmp_name'], $path)) {
+                    $firma_digital_path = $path;
+                }
+            }
 
-        // Solo guardar columnas mínimas: trabajador_id, tipo, fecha_inicio, archivo_contrato, firma_digital (flag int)
+            // Solo guardar columnas mínimas: trabajador_id, tipo, fecha_inicio, archivo_contrato, firma_digital (flag int)
 
             $insert = array(
                 'trabajador_id'     => $trabajador_id,
                 'tipo'              => $tipo_contrato, // mapeamos 'tipo_contrato' del form a columna 'tipo'
                 'fecha_inicio'      => $fecha_inicio,
+                'fecha_fin'         => $fecha_fin_auto,
                 'archivo_contrato'  => $archivo_contrato_path,
                 // columna firma_digital es entera: 1 si se subió archivo de firma en esta operación, 0 en caso contrario
                 'firma_digital'     => ($firma_digital_path ? 1 : 0)
@@ -1200,7 +1692,7 @@ class Contrato {
                             $data['file_url'] = $pdfPath;
                         }
                     }
-                } else { 
+                } else {
                     throw new Exception('Error al insertar el contrato');
                 }
             } else {
@@ -1210,10 +1702,10 @@ class Contrato {
                 if (!$firma_digital_path) unset($insert['firma_digital']);
                 $where = array('id' => $id);
                 $result = $this->db->update('contratos', $insert, $where);
-                if ($result === false) { 
+                if ($result === false) {
                     throw new Exception('Error al actualizar el contrato');
                 }
-                
+
                 $data['id'] = $id;
                 // Regenerar PDF con datos actualizados (usar ruta de firma si se subió en esta operación)
                 $pdfPath = $this->generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo_contrato, $fecha_inicio, null, $firma_digital_path);
@@ -1229,7 +1721,6 @@ class Contrato {
             if ($this->db->conn && $this->db->conn->inTransaction()) {
                 $this->db->conn->commit();
             }
-
         } catch (Exception $e) {
             // Revertir transacción si hay error
             if ($this->db->conn && $this->db->conn->inTransaction()) {
@@ -1245,7 +1736,8 @@ class Contrato {
     }
 
     // Helper: Genera el PDF del contrato con mPDF
-    private function generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, $firma_digital_path) {
+    private function generar_pdf_contrato($upload_dir, $id, $trabajador_id, $tipo, $fecha_inicio, $fecha_fin, $firma_digital_path)
+    {
         // Cargar datos del trabajador (usar nombres de columnas reales)
         $trab = $this->db->fetchRow("SELECT nombre, apellidos, carnet_identidad FROM trabajadores WHERE id = :id", array('id' => $trabajador_id));
         $nombreCompleto = '';
@@ -1261,7 +1753,10 @@ class Contrato {
             __DIR__ . '/../plugins/mpdf/autoload.php'
         );
         foreach ($autoloads as $auto) {
-            if (file_exists($auto)) { require_once($auto); break; }
+            if (file_exists($auto)) {
+                require_once($auto);
+                break;
+            }
         }
         if (!class_exists('Mpdf\\Mpdf')) {
             return null; // mPDF no disponible
@@ -1271,13 +1766,13 @@ class Contrato {
         // Estilos simples (puedes reemplazar por plantilla propia)
         $css = 'body { font-family: DejaVu Sans, sans-serif; font-size: 12px; } .title { text-align:center; font-weight:bold; font-size:18px; margin-bottom:40px; } .sec h3 { margin: 10px 0 5px; } .row { margin: 6px 0; } .label { color:#666; width: 180px; display:inline-block; }';
         $html = '<html><head><style>' . $css . '</style></head><body>'
-              . '<div class="title">Contrato #' . htmlspecialchars((string)$id) . '</div>'
-              . '<div class="sec">'
-              . '<div class="row"><span class="label">Trabajador:</span> ' . htmlspecialchars($nombreCompleto ?: ('ID ' . $trabajador_id)) . '</div>'
-              . '<div class="row"><span class="label">Tipo de Contrato:</span> ' . htmlspecialchars($tipo) . '</div>'
-              . '<div class="row"><span class="label">Fecha Inicio:</span> ' . htmlspecialchars($fecha_inicio ?: '') . '</div>'
-              . '<div class="row"><span class="label">Fecha Fin:</span> ' . htmlspecialchars($fecha_fin ?: 'Indefinido') . '</div>'
-              . '</div>';
+            . '<div class="title">Contrato #' . htmlspecialchars((string)$id) . '</div>'
+            . '<div class="sec">'
+            . '<div class="row"><span class="label">Trabajador:</span> ' . htmlspecialchars($nombreCompleto ?: ('ID ' . $trabajador_id)) . '</div>'
+            . '<div class="row"><span class="label">Tipo de Contrato:</span> ' . htmlspecialchars($tipo) . '</div>'
+            . '<div class="row"><span class="label">Fecha Inicio:</span> ' . htmlspecialchars($fecha_inicio ?: '') . '</div>'
+            . '<div class="row"><span class="label">Fecha Fin:</span> ' . htmlspecialchars($fecha_fin ?: 'Indefinido') . '</div>'
+            . '</div>';
         if (!empty($firma_digital_path)) {
             // Subir el doble la sección de firma (título e imagen) y desplazar un poco más a la derecha
             $html .= '<div class="sec" style="position:relative; margin-top:-120px;">

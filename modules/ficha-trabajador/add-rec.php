@@ -1,4 +1,7 @@
+
+
 <!-- Modal Asignación de Recursos -->
+
 <div class="modal fade" id="recursoModal2" tabindex="-1" role="dialog" aria-labelledby="recursoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document"> <!-- modal-lg para más espacio -->
         <div class="modal-content">
@@ -51,45 +54,20 @@
                                 <input type="date" id="f-fecha-rh" name="fecha_entrega_a_rh" class="form-control" value="<?php echo date('Y-m-d'); ?>">
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Datos del recurso -->
-                    <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6 ">
+                            
                             <div class="form-group">
-                                <label for="f-recurso">Recurso <span class="text-danger">*</span></label>
-                                <input type="text" id="f-recurso" name="recurso" class="form-control" placeholder="Recurso" required>
-                            </div>
-                        </div>
+                                <label for="f-recurso-id">Recursos</label>
+                                <select id="f-recurso-id" name="recurso_id" class="form-control"  required>
+                                    <option value="">Seleccione un recurso disponible</option>
+                                    <?php
+                                    $data_rec = $app->db->fetchAll("SELECT r.id, r.nombre FROM recursos r WHERE r.disponible=1");
+                                    foreach ($data_rec as $row) {
+                                        echo '<option value="'.$row['id'].'">'.$row['nombre'].'</option>';
+                                    }
+                                    ?>
+                                </select>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="f-marca">Marca <span class="text-danger">*</span></label>
-                                <input type="text" id="f-marca" name="marca" class="form-control" placeholder="Marca" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="f-modelo">Modelo <span class="text-danger">*</span></label>
-                                <input type="text" id="f-modelo" name="modelo" class="form-control" placeholder="Modelo" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Segunda fila -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="f-color">Color <span class="text-danger">*</span></label>
-                                <input type="text" id="f-color" name="color" class="form-control" placeholder="Color" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label for="f-otros">Otros recursos</label>
-                                <input type="text" id="f-otros" name="otros_recursos" class="form-control" placeholder="Otros recursos (opcional)">
                             </div>
                         </div>
                     </div>

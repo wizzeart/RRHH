@@ -139,11 +139,11 @@
             <div class="col-xs-8 col-sm-9">
                 <h4 class="panel-title" style="margin:0;">Vista Previa del Subcontrato</h4>
             </div>
-            <div class="col-xs-4 col-sm-3 text-right">
+            <!-- <div class="col-xs-4 col-sm-3 text-right">
                 <button id="btn-preview-fullscreen-subcontrato" type="button" class="btn btn-default btn-sm" title="Ver a pantalla completa">
                     <i class="fa fa-arrows-alt"></i> Ver grande
                 </button>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="panel-body">

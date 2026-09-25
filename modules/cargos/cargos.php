@@ -23,13 +23,13 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label" for="f-salario">CUP/HORA</label>
-                    <input type="number" id="f-salario" class="form-control" placeholder="0.00" step="0.01" value="<?php if (isset($data['salario'])) print($data['salario']); ?>" disabled/>
+                    <input type="number" id="f-salario" class="form-control" placeholder="0.00" step="0.01" value="" disabled/>
                 </div>
             </div>
                         <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label" for="f-salario-mensual">Salario Mensual</label>
-                    <input type="number" id="f-salario-mensual" class="form-control" placeholder="0.00" step="0.01" value="" />
+                    <input type="number" id="f-salario-mensual" class="form-control" step="10" value="<?php if (isset($data['salario'])) print($data['salario']); ?>" />
                 </div>
             </div>
 
@@ -39,6 +39,20 @@
                 <div class="form-group">
                     <label class="control-label" for="f-descripcion">Descripción</label>
                     <textarea id="f-descripcion" class="form-control" rows="3" placeholder="Descripción del cargo"><?php if (isset($data['descripcion'])) print($data['descripcion']); ?></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label" for="f-funciones">Documento de Funciones (.docx)</label>
+                    <input type="file" id="f-funciones" class="form-control" accept=".docx" />
+                    <input type="hidden" id="f-funciones-path" value="<?php if (isset($data['funciones_path'])) print($data['funciones_path']); ?>" />
+                    <?php if (isset($data['funciones_path']) && !empty($data['funciones_path'])): ?>
+                        <small class="text-muted">
+                            Archivo actual: <a href="<?php print($data['funciones_path']); ?>" target="_blank">Ver documento</a>
+                        </small>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

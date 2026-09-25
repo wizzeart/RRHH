@@ -82,6 +82,25 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Campos para Jefe de Área (rol_id = 4) -->
+                        <div class="row" id="row-jefe-area" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-departamentos">Departamentos a cargo</label>
+                                    <select id="f-departamentos" name="departamentos[]" multiple="multiple" class="form-control" data-placeholder="Seleccione departamentos">
+                                    </select>
+                                    <small class="help-block">Departamentos que estará a cargo el jefe de área</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="f-ubicaciones">Ubicaciones a cargo</label>
+                                    <select id="f-ubicaciones" name="ubicaciones[]" multiple="multiple" class="form-control" data-placeholder="Seleccione ubicaciones">
+                                    </select>
+                                    <small class="help-block">Ubicaciones que estará a cargo el jefe de área</small>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">

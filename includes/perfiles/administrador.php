@@ -62,7 +62,7 @@
     </a>
 </li>
 <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('active-link') ?>">
+<li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos','ubicaciones','list-ubicaciones'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-th"></i>
         <span class="menu-title">
@@ -72,19 +72,25 @@
     </a>
 
     <!--Submenus-->
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos'))) print('in') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'database-import-export', 'usuarios', 'historial', 'config', 'list-departamentos', 'departamentos', 'list-cargos', 'cargos','ubicaciones','list-ubicaciones'))) print('in') ?>">
         <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
             <a href="?module=list-usuarios">Usuarios</a>
-        </li>
-        <!-- <li class="<?php if (in_array($_GET['module'], array('list-sedes', 'sedes'))) print('active-link') ?>">
-            <a href="?module=list-sedes">Sedes</a>
-        </li>  -->
-        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
-            <a href="?module=list-departamentos">Departamentos</a>
         </li>
         <li class="<?php if (in_array($_GET['module'], array('list-cargos', 'cargos'))) print('active-link') ?>">
             <a href="?module=list-cargos">Cargos</a>
         </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-departamentos', 'departamentos'))) print('active-link') ?>">
+            <a href="?module=list-departamentos">Departamentos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-ubicaciones', 'ubicaciones'))) print('active-link') ?>">
+            <a href="?module=list-ubicaciones">Ubicaciones</a>
+        </li>
+        <!-- <li class="<?php if (in_array($_GET['module'], array('database-import-export'))) print('active-link') ?>">
+            <a href="?module=database-import-export">Importar/Exportar BD</a>
+        </li> -->
+        <!-- <li class="<?php if (in_array($_GET['module'], array('list-sedes', 'sedes'))) print('active-link') ?>">
+            <a href="?module=list-sedes">Sedes</a>
+        </li>  -->
         <!-- <li class="<?php if (in_array($_GET['module'], array('historial'))) print('active-link') ?>">
             <a href="?module=historial">Historial</a>
         </li> -->
@@ -109,38 +115,44 @@
 
 
 <!--NEW MENU SUBCONTRATOS-->
-<!-- <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc'))) print('active-link') ?>">
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'prenomina-2', 'list-submayor-vacaciones', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc'))) print('active-link') ?>">
     <a href="javascript:void(0);">
         <i class="fa fa-money"></i>
         <span class="menu-title">
             <strong>Contabilidad</strong>
         </span>
         <i class="arrow"></i>
-    </a> -->
+    </a>
 
     <!--Submenu-->
-    <!-- <ul class="collapse <?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-saldos', 'saldos'))) print('active-link') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-saldos', 'list-cuentas', 'saldos', 'prenomina', 'list-prenomina', 'prenomina-2', 'ayudas-trabajadores', 'list-ayudas-trabajadores', 'deudas', 'list-deudas', 'list-tarjetas-snc','list-submayor-vacaciones'))) print('in') ?>">
+        <!-- <li class="<?php if (in_array($_GET['module'], array('list-saldos', 'saldos'))) print('active-link') ?>">
             <a href="?module=list-saldos">Tarifas por Hora</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('prenomina', 'prenomina'))) print('active-link') ?>">
+        </li> -->
+        <!-- <li class="<?php if (in_array($_GET['module'], array('prenomina', 'prenomina'))) print('active-link') ?>">
             <a href="?module=prenomina">Prenómina</a>
+        </li> -->
+        <li class="<?php if (in_array($_GET['module'], array('prenomina-2'))) print('active-link') ?>">
+            <a href="?module=prenomina-2"> Prenómina</a>
         </li>
+                <li class="<?php if (in_array($_GET['module'], array('list-cuentas', 'cuentas'))) print('active-link') ?>">
+            <a href="?module=list-cuentas">Cuentas Bancarias</a>
+        </li>
+        </li>
+                <li class="<?php if (in_array($_GET['module'], array('list-submayor-vacaciones'))) print('active-link') ?>">
+            <a href="?module=list-submayor-vacaciones">Submayor de Vacaciones</a>
+        </li>
+        
         <li class="<?php if (in_array($_GET['module'], array('ayudas-trabajadores', 'list-ayudas-trabajadores'))) print('active-link') ?>">
             <a href="?module=list-ayudas-trabajadores">Ayudas a Trabajadores</a>
         </li>
-        <li class="<?php if (in_array($_GET['module'], array('list-cuentas', 'cuentas'))) print('active-link') ?>">
-            <a href="?module=list-cuentas">Cuentas Bancarias</a>
-        </li>
-        <li class="<?php if (in_array($_GET['module'], array('list-tarjetas-snc'))) print('active-link') ?>">
+
+        <!-- <li class="<?php if (in_array($_GET['module'], array('list-tarjetas-snc'))) print('active-link') ?>">
     <a href="?module=list-tarjetas-snc">Tarjeta SNC</a>
-</li>
-        <li class="<?php if (in_array($_GET['module'], array('deudas', 'list-deudas'))) print('active-link') ?>">
-            <a href="?module=list-deudas">Deudas</a>
-        </li>
-    </ul>
 </li> -->
+    </ul>
+</li>
 <!--NEW MENU CUENTAS BANCARIAS-->
 
 
@@ -190,6 +202,16 @@
 
  -->
 
+ <!--NEW MENU ENTREGA DE RECURSOS-->
+ <li class="list-divider"></li>
+ <li class="<?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('active-link') ?>">
+     <a href="?module=list-recursos">
+         <i class="fa fa-cube"></i>
+         <span class="menu-title">
+             <strong>Recursos</strong>
+         </span>
+     </a>
+ </li> 
 
 <!--NEW MENU BOLSAS EMPLEO-->
 <li class="list-divider"></li>
@@ -202,13 +224,42 @@
     </a>
 </li>
 
-<!--NEW MENU ENTREGA DE RECURSOS-->
-<!-- <li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('list-recursos', 'gestion-recursos'))) print('active-link') ?>">
-    <a href="?module=list-recursos">
-        <i class="fa fa-cube"></i>
+
+<!--NEW MENU EVALUACION-->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-evaluaciones', 'evaluaciones', 'list-aspectos', 'aspectos', 'list-subaspectos', 'subaspectos'))) print('active-link') ?>">
+    <a href="javascript:void(0);">
+        <i class="fa fa-file-text-o"></i>
         <span class="menu-title">
-            <strong>Asignación de Recursos</strong>
+            <strong>Evaluaciones</strong>
+        </span>
+        <i class="arrow"></i>
+    </a>
+    
+    <!--Submenu-->
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-evaluaciones', 'evaluaciones', 'list-aspectos', 'aspectos', 'list-subaspectos', 'subaspectos'))) print('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-aspectos', 'aspectos'))) print('active-link') ?>">
+            <a href="?module=list-aspectos">Aspectos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-subaspectos', 'subaspectos'))) print('active-link') ?>">
+            <a href="?module=list-subaspectos">SubAspectos</a>
+        </li>
+        <li class="<?php if (in_array($_GET['module'], array('list-evaluaciones', 'evaluaciones'))) print('active-link') ?>">
+            <a href="?module=list-evaluaciones">Listado de Evaluaciones</a>
+        </li>
+        <!-- <li class="<?php if (in_array($_GET['module'], array('list-documentos-firmas', 'documentos-firmas'))) print('active-link') ?>">
+            <a href="?module=documentos-firmas">Documentos y Firmas</a>
+        </li> -->
+    </ul>
+</li>
+
+<!--NEW MENU NOTIFICACIONES SMS-->
+<li class="list-divider"></li>
+<li class="<?php if (in_array($_GET['module'], array('list-notificaciones-sms', 'notificaciones-sms'))) print('active-link') ?>">
+    <a href="?module=list-notificaciones-sms">
+        <i class="fa fa-envelope"></i>
+        <span class="menu-title">
+            <strong>Notificaciones SMS</strong>
         </span>
     </a>
-</li> -->
+</li> 

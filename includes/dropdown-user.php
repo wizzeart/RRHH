@@ -1,3 +1,12 @@
+<?php
+// Obtener el ID del trabajador asociado al usuario logueado
+$trabajador_id = '';
+$sql_trabajador = "SELECT id FROM trabajadores WHERE usuario_id = ? LIMIT 1";
+$result_trabajador = $GLOBALS['app']->db->fetchRow($sql_trabajador, [$GLOBALS['app']->user_id]);
+if ($result_trabajador) {
+    $trabajador_id = $result_trabajador['id'];
+}
+?>
 <li id="dropdown-user" class="dropdown">
     <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
         <span class="pull-right">
@@ -10,8 +19,13 @@
         <!-- User dropdown menu -->
         <ul class="head-list">
             <li>
-                <a href="javascript:void(0)">
+                <a href="index.php?module=ficha-trabajador&id=<?php print($trabajador_id); ?>">
                     <i class="fa fa-user fa-fw fa-lg"></i> Mi Perfil - <?php print($app->rol_name) ?>
+                </a>
+            </li>
+            <li>
+                <a href="index.php?module=cambiar-contrasena">
+                    <i class="fa fa-key fa-fw fa-lg"></i> Cambiar Contraseña
                 </a>
             </li>
         </ul>

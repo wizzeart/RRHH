@@ -4,33 +4,41 @@ $(document).ready(function () {
     $('#f-almacen').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
     $('#f-punto-venta').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '90%'});
 
-    $('#btn-test').click(function () {
-        var cmd = 'module=tools&method=test';
-        cmd_params=cmd;
-        $.ajax({url: 'api-app.php', type: 'POST', data: cmd, dataType: 'json',
-            success: function (d) {
-                alert(d.status);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                alert(XMLHttpRequest.responseText);
+    // Inicializar multiselects para jefe de área
+    $('#f-departamentos').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '100%'});
+    $('#f-ubicaciones').chosen({no_results_text: "!Oops, no hay coincidencias!", width: '100%'});
 
-                var cmd = 'module=tools&method=log-error&ref=' + encodeURIComponent('ERROR PANEL')
-                        + '&data=' + encodeURIComponent(XMLHttpRequest.responseText)
-                        + '&params=' + encodeURIComponent(cmd_params);
-                $.ajax({url: 'api-app.php', type: 'POST', data: cmd, dataType: 'json',
-                    success: function (d) {},
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert(XMLHttpRequest.responseText);
-                    }
-                });
-            }
-        });
+    // Cargar datos de departamentos y ubicaciones
+    cargarDepartamentos();
+    cargarUbicaciones();
+
+    // Mostrar/ocultar campos de jefe de área según el rol seleccionado
+    $('#f-rol').on('change', function() {
+        var rolId = $(this).val();
+        if (rolId == '4') { // JEFE_DE_AREA
+            $('#row-jefe-area').show();
+        } else {
+            $('#row-jefe-area').hide();
+            $('#f-departamentos').val('').trigger('chosen:updated');
+            $('#f-ubicaciones').val('').trigger('chosen:updated');
+        }
     });
+
+    // Verificar rol inicial
+    var rolInicial = $('#f-rol').val();
+    if (rolInicial == '4') {
+        $('#row-jefe-area').show();
+        cargarAsignacionesJefe();
+    }
+
     $('#btn-new').click(function () {
         location.href = '?module=usuarios';
     });
     $('#btn-back').click(function () {
         location.href = 'index.php?module=list-usuarios';
+    });
+    $('#btn-test').click(function () {
+        location.href = '?module=usuarios';
     });
     $('#btn-save').click(function () {
         var status = 1;
@@ -49,10 +57,25 @@ $(document).ready(function () {
             status = 0;
             msg += '<div>El campo Rol del Usuario es obligatorio.</div>';
         } else {
-
             if ($('#f-rol').val() == '10' && $('#f-punto-venta').val() == null) {
                 status = 0;
                 msg += '<div>Rol Punto de Venta Facturación debe tener al menos un punto de venta asociado.</div>';
+            }
+            
+            // Validación para Jefe de Área (rol_id = 4)
+            if ($('#f-rol').val() == '4') {
+                var departamentos = $('#f-departamentos').val();
+                var ubicaciones = $('#f-ubicaciones').val();
+                
+                if (!departamentos || departamentos.length === 0) {
+                    status = 0;
+                    msg += '<div>El Jefe de Área debe tener al menos un departamento asignado.</div>';
+                }
+                
+                if (!ubicaciones || ubicaciones.length === 0) {
+                    status = 0;
+                    msg += '<div>El Jefe de Área debe tener al menos una ubicación asignada.</div>';
+                }
             }
         }
 
@@ -70,6 +93,18 @@ $(document).ready(function () {
             var cmd = 'module=usuarios&method=save&' + $.param($('input[name^=x],select[name^=x],textarea[name^=x]').serializeArray());
             cmd += '&action=' + action;
             cmd += '&xusuario_id=' + $('#f-usuario-id').val();
+            
+            // Agregar departamentos y ubicaciones para jefe de área
+            var departamentos = $('#f-departamentos').val();
+            var ubicaciones = $('#f-ubicaciones').val();
+            
+            if (departamentos && departamentos.length > 0) {
+                cmd += '&departamentos=' + encodeURIComponent(JSON.stringify(departamentos));
+            }
+            
+            if (ubicaciones && ubicaciones.length > 0) {
+                cmd += '&ubicaciones=' + encodeURIComponent(JSON.stringify(ubicaciones));
+            }
             $.ajax({url: 'api-app.php', type: 'POST', data: cmd, dataType: 'json',
                 success: function (d) {
                     $('#img-loading').addClass('hidden');
@@ -218,4 +253,87 @@ function formatoNivel(value, row) {
     //<span class="label label-table label-success">Enterprise</span>
     //return '<image style="width:30px" src="/img/modelos/' + row.image + '" class="img-responsive"/>';
     return s;
+}
+
+// Funciones para manejo de jefe de área
+function cargarDepartamentos() {
+    $.ajax({
+        url: 'api-app.php',
+        type: 'GET',
+        data: { module: 'departamentos', method: 'list' },
+        dataType: 'json',
+        success: function(response) {
+            if (response) {
+                var $select = $('#f-departamentos');
+                $select.empty();
+                $select.append('<option value="">Seleccione departamentos</option>');
+                
+                $.each(response, function(i, depto) {
+                    $select.append('<option value="' + depto.id + '">' + depto.nombre + '</option>');
+                });
+                
+                $select.trigger('chosen:updated');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error cargando departamentos:', error);
+        }
+    });
+}
+
+function cargarUbicaciones() {
+    $.ajax({
+        url: 'api-app.php',
+        type: 'GET',
+        data: { module: 'ubicaciones', method: 'list' },
+        dataType: 'json',
+        success: function(response) {
+            if (response) {
+                var $select = $('#f-ubicaciones');
+                $select.empty();
+                $select.append('<option value="">Seleccione ubicaciones</option>');
+                
+                $.each(response, function(i, ubicacion) {
+                    $select.append('<option value="' + ubicacion.id + '">' + ubicacion.nombre + '</option>');
+                });
+                
+                $select.trigger('chosen:updated');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error cargando ubicaciones:', error);
+        }
+    });
+}
+
+function cargarAsignacionesJefe() {
+    var usuarioId = $('#f-usuario-id').val();
+    if (!usuarioId) return;
+    
+    $.ajax({
+        url: 'api-app.php',
+        type: 'GET',
+        data: { 
+            module: 'usuarios', 
+            method: 'get-asignaciones-jefe',
+            usuario_id: usuarioId 
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status == 1) {
+                // Seleccionar departamentos asignados
+                if (response.departamentos && response.departamentos.length > 0) {
+                    $('#f-departamentos').val(response.departamentos).trigger('chosen:updated');
+                }
+                
+                // Seleccionar ubicaciones asignadas
+                if (response.ubicaciones && response.ubicaciones.length > 0) {
+                    $('#f-ubicaciones').val(response.ubicaciones).trigger('chosen:updated');
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error cargando asignaciones de jefe:', error);
+        }
+    });
 }

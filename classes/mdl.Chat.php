@@ -36,10 +36,10 @@ class Chat {
 
                     // Build query per role
                     if ($isAdmin) {
-                        $sql = "SELECT id, user, content, date, sender_role, receiver_user FROM chat ORDER BY date ASC";
+                        $sql = "SELECT id, user, content, date, sender_role, receiver_user, reply_to_user, reply_to_content FROM chat ORDER BY date ASC";
                         $result = $this->db->fetchAll($sql);
                     } else {
-                        $sql = "SELECT id, user, content, date, sender_role, receiver_user
+                        $sql = "SELECT id, user, content, date, sender_role, receiver_user, reply_to_user, reply_to_content
                                 FROM chat
                                 WHERE user = :u
                                    OR (sender_role = 'admin' AND receiver_user = :u2)
@@ -75,13 +75,17 @@ class Chat {
                     $receiver = isset($param['receiver_user']) ? trim($param['receiver_user']) : '';
                     if (!$isAdmin) { $receiver = ''; }
 
-                    $sql = "INSERT INTO chat (user, content, date, sender_role, receiver_user)
-                            SELECT ?, ?, NOW(), ?, NULLIF(?, '')
+                    // allow optional reply metadata when admins reply to a specific message
+                    $replyUser = isset($param['original_user']) ? trim($param['original_user']) : null;
+                    $replyContent = isset($param['original_message']) ? trim($param['original_message']) : null;
+
+                    $sql = "INSERT INTO chat (user, content, date, sender_role, receiver_user, reply_to_user, reply_to_content)
+                            SELECT ?, ?, NOW(), ?, NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, '')
                             FROM DUAL
                             WHERE NOT EXISTS (
                                 SELECT 1 FROM chat WHERE user = ? AND content = ? AND date >= (NOW() - INTERVAL 5 SECOND)
                             )";
-                    $r = $this->db->directExec($sql, array($user, $message, $senderRole, $receiver, $user, $message));
+                    $r = $this->db->directExec($sql, array($user, $message, $senderRole, $receiver, $replyUser, $replyContent, $user, $message));
                     echo json_encode(array('status' => 1, 'msg' => 'Mensaje enviado'));
                 } catch (Exception $ex) {
                     echo json_encode(array('status' => 0, 'msg' => $ex->getMessage()));
@@ -113,6 +117,16 @@ class Chat {
             $col2 = $this->db->fetchRow("SHOW COLUMNS FROM chat LIKE 'receiver_user'");
             if (!$col2) {
                 $this->db->directExec("ALTER TABLE chat ADD COLUMN receiver_user VARCHAR(100) NULL");
+            }
+            // Add reply_to_user if missing
+            $col3 = $this->db->fetchRow("SHOW COLUMNS FROM chat LIKE 'reply_to_user'");
+            if (!$col3) {
+                $this->db->directExec("ALTER TABLE chat ADD COLUMN reply_to_user VARCHAR(100) NULL");
+            }
+            // Add reply_to_content if missing
+            $col4 = $this->db->fetchRow("SHOW COLUMNS FROM chat LIKE 'reply_to_content'");
+            if (!$col4) {
+                $this->db->directExec("ALTER TABLE chat ADD COLUMN reply_to_content TEXT NULL");
             }
         } catch (Exception $e) {
             // silent fail, handled on use
