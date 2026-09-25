@@ -62,6 +62,22 @@ class App
                 $_SESSION['mensaje_exito'] = 'Empresa cambiada correctamente';
             }
         }
+        
+        // Para rol 2 (trabajador), establecer empresa_id automáticamente
+        if ($this->rol == 2 && isset($this->user_id)) {
+            // Obtener el empresa_id del trabajador asociado al usuario
+            $sql = "SELECT t.empresa_id 
+                    FROM trabajadores t 
+                    WHERE t.usuario_id = ? AND t.empresa_id IS NOT NULL 
+                    LIMIT 1";
+            $trabajador = $this->db->fetchRow($sql, [$this->user_id]);
+            
+            if ($trabajador && !empty($trabajador['empresa_id'])) {
+                $_SESSION['empresa_id'] = $trabajador['empresa_id'];
+                $this->empresa_id = $trabajador['empresa_id'];
+            }
+        }
+        
         if(isset($_SESSION['empresa_id'])){
             $this->empresa_id = $_SESSION['empresa_id'];
         }
@@ -113,8 +129,6 @@ class App
 
         $sql = "select a.*"
             . " from " .   "departamentos a"
-            . " where 1=1"
-            . " and a.empresa_id = {$this->empresa_id}"
             . $cond
             . " order by a.nombre";
 
@@ -123,6 +137,19 @@ class App
         return $data;
     }
     
+    public function get_list_ubicaciones($val = array())
+    {
+        $data = array();
+        
+        $sql = "select a.*"
+            . " from " .   "ubicaciones a"
+            . " order by a.id";
+
+        $data = $this->db->fetchAll($sql);
+
+        return $data;
+    }
+
     public function get_list_bolsa_empleo($val = array())
     {
         $data = array();

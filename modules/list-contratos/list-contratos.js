@@ -142,10 +142,14 @@ function firmadoFormatter(value, row, index) {
 function tipoFormatter(value, row, index) {
   //si tipo es 1, mostrar "Contrato de Trabajo Por Tiempo Determinado";
   //si tipo es 2, mostrar "Contrato de Trabajo Por Tiempo Indeterminado";
-  if (value === '1') {
+  if (value === '4') {
+    return 'Contrato de Servicios';
+  } else if (value === '1') {
     return 'Contrato de Trabajo Por Tiempo Indeterminado';
   } else if (value === '2') {
     return 'Contrato de Trabajo Por Tiempo Determinado';
+  } else if (value === '3') {
+    return 'Suplemento de Contrato';
   }
 }
 

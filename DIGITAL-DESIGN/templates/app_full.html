@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IML Word Signer - Enterprise</title>
+    <!-- Tailwind CSS desde CDN para diseño rápido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue.js 3 para gestionar estado complejo -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+    <style>
+        .active-tab {
+            @apply border-indigo-500 text-indigo-600;
+            border-bottom-width: 2px;
+            color: #4f46e5;
+        }
+
+        .signature-wrapper {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #cbd5e1;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-900">IML Word Signer</h1>
+                <div class="flex space-x-4">
+                    <button @click="currentTab = 'doc'" :class="{'text-indigo-600 font-bold': currentTab === 'doc'}"
+                        class="px-3 py-2 rounded hover:bg-gray-50">Firmar Documento</button>
+                    <button @click="currentTab = 'certs'" :class="{'text-indigo-600 font-bold': currentTab === 'certs'}"
+                        class="px-3 py-2 rounded hover:bg-gray-50">Gestión Certificados</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto p-6">
+
+            <!-- VISTA: FIRMAR DOCUMENTO -->
+            <div v-if="currentTab === 'doc'" class="space-y-6">
+                <!-- Paso 1: Subir Documento -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">1. Cargar Documento Word</h2>
+                    <div class="flex items-center space-x-4">
+                        <input type="file" ref="fileInput" @change="handleFileUpload" accept=".docx"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                        <span v-if="currentDoc" class="text-green-600 font-medium">✓ Cargado: {{ currentDoc.filename
+                            }}</span>
+                    </div>
+
+                    <!-- Previsualización de Párrafos (Simulada) -->
+                    <div v-if="paragraphs.length > 0"
+                        class="mt-4 p-4 bg-gray-50 rounded border h-48 overflow-y-auto text-xs font-mono">
+                        <p class="text-gray-500 mb-2 font-bold">Estructura detectada (Párrafos iniciales):</p>
+                        <div v-for="(p, idx) in paragraphs" :key="idx"
+                            class="mb-1 p-1 hover:bg-yellow-100 cursor-pointer" @click="selectParagraph(idx)">
+                            <span class="text-gray-400 mr-2">[{{ idx }}]</span> {{ p }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Configurar Firmas -->
+                <div v-if="currentDoc" class="bg-white shadow rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-medium text-gray-900">2. Configurar Firmantes</h2>
+                        <button @click="addSigner"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">+ Añadir
+                            Firmante</button>
+                    </div>
+
+                    <div v-for="(signer, index) in signers" :key="index"
+                        class="border rounded-lg p-4 mb-4 relative bg-gray-50">
+                        <button @click="removeSigner(index)"
+                            class="absolute top-2 right-2 text-red-500 hover:text-red-700">✕</button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Datos Básicos -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nombre Firmante</label>
+                                <input v-model="signer.name" type="text"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    placeholder="Ej: Juan Pérez">
+
+                                <label class="block text-sm font-medium text-gray-700 mt-2">Certificado Digital</label>
+                                <select v-model="signer.certId"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <option value="">-- Sin Certificado (Solo Visual) --</option>
+                                    <option v-for="c in certificates" :value="c.id">{{ c.name }} ({{ c.issuer }})
+                                    </option>
+                                </select>
+
+                                <label class="block text-sm font-medium text-gray-700 mt-2">Ubicación Firma</label>
+                                <div class="flex space-x-2">
+                                    <select v-model="signer.placementType"
+                                        class="w-1/3 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                                        <option value="paragraph">Párrafo #</option>
+                                        <option value="keyword">Palabra Clave</option>
+                                    </select>
+                                    <input v-model="signer.placementValue" type="text"
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm sm:text-sm"
+                                        placeholder="Ej: 5 o 'ATENTAMENTE'">
+                                </div>
+                            </div>
+
+                            <!-- Pad de Firma -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Firma Manuscrita</label>
+                                <div :id="'sig-pad-' + index" class="signature-wrapper">
+                                    <canvas></canvas>
+                                </div>
+                                <button @click="clearPad(index)" class="text-xs text-red-500 mt-1">Borrar
+                                    Trazos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3: Ejecutar -->
+                <div v-if="signers.length > 0" class="flex justify-end pb-10">
+                    <button @click="processSigning" :disabled="isProcessing"
+                        class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-bold hover:bg-green-700 disabled:opacity-50 flex items-center">
+                        <span v-if="!isProcessing">FIRMAR DOCUMENTO FINAL</span>
+                        <span v-else>Procesando...</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- VISTA: GESTIÓN CERTIFICADOS -->
+            <div v-if="currentTab === 'certs'" class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4">Mis Certificados Digitales</h2>
+
+                <!-- Tabla -->
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nombre Común (CN)</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Emisor</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Válido Hasta</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr v-for="cert in certificates" :key="cert.id">
+                                <td class="px-6 py-4 whitespace-nowrap">{{ cert.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ cert.issuer }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ cert.valid_until }}</td>
+                            </tr>
+                            <tr v-if="certificates.length === 0">
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No hay certificados
+                                    cargados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formulario Nuevo -->
+                <div class="bg-gray-50 p-4 rounded border">
+                    <h3 class="font-bold mb-2">Generar Nuevo Certificado Auto-firmado</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input v-model="newCert.name" placeholder="Nombre (CN)" class="p-2 border rounded">
+                        <input v-model="newCert.org" placeholder="Organización (O)" class="p-2 border rounded">
+                        <input v-model="newCert.country" placeholder="País (C)" class="p-2 border rounded"
+                            maxlength="2">
+                    </div>
+                    <button @click="createCertificate"
+                        class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generar
+                        Certificado</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Modal Resultado -->
+        <div v-if="resultFile"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div class="bg-white p-8 rounded shadow-xl max-w-md w-full text-center">
+                <h3 class="text-2xl font-bold text-green-600 mb-4">¡Éxito!</h3>
+                <p class="mb-6">El documento ha sido firmado digitalmente.</p>
+                <a :href="resultFile.url" :download="resultFile.name"
+                    class="bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700 block w-full mb-2">
+                    Descargar {{ resultFile.name }}
+                </a>
+                <button @click="resultFile = null" class="text-gray-500 hover:text-gray-700 text-sm">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                const currentTab = ref('doc');
+                const certificates = ref([]);
+                const currentDoc = ref(null);
+                const paragraphs = ref([]);
+                const signers = ref([]);
+                const isProcessing = ref(false);
+                const resultFile = ref(null);
+
+                // Formulario Certificado
+                const newCert = ref({ name: '', org: 'IML Enterprise', country: 'ES' });
+
+                // Referencias a Pads de firma
+                const pads = ref({}); // Index -> SignaturePad instance
+
+                // Cargar certificados al inicio
+                const loadCertificates = async () => {
+                    try {
+                        const res = await fetch('/api/certificates');
+                        certificates.value = await res.json();
+                    } catch (e) {
+                        console.error("Error cargando certificados", e);
+                    }
+                };
+
+                onMounted(() => {
+                    loadCertificates();
+                });
+
+                // File Upload
+                const handleFileUpload = async (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                        const data = await res.json();
+                        currentDoc.value = data;
+                        paragraphs.value = data.preview_paragraphs || [];
+
+                        // Añadir primer firmante por defecto
+                        if (signers.value.length === 0) addSigner();
+
+                    } catch (e) {
+                        alert("Error subiendo archivo: " + e);
+                    }
+                };
+
+                // Gestión de Firmantes
+                const addSigner = async () => {
+                    // Esperar a que Vue renderice el DOM para inicializar el Canvas
+                    const idx = signers.value.length;
+                    signers.value.push({
+                        name: '',
+                        certId: '',
+                        placementType: 'paragraph',
+                        placementValue: -1, // Final por defecto
+                        padId: idx
+                    });
+
+                    await nextTick();
+                    initPad(idx);
+                };
+
+                const removeSigner = (index) => {
+                    signers.value.splice(index, 1);
+                    delete pads.value[index];
+                    // Reindexar visualmente sería complejo, simplificamos reset
+                };
+
+                const initPad = (index) => {
+                    const wrapper = document.getElementById('sig-pad-' + index);
+                    if (!wrapper) return;
+                    const canvas = wrapper.querySelector('canvas');
+
+                    // Ajuste HiDPI
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext("2d").scale(ratio, ratio);
+
+                    const pad = new SignaturePad(canvas, { penColor: 'rgb(0, 0, 139)' });
+                    pads.value[index] = pad;
+                };
+
+                const clearPad = (index) => {
+                    if (pads.value[index]) pads.value[index].clear();
+                };
+
+                const selectParagraph = (idx) => {
+                    // Asignar al último firmante activo o preguntar
+                    // Por simplicidad, asignamos al último de la lista
+                    if (signers.value.length > 0) {
+                        const last = signers.value[signers.value.length - 1];
+                        last.placementType = 'paragraph';
+                        last.placementValue = idx;
+                    }
+                };
+
+                // Crear Certificado
+                const createCertificate = async () => {
+                    const formData = new FormData();
+                    formData.append('name', newCert.value.name);
+                    formData.append('org', newCert.value.org);
+                    formData.append('country', newCert.value.country);
+
+                    await fetch('/api/certificates/create', { method: 'POST', body: formData });
+                    alert("Certificado Creado");
+                    newCert.value.name = '';
+                    loadCertificates();
+                };
+
+                // PROCESAR FIRMA FINAL
+                const processSigning = async () => {
+                    if (!currentDoc.value) return alert("Falta documento");
+
+                    isProcessing.value = true;
+                    try {
+                        const signaturesPayload = [];
+
+                        for (let i = 0; i < signers.value.length; i++) {
+                            const s = signers.value[i];
+                            const pad = pads.value[i];
+
+                            if (pad.isEmpty()) {
+                                alert(`Falta la firma visual del firmante ${i + 1}`);
+                                isProcessing.value = false;
+                                return;
+                            }
+
+                            signaturesPayload.push({
+                                signer_name: s.name,
+                                type: 'both', // Asumimos visual + digital siempre si hay cert
+                                image_data_base64: pad.toDataURL(),
+                                placement: {
+                                    type: s.placementType,
+                                    value: s.placementValue
+                                },
+                                certificate_id: s.certId || null
+                            });
+                        }
+
+                        const payload = {
+                            document_path: currentDoc.value.server_path,
+                            signatures: signaturesPayload,
+                            original_filename: currentDoc.value.filename
+                        };
+
+                        const res = await fetch('/api/sign/batch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const data = await res.json();
+
+                        if (data.status === 'ok') {
+                            resultFile.value = {
+                                url: data.download_url,
+                                name: data.filename
+                            };
+                        } else {
+                            alert("Error servidor: " + data.error);
+                        }
+
+                    } catch (e) {
+                        console.error(e);
+                        alert("Error de conexión");
+                    } finally {
+                        isProcessing.value = false;
+                    }
+                };
+
+                return {
+                    currentTab, certificates, currentDoc, paragraphs, signers,
+                    handleFileUpload, addSigner, removeSigner, clearPad,
+                    newCert, createCertificate, processSigning, selectParagraph,
+                    isProcessing, resultFile
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>

@@ -11,14 +11,20 @@ $(function(){
 });
 
 function salarioFormatter(value) {
-    return value ? '$' + parseFloat(value).toFixed(2) : '-';
+    return value ? '$' + parseFloat(value/192).toFixed(2) : '-';
 }
 
 function operateFormatter(value, row, index) {
-    return [
+    var buttons = [
         '<button class="edit btn btn-info btn-icon icon-sm fa fa-edit" title="Editar" data-id="' + row.id + '"></button>',
         '<button class="remove btn btn-danger btn-icon icon-sm fa fa-trash" title="Eliminar" data-id="' + row.id + '"></button>'
-    ].join('\n');
+    ];
+
+    if (row.funciones_path && row.funciones_path.trim() !== '') {
+        buttons.push('<button class="download btn btn-success btn-icon icon-sm fa fa-download" title="Descargar Funciones" data-id="' + row.id + '" data-path="' + row.funciones_path + '"></button>');
+    }
+
+    return buttons.join('\n');
 }
 
 window.operateEvents = {
@@ -50,6 +56,12 @@ window.operateEvents = {
                     } else { alert('Error de conexión'); }
                 }
             });
+        }
+    },
+    'click .download': function (e, value, row, index) {
+        var path = row.funciones_path;
+        if (path) {
+            window.open(path, '_blank');
         }
     }
 };

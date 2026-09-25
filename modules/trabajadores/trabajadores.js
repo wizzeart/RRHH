@@ -50,7 +50,6 @@ $(document).ready(function () {
 
 
     // Aplicar la funcionalidad a todos los campos de fecha
-    makeDateFieldClickable('#f-contratacion');
     // Prefill desde bolsa_empleo si viene por querystring
     var prefillBolsa = {};
     try {
@@ -77,9 +76,6 @@ $(document).ready(function () {
             // No prellenar el email desde bolsa_empleo según solicitud
             if (prefillBolsa.cargo_postulado_id) $('#f-cargo').val(prefillBolsa.cargo_postulado_id);
             if ($('#f-bolsa').length && prefillBolsa.id) $('#f-bolsa').val(prefillBolsa.id);
-            if (!$('#f-contratacion').val()) {
-                $('#f-contratacion').val(new Date().toISOString().split('T')[0]);
-            }
             if (!$('#f-estatus').val()) {
                 $('#f-estatus').val('activo');
             }
@@ -232,6 +228,10 @@ $(document).ready(function () {
             status = 0;
             msg += '<div>El campo Apellidos del Trabajador es obligatorio.</div>';
         }
+        if ($('#f-ubicaciones').val() == '') {
+            status = 0;
+            msg += '<div>El campo Ubicación del Trabajador es obligatorio.</div>';
+        }
         if ($('#f-nombre').val() && !/^([\p{L}\s])+$/u.test($('#f-nombre').val())) {
             status = 0;
             msg += '<div>El campo Nombre solo debe contener letras.</div>';
@@ -293,10 +293,7 @@ $(document).ready(function () {
             msg += '<div>El campo Nivel del Trabajador es obligatorio.</div>';
         }
         
-         if ($('#f-contratacion').val() == '') {
-            status = 0;
-            msg += '<div>El campo Contratación del Trabajador es obligatorio.</div>';
-        }
+
          
 
 
@@ -313,6 +310,11 @@ $(document).ready(function () {
         if ($('#f-cargo').val() == '') {
             status = 0;
             msg += '<div>El campo Cargo del Trabajador es obligatorio.</div>';
+        }
+
+        if (action === 'insert' && $('#f-fecha-contrato').length && (!$('#f-fecha-contrato').val() || $('#f-fecha-contrato').val() === '')) {
+            status = 0;
+            msg += '<div>El campo Fecha de Contrato es obligatorio.</div>';
         }
 
         if ($('#f-bolsa').val() == '') {
@@ -353,6 +355,7 @@ $(document).ready(function () {
                 'module': 'trabajadores',
                 'method': 'save',
                 'action': action,
+                'ubicacion': $('#f-ubicaciones').val(),
                 'nombre': $('#f-nombre').val(),
                 'apellidos': $('#f-apellidos').val(),
                 'apellidos_segundos': $('#f-apellidos-segundos').val(),
@@ -370,9 +373,13 @@ $(document).ready(function () {
                 'nivel_educacional': $('#f-nivel').val(),
                 'departamento_id': $('#f-departamento').val(),
                 'cargos_id': $('#f-cargo').val(),
-                'fecha_contratacion': $('#f-contratacion').val() || new Date().toISOString().split('T')[0],
                 'estatus': $('#f-estatus').val() || 'activo'
             };
+
+            // Agregar fecha de contrato solo si es un nuevo registro y el campo existe
+            if (action === 'insert' && $('#f-fecha-contrato').length && $('#f-fecha-contrato').val() && !$('#f-fecha-contrato').is(':disabled')) {
+                campos.fecha_contrato = $('#f-fecha-contrato').val();
+            }
 
             for (var key in campos) {
                 formDataObj.append(key, campos[key]);

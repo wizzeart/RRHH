@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IML - Sistema de Firma Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <style>
+        .signature-canvas {
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.5rem;
+            background: #f8fafc;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Sistema de Firma Digital IML</h1>
+            <p class="text-gray-600">Firma documentos Word de forma segura y profesional</p>
+        </div>
+
+        <!-- Main Form -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+
+            <!-- Step 1: Upload Document -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <span
+                        class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">1</span>
+                    Cargar Documento
+                </h2>
+                <input type="file" id="docFile" accept=".docx"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+                <div id="docInfo" class="mt-4 hidden">
+                    <div class="bg-green-50 border border-green-200 rounded p-3">
+                        <p class="text-green-800 font-medium">✓ Documento cargado: <span id="docName"></span></p>
+                        <p class="text-sm text-green-600 mt-1">Párrafos detectados: <span id="docParagraphs"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Signer Info -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <span
+                        class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">2</span>
+                    Datos del Firmante
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                        <input type="text" id="signerName" placeholder="Ej: Juan Pérez González"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Certificado Digital
+                            (Opcional)</label>
+                        <select id="certificateSelect"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">Sin certificado (solo visual)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Signature -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <span
+                        class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">3</span>
+                    Firma Manuscrita
+                </h2>
+                <div class="relative">
+                    <canvas id="signaturePad" width="700" height="200" class="signature-canvas w-full"></canvas>
+                    <button id="clearSignature"
+                        class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Placement -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <span
+                        class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">4</span>
+                    Ubicación de la Firma
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Ubicación</label>
+                        <select id="placementType"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="end">Al final del documento</option>
+                            <option value="paragraph">En párrafo específico</option>
+                            <option value="keyword">Después de palabra clave</option>
+                        </select>
+                    </div>
+                    <div id="placementValueContainer" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="placementLabel">Valor</label>
+                        <input type="text" id="placementValue" placeholder="Ej: 5 o 'FIRMA AQUÍ'"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button id="signButton"
+                    class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-indigo-700 transition duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    Firmar Documento
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="hidden mt-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+                    <svg class="animate-spin h-5 w-5 text-blue-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    <span class="text-blue-800 font-medium">Procesando firma digital...</span>
+                </div>
+            </div>
+
+            <!-- Success -->
+            <div id="success" class="hidden mt-6">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p class="text-green-800 font-semibold mb-3">✓ Documento firmado exitosamente</p>
+                    <a id="downloadLink" href="#"
+                        class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                        Descargar Documento Firmado
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error -->
+            <div id="error" class="hidden mt-6">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p class="text-red-800 font-semibold">Error:</p>
+                    <p id="errorMessage" class="text-red-600 mt-1"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Certificate Management -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mt-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Gestión de Certificados</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="newCertName" placeholder="Nombre"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                <input type="text" id="newCertOrg" placeholder="Organización" value="IML"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                <input type="text" id="newCertCountry" placeholder="País (2 letras)" value="CU" maxlength="2"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <button id="createCertButton"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Crear Nuevo Certificado
+            </button>
+
+            <div id="certList" class="mt-4 text-sm text-gray-600">
+                Cargando certificados...
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Estado global
+        let uploadedDoc = null;
+        let signaturePad = null;
+
+        // Inicializar Signature Pad
+        const canvas = document.getElementById('signaturePad');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            penColor: 'rgb(0, 0, 139)'
+        });
+
+        document.getElementById('clearSignature').addEventListener('click', () => {
+            signaturePad.clear();
+        });
+
+        // Cargar certificados
+        async function loadCertificates() {
+            try {
+                const res = await fetch('/api/certificates');
+                const data = await res.json();
+
+                const select = document.getElementById('certificateSelect');
+                select.innerHTML = '<option value="">Sin certificado (solo visual)</option>';
+
+                data.certificates.forEach(cert => {
+                    const option = document.createElement('option');
+                    option.value = cert.id;
+                    option.textContent = `${cert.name} (${cert.organization})`;
+                    select.appendChild(option);
+                });
+
+                document.getElementById('certList').innerHTML =
+                    data.certificates.length > 0
+                        ? `${data.certificates.length} certificado(s) disponible(s)`
+                        : 'No hay certificados. Crea uno arriba.';
+
+            } catch (e) {
+                console.error('Error cargando certificados:', e);
+            }
+        }
+
+        loadCertificates();
+
+        // Upload document
+        document.getElementById('docFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/documents/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    uploadedDoc = data;
+                    document.getElementById('docName').textContent = data.filename;
+                    document.getElementById('docParagraphs').textContent = data.total_paragraphs;
+                    document.getElementById('docInfo').classList.remove('hidden');
+                } else {
+                    alert('Error subiendo documento');
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        });
+
+        // Placement type change
+        document.getElementById('placementType').addEventListener('change', (e) => {
+            const container = document.getElementById('placementValueContainer');
+            const label = document.getElementById('placementLabel');
+
+            if (e.target.value === 'end') {
+                container.classList.add('hidden');
+            } else {
+                container.classList.remove('hidden');
+                label.textContent = e.target.value === 'paragraph'
+                    ? 'Número de Párrafo'
+                    : 'Palabra Clave';
+            }
+        });
+
+        // Sign document
+        document.getElementById('signButton').addEventListener('click', async () => {
+            // Validaciones
+            if (!uploadedDoc) {
+                alert('Por favor carga un documento primero');
+                return;
+            }
+
+            const signerName = document.getElementById('signerName').value.trim();
+            if (!signerName) {
+                alert('Por favor ingresa el nombre del firmante');
+                return;
+            }
+
+            if (signaturePad.isEmpty()) {
+                alert('Por favor dibuja tu firma');
+                return;
+            }
+
+            // Preparar datos
+            const formData = new FormData();
+            formData.append('document_path', uploadedDoc.server_path);
+            formData.append('signer_name', signerName);
+
+            const certId = document.getElementById('certificateSelect').value;
+            if (certId) {
+                formData.append('certificate_id', certId);
+            }
+
+            formData.append('placement_type', document.getElementById('placementType').value);
+            const placementValue = document.getElementById('placementValue').value;
+            if (placementValue) {
+                formData.append('placement_value', placementValue);
+            }
+
+            // Convertir firma a blob
+            const dataURL = signaturePad.toDataURL('image/png');
+            const blob = await (await fetch(dataURL)).blob();
+            formData.append('signature_image', blob, 'signature.png');
+
+            // UI
+            document.getElementById('signButton').disabled = true;
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('success').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/sign/document', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('downloadLink').href = data.download_url;
+                    document.getElementById('success').classList.remove('hidden');
+                } else {
+                    throw new Error(data.detail || 'Error desconocido');
+                }
+
+            } catch (e) {
+                document.getElementById('errorMessage').textContent = e.message;
+                document.getElementById('error').classList.remove('hidden');
+            } finally {
+                document.getElementById('signButton').disabled = false;
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+
+        // Create certificate
+        document.getElementById('createCertButton').addEventListener('click', async () => {
+            const name = document.getElementById('newCertName').value.trim();
+            const org = document.getElementById('newCertOrg').value.trim();
+            const country = document.getElementById('newCertCountry').value.trim().toUpperCase();
+
+            if (!name || !org || country.length !== 2) {
+                alert('Por favor completa todos los campos correctamente');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('organization', org);
+            formData.append('country', country);
+
+            try {
+                const res = await fetch('/api/certificates/create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('newCertName').value = '';
+                    loadCertificates();
+                } else {
+                    alert('Error: ' + (data.detail || 'Error desconocido'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

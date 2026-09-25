@@ -271,7 +271,14 @@
                                   dataType: "json",
                                   success: function (d) {
                                       if (d.status == 1) {
-                                          location.href = "index.php?module=home";
+                                          // Redirect based on user role
+                                          if (d.rol == '3') {
+                                              location.href = "index.php?module=list-recursos";
+                                          } else if (d.rol == '4') {
+                                              location.href = "index.php?module=home";
+                                          } else {
+                                              location.href = "index.php?module=home";
+                                          }
                                       } else {
                                           alert(d.msg);
                                       }

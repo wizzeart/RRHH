@@ -42,6 +42,9 @@ class Cuentas {
     private function _list($param) {
         $data = array();
         
+        // Get empresa_id from parameter or session
+        $empresaId = isset($param['empresa_id']) ? $param['empresa_id'] : $this->app->empresa_id;
+        
         // Consulta con JOIN entre bancos y trabajadores
         $sql = "SELECT 
                 b.id,
@@ -53,8 +56,15 @@ class Cuentas {
                 t.estatus
                 FROM bancos b
                 INNER JOIN trabajadores t ON b.trabajador_id = t.id
-                WHERE t.trabajador_eliminado = '0'
-                ORDER BY t.apellidos, t.nombre";
+                LEFT JOIN departamentos d ON t.departamento_id = d.id
+                WHERE t.trabajador_eliminado = '0'";
+        
+        // Add empresa filter
+        if ($empresaId) {
+            $sql .= " AND t.empresa_id = '" . addslashes($empresaId) . "'";
+        }
+        
+        $sql .= " ORDER BY t.apellidos, t.nombre";
         
         try {
             $data = $this->db->fetchAll($sql);

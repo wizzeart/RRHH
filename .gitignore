@@ -1,4 +1,5 @@
 includes/config.php
+api/mobile/_fcm_credentials.php
 .vscode
 img/
 

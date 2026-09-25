@@ -14,11 +14,21 @@ if ($app->user_id == '')
     header("Location:login.html");
 require(BASE . '/includes/controlador.php');
 $load_grid = true;
+
+$empresa_logo_src = 'img/logo.png';
+$empresa_id_logo = isset($_SESSION['empresa_id']) ? (int)$_SESSION['empresa_id'] : 0;
+if ($empresa_id_logo > 0) {
+    $empresa_logo_candidate = 'img/logo_' . $empresa_id_logo . '.png';
+    if (file_exists(__DIR__ . '/' . $empresa_logo_candidate)) {
+        $empresa_logo_src = $empresa_logo_candidate;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
+    
     <meta charset="utf-8">
     <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache" />
@@ -27,6 +37,117 @@ $load_grid = true;
     <meta http-equiv="pragma" content="no-cache" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php print($page['title']) ?></title>
+
+    <style>
+        /* Ocultar sidebar solo en dispositivos móviles */
+        @media (max-width: 768px) {
+            #mainnav-container {
+                display: none !important;
+            }
+
+            /* Ocultar botón de collapse del sidemenu en móviles */
+            .tgl-menu-btn {
+                display: none !important;
+            }
+        }
+
+        /* En desktop, el sidebar se muestra normalmente */
+        @media (min-width: 769px) {
+            #mainnav-container {
+                display: block !important;
+            }
+
+            .tgl-menu-btn {
+                display: block !important;
+            }
+        }
+
+        /* Ajustar contenedor cuando no hay sidebar */
+        .boxed #content-container {
+            margin-left: 0 !important;
+        }
+
+        /* Estilos responsive para tablas en móviles */
+        @media (max-width: 768px) {
+            /* Permitir scroll horizontal en tablas */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            table td,
+            table th {
+                padding: 8px 6px;
+                word-break: break-word;
+            }
+
+            table thead {
+                font-size: 12px;
+            }
+
+            table thead th {
+                padding: 8px 4px;
+            }
+
+            /* Hacer scroll horizontal si es necesario */
+            .table-scrollable {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-scrollable table {
+                min-width: 500px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            table {
+                font-size: 12px;
+            }
+
+            table td,
+            table th {
+                padding: 6px 4px;
+                font-size: 12px;
+            }
+
+            table thead th {
+                padding: 6px 3px;
+                font-size: 11px;
+            }
+
+            /* Botones en tablas */
+            .btn-xs {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+
+            .btn-sm {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
+            /* Iconos en botones */
+            .btn i {
+                margin-right: 2px;
+            }
+
+            /* Enlaces en tablas */
+            a {
+                word-break: break-word;
+            }
+
+            /* Badge ajustados */
+            .badge {
+                font-size: 10px;
+                padding: 3px 5px;
+            }
+        }
+    </style>
 
     <!--STYLESHEET-->
     <!--=================================================-->
@@ -44,6 +165,13 @@ $load_grid = true;
 
     <!--Nifty Stylesheet [ RECOMMENDED ]-->
     <link href="css/nifty.css" rel="stylesheet">
+
+    <link rel="icon" type="image/png" href="/my-favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/my-favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/my-favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/my-favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="RRHH" />
+    <link rel="manifest" href="/my-favicon/site.webmanifest" />
     
     <style>
         /* Company display in navbar */
@@ -79,6 +207,48 @@ $load_grid = true;
     <!--Font Awesome [ OPTIONAL ]-->
     <link href="plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
+    <style>
+        /* Acceso persistente a la ayuda interna del sistema */
+        #navbar .navbar-help-link {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            padding: 0 10px;
+            color: #183b63;
+            text-decoration: none;
+        }
+
+        #navbar .navbar-help-link .navbar-help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: #ffffff;
+            background: linear-gradient(135deg, #16255c 0%, #18b9e6 100%);
+            box-shadow: 0 5px 14px rgba(24, 85, 135, 0.24);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        #navbar .navbar-help-link:hover .navbar-help-icon,
+        #navbar .navbar-help-link:focus .navbar-help-icon {
+            transform: translateY(-1px) rotate(-6deg);
+            box-shadow: 0 7px 18px rgba(24, 85, 135, 0.34);
+        }
+
+        #navbar .navbar-help-link:focus-visible {
+            outline: 3px solid rgba(24, 185, 230, .42);
+            outline-offset: -3px;
+        }
+
+        @media (max-width: 767px) {
+            #navbar .navbar-help-link {
+                padding: 0 10px;
+            }
+        }
+    </style>
+
     <!-- Dashboard Dependencies -->
     <!-- Chart.js para gráficos interactivos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
@@ -86,9 +256,7 @@ $load_grid = true;
     <!-- Heatmap.js para mapas de calor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
     
-    <!-- Date Range Picker y sus dependencias -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <!-- Date Range Picker CSS (solo CSS aquí, scripts se cargarán después de jQuery) -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 
@@ -173,7 +341,7 @@ $load_grid = true;
 <!--You may remove all ID or Class names which contain "demo-", they are only used for demonstration. -->
 
 <body>
-    <div id="container" class="effect mainnav-lg">
+    <div id="container" class="effect mainnav-lg<?php if (isset($_SESSION['empresa_id'])) { $eid = (int)$_SESSION['empresa_id']; if ($eid === 2) { echo ' empresa-theme-2'; } elseif ($eid === 3) { echo ' empresa-theme-3'; } } ?>">
 
         <!--NAVBAR-->
         <!--===================================================-->
@@ -184,7 +352,7 @@ $load_grid = true;
                 <!--================================-->
                 <div class="navbar-header">
                     <a href="index.php" class="navbar-brand">
-                        <img src="img/logo.png" alt="Logo" class="brand-icon" style="max-height: 60px; width: auto;">
+                        <img src="<?php echo htmlspecialchars($empresa_logo_src); ?>" alt="Logo" class="brand-icon" style="max-height: 60px; width: auto;">
                         <div class="brand-title">
                             <span class="brand-text"></span>
                         </div>
@@ -226,9 +394,24 @@ $load_grid = true;
                     </ul>
                     <ul class="nav navbar-top-links pull-right">
 
+                        <!-- Ayuda interna del sistema: disponible para todos los roles autenticados -->
+                        <li class="navbar-help-item">
+                            <a class="navbar-help-link"
+                               href="docs/manual-sistema-allnovu/guia.php"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               title="Abrir ayuda del sistema"
+                               aria-label="Abrir la ayuda del Sistema de Recursos Humanos en una pestaña nueva">
+                                <span class="navbar-help-icon" aria-hidden="true">
+                                    <i class="fa fa-question"></i>
+                                </span>
+                            </a>
+                        </li>
+
                         <!--City selector-->
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                         <?php //require_once(INCLUDES . DS . 'city-selector.php');  ?>
+                        <?php if ($app->rol != 4): ?>
                         <!-- Botón de notificaciones/Chat -->
                         <li>
                             <a id="btn-navbar-chat" href="index.php?module=chat" title="Chat / Notificaciones">
@@ -237,7 +420,19 @@ $load_grid = true;
                             </a>
                         </li>
 
+                        <!-- Campanita de Cumpleaños -->
+                        <?php if ($app->rol != 2): ?>
+                        <li>
+                            <a id="btn-navbar-cumpleanos" href="index.php?module=list-otros" title="Cumpleaños" style="position: relative;">
+                                <i class="fa fa-birthday-cake fa-lg"></i>
+                                <span id="cumpleanos-count" class="badge badge-success" style="display:none; position: absolute; top: -5px; right: -8px; font-size: 10px; padding: 2px 5px;">0</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
+                        <?php endif; ?>
+
                         <!-- Botón de cambio de empresa -->
+                        <?php if ($app->rol != 2): ?>
                         <li>
                             <a id="btn-cambiar-empresa" href="#" title="Cambiar empresa" data-toggle="dropdown" class="dropdown-toggle">
                                 <i class="fa fa-cog fa-lg"></i>
@@ -267,6 +462,7 @@ $load_grid = true;
                                 ?>
                             </div>
                         </li>
+                        <?php endif; ?>
 
                         <!--City selector-->
                         <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -419,6 +615,9 @@ $load_grid = true;
     <!--BootstrapJS [ RECOMMENDED ]-->
     <script src="js/bootstrap.min.js"></script>
 
+    <!-- Date Range Picker (después de jQuery) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <!--Fast Click [ OPTIONAL ]-->
     <script src="plugins/fast-click/fastclick.min.js"></script>
@@ -427,6 +626,8 @@ $load_grid = true;
     <!--Nifty Admin [ RECOMMENDED ]-->
     <script src="js/nifty.js"></script>
 
+   <!--Confetti.js [ OPTIONAL ]-->
+    <script src="js/js-confetti.js"></script>
 
     <!--Morris.js [ OPTIONAL ]-->
     <script src="plugins/morris-js/morris.min.js"></script>

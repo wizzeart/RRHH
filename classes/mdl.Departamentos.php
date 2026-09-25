@@ -64,10 +64,8 @@ class Departamentos {
     }
 
     private function _list($param) {
-        $sql = "SELECT d.id, d.nombre, d.descripcion, d.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
+        $sql = "SELECT d.id, d.nombre, d.descripcion
                 FROM departamentos d
-                LEFT JOIN empresa e ON d.empresa_id = e.id
-                WHERE d.empresa_id = {$this->app->empresa_id}
                 ORDER BY d.nombre ASC";
         $data = $this->db->fetchAll($sql);
         return $data;
@@ -84,7 +82,6 @@ class Departamentos {
         // Validaciones
         $required = array(
             'nombre' => 'Nombre',
-            'empresa_id' => 'Empresa'
         );
         foreach ($required as $field => $label) {
             if (!isset($param[$field]) || trim($param[$field]) === '') {
@@ -98,7 +95,6 @@ class Departamentos {
         $insert = array(
             'nombre' => $param['nombre'],
             'descripcion' => isset($param['descripcion']) ? $param['descripcion'] : '',
-            'empresa_id' => intval($param['empresa_id'])
         );
 
         // Campos de control

@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /api/mobile/
+
+# Permitir el header Authorization (Apache/cgi a veces lo pierde)
+RewriteCond %{HTTP:Authorization} ^(.+)$
+RewriteRule ^ - [E=HTTP_AUTHORIZATION:%1]
+
+# Si el recurso solicitado no existe como archivo, enviar a index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]

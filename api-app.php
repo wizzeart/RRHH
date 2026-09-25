@@ -19,12 +19,17 @@ $app = new App();
 
 
 if ($app->user_id == '' && !in_array($_REQUEST['module'], array('login', 'reset'))) {
-    $data = array(
-        'status' => 0,
-        'msg_title' => 'Operación incorrecta!!',
-        'msg' => 'Sesión finalizada. Vuelva a iniciar sesión.'
-    );
-    die(json_encode($data));
+    // Permitir acceso al módulo trabajadores si se proporciona una API key válida
+    if (isset($_REQUEST['api_key']) && $_REQUEST['api_key'] == API_KEY_TRABAJADORES) {
+        // Acceso permitido con API key
+    } else {
+        $data = array(
+            'status' => 0,
+            'msg_title' => 'Operación incorrecta!!',
+            'msg' => 'Sesión finalizada. Vuelva a iniciar sesión.'
+        );
+        die(json_encode($data));
+    }
 }
 
 switch ($_REQUEST['module']) {
@@ -56,9 +61,19 @@ switch ($_REQUEST['module']) {
         $mdl = new Usuario($app);
         $mdl->api($_REQUEST);
         break;
+    case 'cambiar-contrasena':
+        include_once(BASE_CLASS . '/mdl.CambiarContrasena.php');
+        $mdl = new CambiarContrasena($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'trabajadores':
         include_once(BASE_CLASS . '/mdl.Trabajadores.php');
         $mdl = new Trabajador($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'evaluaciones':
+        include_once(BASE_CLASS . '/mdl.Evaluaciones.php');
+        $mdl = new Evaluaciones($app);
         $mdl->api($_REQUEST);
         break;
     case 'home':
@@ -122,6 +137,16 @@ switch ($_REQUEST['module']) {
         $mdl = new Departamentos($app);
         $mdl->api($_REQUEST);
         break;
+    case 'aspectos':
+        include_once(BASE_CLASS . '/mdl.Aspectos.php');
+        $mdl = new Aspectos($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'subaspectos':
+        include_once(BASE_CLASS . '/mdl.Subaspectos.php');
+        $mdl = new Subaspectos($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'cargos':
         include_once(BASE_CLASS . '/mdl.Cargos.php');
         $mdl = new Cargos($app);
@@ -152,6 +177,11 @@ switch ($_REQUEST['module']) {
         $mdl = new Contrato($app);
         $mdl->api($_REQUEST);
         break;
+    case 'ubicaciones':
+        include_once(BASE_CLASS . '/mdl.Ubicaciones.php');
+        $mdl = new Ubicaciones($app);
+        $mdl->api($_REQUEST);
+        break;
     case 'tarjetas-snc':
         include_once(BASE_CLASS . '/mdl.TarjetasSNC.php');
         $mdl = new TarjetasSNC($app);
@@ -160,6 +190,26 @@ switch ($_REQUEST['module']) {
     case 'asistencias':
         include_once(BASE_CLASS . '/mdl.Asistencias.php');
         $mdl = new Asistencia($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'analisis-asistencia':
+        include_once(BASE_CLASS . '/mdl.AnalisisAsistencia.php');
+        $mdl = new AnalisisAsistencia($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'submayor-vacaciones':
+        include_once(BASE_CLASS . '/mdl.SubmayorVacaciones.php');
+        $mdl = new SubmayorVacaciones($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'empresa':
+        include_once(BASE_CLASS . '/mdl.Empresa.php');
+        $mdl = new Empresa($app);
+        $mdl->api($_REQUEST);
+        break;
+    case 'notificaciones-sms':
+        include_once(BASE_CLASS . '/mdl.NotificacionesSMS.php');
+        $mdl = new NotificacionesSMS($app);
         $mdl->api($_REQUEST);
         break;
     case 'login':
@@ -215,6 +265,9 @@ switch ($_REQUEST['module']) {
                 'xusuario_id' => $row['xusuario_id']
             );
             $app->db->update('usuarios', $update, $where);
+            
+            // Return role information for client-side redirect
+            $data['rol'] = $row['xrol_id'];
         }
 
         print(json_encode($data));
@@ -232,4 +285,3 @@ switch ($_REQUEST['module']) {
         break;
 }
 $app->close();
-

@@ -1,3 +1,7 @@
+$(document).ready(function(){
+    $('#f-salario').val((parseFloat($('#f-salario-mensual').val()) / 192).toFixed(2));
+});
+
 $(function(){
     function notify(type, title, message, timer){
         if ($.niftyNoty) {
@@ -39,15 +43,43 @@ $(function(){
         } catch (e) {
             // no bloquear envío por error en conversión
         }
-        var payload={
-            module:'cargos', method:'save', action: action,
-            nombre: $('#f-nombre').val(),
-            descripcion: $('#f-descripcion').val(),
-            salario: $('#f-salario').val(),
-            
-        };
-        if(action==='update'){ payload.id=$('#f-id').val(); }
-        $.ajax({ url:'api-app.php', type:'POST', data:payload, dataType:'json'
+        
+        // Manejar subida de archivo
+        var fileInput = $('#f-funciones')[0];
+        var formData = new FormData();
+        
+        // Agregar campos del formulario
+        formData.append('module', 'cargos');
+        formData.append('method', 'save');
+        formData.append('action', action);
+        formData.append('nombre', $('#f-nombre').val());
+        formData.append('descripcion', $('#f-descripcion').val());
+        formData.append('salario', $('#f-salario-mensual').val());
+        formData.append('funciones_path', $('#f-funciones-path').val());
+        
+        if(action==='update'){ 
+            formData.append('id', $('#f-id').val()); 
+        }
+        
+        // Agregar archivo si se seleccionó uno
+        if (fileInput.files && fileInput.files[0]) {
+            var file = fileInput.files[0];
+            // Validar que sea .docx
+            if (!file.name.toLowerCase().endsWith('.docx')) {
+                notify('danger','Error','El archivo debe ser de tipo .docx',4000);
+                $('#btn-save').prop('disabled', false);
+                return;
+            }
+            formData.append('funciones_file', file);
+        }
+        
+        $.ajax({
+            url:'api-app.php', 
+            type:'POST', 
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType:'json'
         }).done(function(d){
             $('#btn-save').prop('disabled', false);
             if(d.status==1){

@@ -31,8 +31,11 @@ $(document).ready(function() {
                         container: 'floating',
                         timer: 3000
                     });
+                    
+                    // Trigger custom event to notify other modules
+                    $(document).trigger('empresaChanged', [empresaId]);
+                    
                     //Refresh the page
-
                     location.reload(true);
                     
                 },
@@ -51,4 +54,65 @@ $(document).ready(function() {
                 }
             });
         });
+        
+        // Check for birthdays today on page load
+        checkCumpleanosHoy();
     });
+
+    function checkCumpleanosHoy() {
+        $.ajax({
+            url: 'api-app.php',
+            type: 'GET',
+            data: {
+                module: 'trabajadores',
+                method: 'cumpleanos-hoy'
+            },
+            dataType: 'json',
+            success: function(cumpleaños) {
+                if (cumpleaños && cumpleaños.length > 0) {
+                    // Actualizar badge en la campanita
+                    $('#cumpleanos-count').text(cumpleaños.length).show();
+                    
+                    // Crear notificación compacta
+                    var nombre = cumpleaños[0].nombre + ' ' + cumpleaños[0].apellidos;
+                    var titulo = 'Hoy Cumple años ' + nombre;
+                    
+                    var $notifDiv = $('<div id="birthday-notification" style="' +
+                        'position: fixed; ' +
+                        'top: 50px; ' +
+                        'right: 20px; ' +
+                        'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); ' +
+                        'color: white; ' +
+                        'padding: 8px 12px; ' +
+                        'border-radius: 4px; ' +
+                        'box-shadow: 0 2px 8px rgba(0,0,0,0.15); ' +
+                        'z-index: 10000; ' +
+                        'cursor: pointer; ' +
+                        'font-size: 12px; ' +
+                        'white-space: nowrap; ' +
+                        'font-family: Arial, sans-serif;' +
+                        '">' +
+                        '<i class="fa fa-birthday-cake" style="margin-right: 6px;"></i>' +
+                        '<span>' + titulo + '</span>' +
+                        '</div>');
+                    
+                    $('body').append($notifDiv);
+                    
+                    // Click handler para ir a list-otros
+                    $notifDiv.on('click', function() {
+                        location.href = '?module=list-otros';
+                    });
+                    
+                    // Auto-remove after 8 seconds
+                    setTimeout(function() {
+                        $notifDiv.fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 8000);
+                }
+            },
+            error: function(e) {
+                console.log('Error checking birthdays:', e);
+            }
+        });
+    }

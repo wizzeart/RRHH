@@ -24,9 +24,13 @@
                         <?php } ?>
                     </select>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <label>&nbsp;</label>
                     <button id="btn-prenom-save" class="btn btn-primary btn-sm btn-block"><i class="fa fa-save"></i> Guardar</button>
+                </div>
+                <div class="col-sm-2">
+                    <label>&nbsp;</label>
+                    <button id="btn-prenom-export" class="btn btn-success btn-sm btn-block"><i class="fa fa-file-excel-o"></i> Exportar Excel</button>
                 </div>
             </div>
             <ul class="nav nav-tabs" id="tabs-prenomina"></ul>
@@ -38,7 +42,7 @@
                 data-search="true"
                 data-show-refresh="true"
                 data-show-toggle="false"
-                data-show-columns="false"
+                data-show-columns="true"
                 data-sort-name="expediente"
                 data-page-list="[20, 50, 100]"
                 data-page-size="50"
@@ -47,22 +51,21 @@
                 class="table table-striped">
                 <thead>
                     <tr>
-                        <th data-field="expediente" data-sortable="true" data-width="90">No. Exp</th>
-                        <th data-field="nombre" data-sortable="true">Nombre y Apellido</th>
-                        <th data-field="ci" data-sortable="true" data-width="140">C.I</th>
-                        <th data-field="horas" data-align="right" data-sortable="true" data-formatter="hoursInputFormatter" data-width="150">Horas trabajadas</th>
-                        <th data-field="tarifa" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="120">Tarifas x horas</th>
-                        <th data-field="a_cobrar" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="120">A Cobrar</th>
-                        <th data-field="bonif" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">Bonif</th>
-                        <th data-field="sal_dev" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="120">Sal. Dev</th>
-                        <th data-field="ausencias" data-align="right" data-sortable="true" data-formatter="number2Formatter" data-width="110">Ausencias</th>
-                        <th data-field="ausenciasCosto" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="110">Descuento Ausencias</th>
-                        <th data-field="vacaciones" data-align="right" data-sortable="true" data-formatter="number2Formatter" data-width="120">Vacaciones</th>
-                        <th data-field="pago_vac" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="140">pago x vacaciones</th>
-                        <th data-field="salario_neto" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="130">Salario Neto</th>
-                        <th data-field="seg_social" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="150">importe Seg Social</th>
-                        <th data-field="ing_pers" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="150">importe Ing Pers</th>
-                        <th data-field="salario_pagar" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="150">Salario a pagar</th>
+                        <!-- <th data-field="expediente" data-sortable="true" data-width="70">No. Exp</th> -->
+                        <th data-field="nombre" data-sortable="true" data-width="180">Nombre</th>
+                        <th data-field="ci" data-sortable="true" data-width="100">C.I</th>
+                        <th data-field="horas" data-align="right" data-sortable="true" data-formatter="hoursInputFormatter" data-width="90">Horas</th>
+                        <th data-field="tarifa" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="40">Tarifa/h</th>
+                        <th data-field="a_cobrar" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="90">A Cobrar</th>
+                        <th data-field="bonif" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="80">Bonif</th>
+                        <th data-field="sal_dev" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="80">Sal. Dev</th>
+                        <th data-field="vacaciones" data-align="right" data-sortable="true" data-formatter="number2Formatter" data-width="90">Vac.</th>
+                        <th data-field="pago_vac" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">P. Vac.</th>
+                        <th data-field="salario_neto" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">S. Neto</th>
+                        <th data-field="seg_social" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">SNC225</th>
+                        <th data-field="ing_pers_3" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="80">I.P. 3%</th>
+                        <th data-field="ing_pers_5" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="80">I.P. 5%</th>
+                        <th data-field="salario_pagar" data-align="right" data-sortable="true" data-formatter="currencyFormatter" data-width="100">A Pagar</th>
                     </tr>
                 </thead>
             </table>

@@ -64,9 +64,9 @@ class Sedes {
     }
 
     private function _list($param) {
-        $sql = "SELECT d.id, d.nombre, d.direccion, d.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
+        $sql = "SELECT d.id, d.nombre, d.direccion, t.empresa_id, COALESCE(e.nombre, 'Sin empresa') AS empresa_nombre
                 FROM sedes d
-                LEFT JOIN empresa e ON d.empresa_id = e.id
+                LEFT JOIN empresa e ON t.empresa_id = e.id
                 ORDER BY d.nombre ASC";
         $data = $this->db->fetchAll($sql);
         return $data;

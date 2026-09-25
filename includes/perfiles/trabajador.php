@@ -1,7 +1,8 @@
 <!--Menu list item-->
 <!-- 
 
-<li class="<?php if ($_GET['module'] == 'home') print('active-link') ?>">
+<li class="<?php if ($_GET['module'] == 'home')
+    print ('active-link') ?>">
     <a href="index.php">
         <i class="fa fa-dashboard"></i>
         <span class="menu-title">
@@ -21,8 +22,10 @@
 
     
     
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-pedidos', 'list-pedidos-ptes', 'pedidos', 'list-clientes', 'list-clientes-mr', 'clientes', 'list-cestas', 'cestas', 'list-recargas', 'recargas'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-partes-trabajo', 'partes-trabajo'))) print('active-link') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-pedidos', 'list-pedidos-ptes', 'pedidos', 'list-clientes', 'list-clientes-mr', 'clientes', 'list-cestas', 'cestas', 'list-recargas', 'recargas')))
+    print ('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-partes-trabajo', 'partes-trabajo')))
+    print ('active-link') ?>">
             <a href="?module=list-partes-trabajo">Partes de Trabajo</a>
         </li>
     </ul>
@@ -39,44 +42,69 @@
     </a>
 
    
-    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config'))) print('in') ?>">
-        <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios'))) print('active-link') ?>">
+    <ul class="collapse <?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios', 'config')))
+    print ('in') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('list-usuarios', 'usuarios')))
+    print ('active-link') ?>">
             <a href="?module=list-usuarios">Usuarios</a>
         </li>
         <li e>
-        <li class="<?php if (in_array($_GET['module'], array('config'))) print('active-link') ?>">
+        <li class="<?php if (in_array($_GET['module'], array('config')))
+    print ('active-link') ?>">
             <a href="?module=config">Configuración</a>
         </li>
     </ul>
 </li>
 
 -->
-<!--NEW MENU GENERAL-->
+    <!--NEW MENU GENERAL-->
 
-<!--NEW MENU TRABAJADORES-->
-<li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('ficha-trabajador'))) print('active-link') ?>">
-    <a href="?module=ficha-trabajador&usuario_id=<?php print($app->user_id); ?>">
+    <!--NEW MENU TRABAJADORES-->
+    <li class="list-divider"></li>
+    <li class="<?php if (in_array($_GET['module'], array('ficha-trabajador')))
+    print ('active-link') ?>">
+        <?php
+// Obtener el ID del trabajador para el usuario actual
+$sql_trab = "SELECT id FROM trabajadores WHERE usuario_id = " . $app->user_id;
+$row_trab = $app->db->fetchRow($sql_trab);
+$trabajador_id = $row_trab ? $row_trab['id'] : 0;
+?>
+    <a href="?module=ficha-trabajador&id=<?php print ($trabajador_id); ?>">
         <i class="fa fa-user"></i>
         <span class="menu-title">
             <strong>Ficha de Trabajador</strong>
         </span>
-        <!--<i class="arrow"></i>-->
+
     </a>
 
-    
+
 </li>
 
 <!--NEW MENU BOLSAS EMPLEO-->
-<li class="list-divider"></li>
-<li class="<?php if (in_array($_GET['module'], array('planificacion-vacaciones'))) print('active-link') ?>">
-    <a href="?module=planificacion-vacaciones&usuario_id=<?php print($app->user_id); ?>">
-        <i class="fa fa-umbrella"></i>
-        <span class="menu-title">
-            <strong>Planificar Vacaciones</strong>
-        </span>
-        <!--<i class="arrow"></i>-->
-    </a>
+<?php if ($app->rol != 2): ?>
+    <li class="list-divider"></li>
+    <li class="<?php if (in_array($_GET['module'], array('vacaciones', 'planificacion-vacaciones')))
+        print ('active-link') ?>">
+            <a href="?module=vacaciones">
+                <i class="fa fa-umbrella"></i>
+                <span class="menu-title">
+                    <strong>Mis Vacaciones</strong>
+                </span>
+                <!--<i class="arrow"></i>-->
+            </a>
 
-    
-</li>
+
+        </li>
+<?php endif; ?>
+
+<!--MENU CAMBIAR CONTRASEÑA-->
+<li class="list-divider"></li>
+<li class="<?php if ($_REQUEST['module'] == 'cambiar-contrasena')
+    print ('active-link') ?>">
+        <a href="?module=cambiar-contrasena">
+            <i class="fa fa-lock"></i>
+            <span class="menu-title">
+                <strong>Cambiar Contraseña</strong>
+            </span>
+        </a>
+    </li>
